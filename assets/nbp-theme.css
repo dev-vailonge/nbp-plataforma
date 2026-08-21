@@ -1,0 +1,44 @@
+/* No Blank Page — theme overrides.
+   Dark is the default (defined inline in each page's :root).
+   Light theme is applied when <html data-theme="light">. */
+
+:root { color-scheme: dark; }
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #F3F4EC;
+  --bg-surface: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-elev: #ECEDE3;
+  --border: #1717170F;
+  --border-strong: #1717171F;
+  --text: #1B1C18;
+  --text-muted: #5E6055;
+  --text-subtle: #8B8D80;
+  --sage: #7E8268;
+}
+
+/* Primary buttons invert: dark surface needs light label in light theme */
+html[data-theme="light"] .btn.primary { color: #FDFFEF; }
+html[data-theme="light"] .btn.primary:hover { box-shadow: 0 8px 24px rgba(27,28,24,0.18); }
+
+/* Cream hover tints are invisible on a light background — give them a subtle dark tint instead */
+html[data-theme="light"] .nav-item:hover { background: rgba(27,28,24,0.05); }
+html[data-theme="light"] .nav-item.active { background: rgba(27,28,24,0.07); }
+html[data-theme="light"] .sidebar-profile:hover,
+html[data-theme="light"] .sidebar-profile.active { background: rgba(27,28,24,0.05); }
+html[data-theme="light"] .nav-item.active::before,
+html[data-theme="light"] .brand-mark { box-shadow: 0 0 12px rgba(27,28,24,0.12); }
+
+/* Profile "próxima sessão" card gradient reads muddy on white — soften for light */
+html[data-theme="light"] .session-card {
+  background: linear-gradient(160deg, rgba(126,130,104,0.14), rgba(255,255,255,0.6));
+}
+
+/* Subtle elevation so white cards separate from a white/cream page */
+html[data-theme="light"] .hero-card,
+html[data-theme="light"] .session-card,
+html[data-theme="light"] .stat-card,
+html[data-theme="light"] .panel {
+  box-shadow: 0 1px 2px rgba(27,28,24,0.04), 0 8px 24px rgba(27,28,24,0.04);
+}

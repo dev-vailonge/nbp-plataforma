@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="pt-BR" style="scroll-behavior: auto;">
+<head>
+<meta charset="utf-8"/>
+<title>No Blank Page — Design System</title>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+
+<link href="assets/reset_0f9ee9f4f517.css" id="hello-elementor-css" media="all" rel="stylesheet"/>
+<link href="assets/theme_0669b57c8fb5.css" id="hello-elementor-theme-style-css" media="all" rel="stylesheet"/>
+<link href="assets/header-footer_e66789d601fa.css" id="hello-elementor-header-footer-css" media="all" rel="stylesheet"/>
+<link href="assets/frontend_0822fffedd00.css" id="elementor-frontend-css" media="all" rel="stylesheet"/>
+<link href="assets/post-6_c4b837de85d0.css" id="elementor-post-6-css" media="all" rel="stylesheet"/>
+<link href="assets/widget-image_c6eeb4353544.css" id="widget-image-css" media="all" rel="stylesheet"/>
+<link href="assets/widget-heading_f12c63fad7fa.css" id="widget-heading-css" media="all" rel="stylesheet"/>
+<link href="assets/e-animation-float_145567b4f873.css" id="e-animation-float-css" media="all" rel="stylesheet"/>
+<link href="assets/widget-icon-list_d27b2c33701e.css" id="widget-icon-list-css" media="all" rel="stylesheet"/>
+<link href="assets/widget-icon-box_b101ae1760ed.css" id="widget-icon-box-css" media="all" rel="stylesheet"/>
+<link href="assets/widget-spacer_19264941505b.css" id="widget-spacer-css" media="all" rel="stylesheet"/>
+<link href="assets/post-2562_6bbdca113d80.css" id="elementor-post-2562-css" media="all" rel="stylesheet"/>
+<link href="assets/widget-styles_22c3024347bd.css" id="ekit-widget-styles-css" media="all" rel="stylesheet"/>
+<link href="assets/responsive_8427c4a26357.css" id="ekit-responsive-css" media="all" rel="stylesheet"/>
+<link href="assets/ekiticons_4dfc472e5fa2.css" id="elementor-icons-ekiticons-css" media="all" rel="stylesheet"/>
+
+<style>
+html, body {
+  overflow: auto !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  min-height: 100% !important;
+  scroll-behavior: smooth !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ── Design System Navigation ── */
+.ds-nav {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #181818;
+  border-bottom: 1px solid #FFFFFF2B;
+  padding: 0 20px;
+  overflow-x: auto;
+  font-family: "TT Norms Pro", Sans-serif;
+}
+.ds-nav a {
+  color: #FDFFEF;
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 16px 18px;
+  white-space: nowrap;
+  transition: background 0.25s;
+  border-right: 1px solid #FFFFFF2B;
+}
+.ds-nav a:first-child {
+  border-left: 1px solid #FFFFFF2B;
+}
+.ds-nav a:hover {
+  background: #4B4C47;
+}
+
+/* ── Section label ── */
+.ds-section-label {
+  font-family: "TT Norms Pro", Sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #94968D;
+  margin-bottom: 10px;
+}
+.ds-section-label-dark {
+  color: #94968D;
+}
+.ds-section-label-light {
+  color: #4B4C47;
+}
+
+/* ── Typography Table ── */
+.ds-type-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ds-type-table tr {
+  border-bottom: 1px solid #C6C8BA40;
+}
+.ds-type-table td {
+  padding: 18px 0;
+  vertical-align: middle;
+  font-family: "TT Norms Pro", Sans-serif;
+}
+.ds-type-table .ds-type-name {
+  width: 160px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #94968D;
+}
+.ds-type-table .ds-type-preview {
+  color: #FDFFEF;
+}
+.ds-type-table .ds-type-spec {
+  width: 140px;
+  text-align: right;
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: #94968D;
+  white-space: nowrap;
+}
+
+/* ── Color Swatches ── */
+.ds-color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.ds-color-card {
+  border: 1px solid #C6C8BA85;
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: "TT Norms Pro", Sans-serif;
+}
+.ds-color-swatch {
+  height: 80px;
+}
+.ds-color-info {
+  padding: 12px;
+  background: #181818;
+}
+.ds-color-info .ds-color-name {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #FDFFEF;
+  margin-bottom: 4px;
+}
+.ds-color-info .ds-color-hex {
+  font-size: 0.7rem;
+  color: #94968D;
+}
+
+/* ── Gradient Swatches ── */
+.ds-gradient-card .ds-color-swatch {
+  height: 60px;
+}
+
+/* ── Component Showcase ── */
+.ds-component-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+.ds-component-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ds-component-item .ds-state-label {
+  font-family: "TT Norms Pro", Sans-serif;
+  font-size: 0.65rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #94968D;
+}
+
+/* ── Layout Demo ── */
+.ds-layout-demo {
+  border: 1px solid #C6C8BA85;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+/* ── Motion Gallery ── */
+.ds-motion-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-right: 32px;
+  margin-bottom: 24px;
+}
+.ds-motion-item .ds-state-label {
+  font-family: "TT Norms Pro", Sans-serif;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #94968D;
+}
+
+/* ── Icon Gallery ── */
+.ds-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 16px;
+}
+.ds-icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 10px;
+  border: 1px solid #C6C8BA85;
+  border-radius: 10px;
+  background: linear-gradient(45deg, #FDFFEF00 0%, #FDFFEF29 100%);
+  font-family: "TT Norms Pro", Sans-serif;
+}
+.ds-icon-item i {
+  font-size: 28px;
+  color: #FDFFEF;
+}
+.ds-icon-item span {
+  font-size: 0.6rem;
+  color: #94968D;
+  text-align: center;
+  word-break: break-all;
+}
+</style>
+</head>
+
+<body class="home page-template page-template-elementor_canvas page page-id-2562 elementor-default elementor-template-canvas elementor-kit-6 elementor-page elementor-page-2562" style="scroll-behavior: smooth;">
+
+<!-- ════════════════════════════════════════════════════════
+     NAVIGATION
+     ════════════════════════════════════════════════════════ -->
+<nav class="ds-nav">
+  <a href="#hero">Hero</a>
+  <a href="#typography">Tipografia</a>
+  <a href="#colors">Cores &amp; Superfícies</a>
+  <a href="#components">Componentes</a>
+  <a href="#layout">Layout &amp; Espaçamento</a>
+  <a href="#motion">Movimento &amp; Interação</a>
+  <a href="#icons">Ícones</a>
+</nav>
+
+<div class="elementor elementor-2562" data-elementor-id="2562" data-elementor-post-type="page" data-elementor-type="wp-page">
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 0 — HERO (Exact Clone, Text Adapted)
+     ════════════════════════════════════════════════════════ -->
+<div id="hero" class="elementor-element elementor-element-08c212c e-flex e-con-boxed e-con e-parent e-lazyloaded" data-e-type="container" data-element_type="container" data-id="08c212c" data-settings='{"background_background":"classic"}'>
+<div class="e-con-inner">
+<div class="elementor-element elementor-element-a30456e e-con-full e-flex e-con e-child" data-e-type="container" data-element_type="container" data-id="a30456e">
+<div class="elementor-element elementor-element-94463b6 elementor-widget__width-initial elementor-widget elementor-widget-image" data-e-type="widget" data-element_type="widget" data-id="94463b6" data-widget_type="image.default">
+<div class="elementor-widget-container">
+<img alt="" class="attachment-large size-large wp-image-2291" decoding="async" fetchpriority="high" height="344" src="assets/Prancheta-105-1_59f348ae0446.png" width="800"/>
+</div>
+</div>
+<div class="elementor-element elementor-element-c063864 elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-id="c063864" data-widget_type="heading.default">
+<div class="elementor-widget-container">
+<h2 class="elementor-heading-title elementor-size-default">O <span style="font-weight: 700">Design System</span> completo do seu ecossistema digital</h2>
+</div>
+</div>
+<div class="elementor-element elementor-element-3b7f10d elementor-widget-mobile__width-inherit elementor-widget__width-initial elementor-widget elementor-widget-text-editor" data-e-type="widget" data-element_type="widget" data-id="3b7f10d" data-widget_type="text-editor.default">
+<div class="elementor-widget-container">
+<p>Este documento é a referência visual e funcional de todos os elementos do site No Blank Page. Aqui encontra a <strong>tipografia, cores, componentes e padrões de layout</strong> exatamente como são utilizados na interface original.</p><p>Um guia para garantir <b>consistência, escalabilidade e identidade visual</b> em cada ponto de contacto digital.</p>
+</div>
+</div>
+<div class="elementor-element elementor-element-f47000b elementor-align-left elementor-mobile-align-justify elementor-widget-mobile__width-inherit botao-normal elementor-widget elementor-widget-button" data-e-type="widget" data-element_type="widget" data-id="f47000b" data-widget_type="button.default">
+<div class="elementor-widget-container">
+<div class="elementor-button-wrapper">
+<a class="elementor-button elementor-button-link elementor-size-sm elementor-animation-float" href="#typography">
+<span class="elementor-button-content-wrapper">
+<span class="elementor-button-text">EXPLORAR O DESIGN SYSTEM</span>
+</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 1 — TYPOGRAPHY
+     ════════════════════════════════════════════════════════ -->
+<div id="typography" class="elementor-element elementor-element-bf53301 e-flex e-con-boxed e-con e-parent e-lazyloaded" data-e-type="container" data-element_type="container" data-id="bf53301" data-settings='{"background_background":"classic"}' style="--padding-top:80px;--padding-bottom:80px;">
+<div class="e-con-inner">
+<div class="elementor-element e-con-full e-flex e-con e-child" data-e-type="container" data-element_type="container">
+
+<div class="ds-section-label ds-section-label-dark">01 — Tipografia</div>
+
+<div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 40px;">
+<div class="elementor-widget-container">
+<h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Escala Tipográfica</h2>
+</div>
+</div>
+
+<table class="ds-type-table">
+  <tr>
+    <td class="ds-type-name">Heading 1</td>
+    <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:2.8rem;font-weight:600;text-transform:uppercase;color:#FDFFEF;line-height:1.1em;">Quem será o seu mentor?</span></td>
+    <td class="ds-type-spec">2.8rem / 1.1em<br>Semibold 600</td>
+  </tr>
+  <tr>
+    <td class="ds-type-name">Heading 2 — Large</td>
+    <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:2.4rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;line-height:1.1em;">Não há nada mais poderoso</span></td>
+    <td class="ds-type-spec">2.4rem / 1.1em<br>Regular 400</td>
+  </tr>
+  <tr>
+    <td class="ds-type-name">Heading 2</td>
+    <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;line-height:1.1em;">Dentro do nosso ecossistema</span></td>
+    <td class="ds-type-spec">2.3rem / 1.1em<br>Regular 400</td>
+  </tr>
+  <tr>
+    <td class="ds-type-name">Heading 2 — Bold</td>
+    <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:300;text-transform:uppercase;color:#FDFFEF;line-height:1.1em;">Escale a <span style="font-weight:700">faturação</span> do seu serviço</span></td>
+    <td class="ds-type-spec">2.3rem / 1.1em<br>Light 300 + Bold 700</td>
+  </tr>
+  <tr>
+    <td class="ds-type-name">Heading 2 — Semibold</td>
+    <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:1.9rem;font-weight:600;text-transform:uppercase;color:#FDFFEF;">Como dono de um negócio</span></td>
+    <td class="ds-type-spec">1.9rem<br>Semibold 600</td>
+  </tr>
+  <tr>
+    <td class="ds-type-name">Heading 3</td>
+    <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:1.5rem;font-weight:400;color:#FDFFEF;line-height:1.1em;">Criar um Plano de Ação Personalizado</span></td>
+    <td class="ds-type-spec">1.5rem / 1.1em<br>Regular 400</td>
+  </tr>
+  <tr>
+    <td class="ds-type-name">Heading 4</td>
+    <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:1.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">joão mafra</span></td>
+    <td class="ds-type-spec">1.3rem<br>Regular 400</td>
+  </tr>
+  <tr>
+    <td class="ds-type-name">Body — Regular</td>
+    <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:1rem;font-weight:400;color:#FDFFEF;">Quer escalar seu serviço, trabalhando mais NO negócio em vez de se tornar escravo do operacional.</span></td>
+    <td class="ds-type-spec">1rem<br>Regular 400</td>
+  </tr>
+  <tr>
+    <td class="ds-type-name">Body — Bold</td>
+    <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:1rem;font-weight:700;color:#FDFFEF;">Previsibilidade de vendas e crescimento real.</span></td>
+    <td class="ds-type-spec">1rem<br>Bold 700</td>
+  </tr>
+  <tr>
+    <td class="ds-type-name">Small / Caption</td>
+    <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:0.9rem;font-weight:400;color:#FDFFEF;">Para garantir que entregamos resultados e satisfação.</span></td>
+    <td class="ds-type-spec">0.9rem<br>Regular 400</td>
+  </tr>
+  <tr>
+    <td class="ds-type-name">Button Text</td>
+    <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#FDFFEF;">AGENDAR SESSÃO ESTRATÉGICA</span></td>
+    <td class="ds-type-spec">0.8rem<br>Bold 700</td>
+  </tr>
+  <tr>
+    <td class="ds-type-name">Footer</td>
+    <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:0.8rem;font-weight:400;color:#FDFFEF;">© 2025 João Mafra. Todos os direitos reservados.</span></td>
+    <td class="ds-type-spec">0.8rem<br>Regular 400</td>
+  </tr>
+</table>
+
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 2 — COLORS & SURFACES
+     ════════════════════════════════════════════════════════ -->
+<div id="colors" class="elementor-element e-flex e-con-boxed e-con e-parent e-lazyloaded" data-e-type="container" data-element_type="container" style="--padding-top:80px;--padding-bottom:80px;--padding-left:20px;--padding-right:20px;background-color:#4B4C47;">
+<div class="e-con-inner">
+<div class="elementor-element e-con-full e-flex e-con e-child" data-e-type="container" data-element_type="container">
+
+<div class="ds-section-label ds-section-label-dark">02 — Cores &amp; Superfícies</div>
+
+<div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 16px;">
+<div class="elementor-widget-container">
+<h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Backgrounds</h2>
+</div>
+</div>
+
+<div class="ds-color-grid" style="margin-bottom:48px;">
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#181818;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Dark Primary</div><div class="ds-color-hex">#181818 — Fundo principal, seções escuras</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#191919;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Dark Secondary</div><div class="ds-color-hex">#191919 — Seção de destaque, CTA</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#4B4C47;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Mid Tone</div><div class="ds-color-hex">#4B4C47 — Seções intermediárias, FAQ, botão</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#BFBFBD;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Light Grey</div><div class="ds-color-hex">#BFBFBD — Fundo hero (fallback)</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#BABABA;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Grey</div><div class="ds-color-hex">#BABABA — Seção CTA final</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#FEFFFA;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Off White</div><div class="ds-color-hex">#FEFFFA — Card highlight, fundo claro</div></div>
+  </div>
+</div>
+
+<div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 16px;">
+<div class="elementor-widget-container">
+<h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Texto</h2>
+</div>
+</div>
+
+<div class="ds-color-grid" style="margin-bottom:48px;">
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#FDFFEF;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Cream White</div><div class="ds-color-hex">#FDFFEF — Texto em fundo escuro</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#181818;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Dark Text</div><div class="ds-color-hex">#181818 — Texto em fundo claro</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#4B4C47;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Body Text</div><div class="ds-color-hex">#4B4C47 — Parágrafos em fundo claro</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#94968D;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Muted</div><div class="ds-color-hex">#94968D — Labels, captions</div></div>
+  </div>
+</div>
+
+<div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 16px;">
+<div class="elementor-widget-container">
+<h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Bordas &amp; Divisores</h2>
+</div>
+</div>
+
+<div class="ds-color-grid" style="margin-bottom:48px;">
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#181818;border:1px solid #C6C8BA85;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Border Default</div><div class="ds-color-hex">#C6C8BA85 — Cards, inputs, divisores</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#181818;border:1px solid #C6C8BA40;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Border Subtle</div><div class="ds-color-hex">#C6C8BA40 — Laterais, separadores leves</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#181818;border:1px solid #FFFFFF2B;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Border Light</div><div class="ds-color-hex">#FFFFFF2B — Seções, footer</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background-color:#181818;border:2px solid #FFFFFF38;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Button Border</div><div class="ds-color-hex">#FFFFFF38 — Contorno do botão</div></div>
+  </div>
+</div>
+
+<div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 16px;">
+<div class="elementor-widget-container">
+<h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Gradientes</h2>
+</div>
+</div>
+
+<div class="ds-color-grid ds-gradient-card">
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background:linear-gradient(45deg, #4B4C47 0%, #94968D 100%);"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Button Gradient</div><div class="ds-color-hex">45deg: #4B4C47 → #94968D</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background:linear-gradient(45deg, #FDFFEF00 0%, #FDFFEF29 100%);border:1px solid #C6C8BA85;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Card Surface</div><div class="ds-color-hex">45deg: transparent → #FDFFEF29</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background:linear-gradient(45deg, #FFFFFF0D 0%, #FFFFFF00 100%);border:1px solid #C6C8BA85;"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Glass Surface</div><div class="ds-color-hex">45deg: #FFFFFF0D → transparent</div></div>
+  </div>
+  <div class="ds-color-card">
+    <div class="ds-color-swatch" style="background:linear-gradient(90deg, #181818, transparent 15%, transparent 85%, #181818 100%);"></div>
+    <div class="ds-color-info"><div class="ds-color-name">Edge Fade</div><div class="ds-color-hex">90deg: fade-in / fade-out overlay</div></div>
+  </div>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 3 — UI COMPONENTS
+     ════════════════════════════════════════════════════════ -->
+<div id="components" class="elementor-element e-flex e-con-boxed e-con e-parent e-lazyloaded" data-e-type="container" data-element_type="container" style="--padding-top:80px;--padding-bottom:80px;--padding-left:20px;--padding-right:20px;background-color:#181818;">
+<div class="e-con-inner">
+<div class="elementor-element e-con-full e-flex e-con e-child" data-e-type="container" data-element_type="container" style="--flex-direction:column;--gap:60px 0;">
+
+<div>
+  <div class="ds-section-label ds-section-label-dark">03 — Componentes UI</div>
+  <div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 40px;">
+  <div class="elementor-widget-container">
+  <h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Botões</h2>
+  </div>
+  </div>
+
+  <div class="ds-component-row">
+    <div class="ds-component-item">
+      <span class="ds-state-label">Default (Gradient)</span>
+      <div class="elementor-element elementor-element-f47000b elementor-align-left botao-normal elementor-widget elementor-widget-button" data-e-type="widget" data-element_type="widget" data-id="f47000b" data-widget_type="button.default">
+      <div class="elementor-widget-container">
+      <div class="elementor-button-wrapper">
+      <a class="elementor-button elementor-button-link elementor-size-sm elementor-animation-float" href="#" onclick="return false;">
+      <span class="elementor-button-content-wrapper">
+      <span class="elementor-button-text">AGENDE JÁ SUA SESSÃO ESTRATÉGICA</span>
+      </span>
+      </a>
+      </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="ds-component-item">
+      <span class="ds-state-label">Hover (passe o rato)</span>
+      <div class="elementor-element elementor-element-9ad062d elementor-align-left botao-normal elementor-widget elementor-widget-button" data-e-type="widget" data-element_type="widget" data-id="9ad062d" data-widget_type="button.default">
+      <div class="elementor-widget-container">
+      <div class="elementor-button-wrapper">
+      <a class="elementor-button elementor-button-link elementor-size-sm elementor-animation-float" href="#" onclick="return false;">
+      <span class="elementor-button-content-wrapper">
+      <span class="elementor-button-text">AGENDAR SESSÃO ESTRATÉGICA</span>
+      </span>
+      </a>
+      </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 40px;">
+  <div class="elementor-widget-container">
+  <h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Cards (Icon Box)</h2>
+  </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:900px;">
+    <div class="elementor-element elementor-element-73853b9 elementor-view-stacked elementor-shape-rounded elementor-position-block-start elementor-widget elementor-widget-icon-box" data-e-type="widget" data-element_type="widget" data-id="73853b9" data-widget_type="icon-box.default">
+    <div class="elementor-widget-container">
+    <div class="elementor-icon-box-wrapper">
+    <div class="elementor-icon-box-icon">
+    <span class="elementor-icon"><i aria-hidden="true" class="icon icon-document"></i></span>
+    </div>
+    <div class="elementor-icon-box-content">
+    <h3 class="elementor-icon-box-title"><span>Criar um Plano de Ação Personalizado</span></h3>
+    <p class="elementor-icon-box-description">Para ter clareza sobre os próximos passos e focar-se no que realmente traz resultados.</p>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <div class="elementor-element elementor-element-40e23ea elementor-view-stacked elementor-shape-rounded elementor-position-block-start elementor-widget elementor-widget-icon-box" data-e-type="widget" data-element_type="widget" data-id="40e23ea" data-widget_type="icon-box.default">
+    <div class="elementor-widget-container">
+    <div class="elementor-icon-box-wrapper">
+    <div class="elementor-icon-box-icon">
+    <span class="elementor-icon"><i aria-hidden="true" class="icon icon-internet"></i></span>
+    </div>
+    <div class="elementor-icon-box-content">
+    <h3 class="elementor-icon-box-title"><span>Construir Sistemas e Processos Eficientes</span></h3>
+    <p class="elementor-icon-box-description">Para que o seu negócio funcione para si, e não o contrário.</p>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <div class="elementor-element elementor-element-a23c09f elementor-view-stacked elementor-shape-rounded elementor-position-block-start elementor-widget elementor-widget-icon-box" data-e-type="widget" data-element_type="widget" data-id="a23c09f" data-widget_type="icon-box.default">
+    <div class="elementor-widget-container">
+    <div class="elementor-icon-box-wrapper">
+    <div class="elementor-icon-box-icon">
+    <span class="elementor-icon"><i aria-hidden="true" class="icon icon-rocket-ship"></i></span>
+    </div>
+    <div class="elementor-icon-box-content">
+    <h3 class="elementor-icon-box-title"><span>Dominar a sua Estratégia Digital</span></h3>
+    <p class="elementor-icon-box-description">Construa a sua autoridade e destaque-se no mercado.</p>
+    </div>
+    </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 40px;">
+  <div class="elementor-widget-container">
+  <h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Listas (Icon List)</h2>
+  </div>
+  </div>
+
+  <div style="max-width:700px;border-left:1px solid #C6C8BA40;padding-left:50px;">
+    <div class="elementor-element elementor-element-883dcb5 elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list" data-e-type="widget" data-element_type="widget" data-id="883dcb5" data-widget_type="icon-list.default">
+    <div class="elementor-widget-container">
+    <ul class="elementor-icon-list-items">
+    <li class="elementor-icon-list-item">
+    <span class="elementor-icon-list-text"><b>Geração de negócio inconsistente:</b> Depende demasiado de referências e não tem um fluxo previsível de clientes.</span>
+    </li>
+    <li class="elementor-icon-list-item">
+    <span class="elementor-icon-list-text"><b>O negócio ser 100% você:</b> Sente que a empresa não avança se você não estiver presente.</span>
+    </li>
+    <li class="elementor-icon-list-item">
+    <span class="elementor-icon-list-text"><b>Constantemente a "apagar fogos":</b> Passa o dia em tarefas operacionais em vez de trabalhar no crescimento.</span>
+    </li>
+    </ul>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 40px;">
+  <div class="elementor-widget-container">
+  <h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Accordion (FAQ)</h2>
+  </div>
+  </div>
+
+  <div style="max-width:700px;">
+    <div class="elementor-element elementor-element-c8622e8 elementor-widget elementor-widget-elementskit-accordion" data-e-type="widget" data-element_type="widget" data-id="c8622e8" data-widget_type="elementskit-accordion.default">
+    <div class="elementor-widget-container">
+    <div class="ekit-wid-con">
+    <div class="elementskit-accordion accoedion-primary" id="ds-accordion">
+
+    <div class="elementskit-card active">
+    <div class="elementskit-card-header" id="ds-heading-0">
+    <a aria-controls="ds-collapse-0" aria-expanded="true" class="ekit-accordion--toggler elementskit-btn-link collapsed" data-ekit-toggle="collapse" data-target="#ds-collapse-0" href="#ds-collapse-0">
+    <span class="ekit-accordion-title">O que é a No Blank Page (NBP)?</span>
+    <div class="ekit_accordion_icon_group">
+    <div class="ekit_accordion_normal_icon"><i class="icon icon-down-arrow1"></i></div>
+    <div class="ekit_accordion_active_icon"><i class="icon icon-up-arrow"></i></div>
+    </div>
+    </a>
+    </div>
+    <div aria-labelledby="ds-heading-0" class="show collapse" data-parent="#ds-accordion" id="ds-collapse-0">
+    <div class="elementskit-card-body ekit-accordion--content">
+    <p>A No Blank Page (NBP) é um ecossistema de aceleração para empreendedores digitais que prestam serviços.</p>
+    </div>
+    </div>
+    </div>
+
+    <div class="elementskit-card">
+    <div class="elementskit-card-header" id="ds-heading-1">
+    <a aria-controls="ds-collapse-1" aria-expanded="false" class="ekit-accordion--toggler elementskit-btn-link collapsed" data-ekit-toggle="collapse" data-target="#ds-collapse-1" href="#ds-collapse-1">
+    <span class="ekit-accordion-title">Para quem é a NBP?</span>
+    <div class="ekit_accordion_icon_group">
+    <div class="ekit_accordion_normal_icon"><i class="icon icon-down-arrow1"></i></div>
+    <div class="ekit_accordion_active_icon"><i class="icon icon-up-arrow"></i></div>
+    </div>
+    </a>
+    </div>
+    <div aria-labelledby="ds-heading-1" class="collapse" data-parent="#ds-accordion" id="ds-collapse-1">
+    <div class="elementskit-card-body ekit-accordion--content">
+    <p>A NBP é para donos de negócios digitais de serviço — freelancers, consultores, agências e prestadores de serviço.</p>
+    </div>
+    </div>
+    </div>
+
+    <div class="elementskit-card">
+    <div class="elementskit-card-header" id="ds-heading-2">
+    <a aria-controls="ds-collapse-2" aria-expanded="false" class="ekit-accordion--toggler elementskit-btn-link collapsed" data-ekit-toggle="collapse" data-target="#ds-collapse-2" href="#ds-collapse-2">
+    <span class="ekit-accordion-title">Como funciona a mentoria NBP?</span>
+    <div class="ekit_accordion_icon_group">
+    <div class="ekit_accordion_normal_icon"><i class="icon icon-down-arrow1"></i></div>
+    <div class="ekit_accordion_active_icon"><i class="icon icon-up-arrow"></i></div>
+    </div>
+    </a>
+    </div>
+    <div aria-labelledby="ds-heading-2" class="collapse" data-parent="#ds-accordion" id="ds-collapse-2">
+    <div class="elementskit-card-body ekit-accordion--content">
+    <p>O ecossistema inclui sessões de temas relevantes para empreendedores de serviço, tutorias especializadas e acompanhamento contínuo.</p>
+    </div>
+    </div>
+    </div>
+
+    </div>
+    </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 40px;">
+  <div class="elementor-widget-container">
+  <h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Card Highlight (CTA)</h2>
+  </div>
+  </div>
+
+  <div style="max-width:700px;">
+    <div class="elementor-element elementor-element-cbbfee5 e-con-full e-flex e-con e-child" data-e-type="container" data-element_type="container" data-id="cbbfee5" data-settings='{"background_background":"classic"}'>
+    <div class="elementor-element elementor-element-3060ecf elementor-widget__width-inherit elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-id="3060ecf" data-widget_type="heading.default">
+    <div class="elementor-widget-container">
+    <h2 class="elementor-heading-title elementor-size-default">Não há nada mais poderoso do que estar em um <span style="font-weight: 700">ambiente de crescimento</span></h2>
+    </div>
+    </div>
+    <div class="elementor-element elementor-element-236f793 elementor-widget-mobile__width-inherit elementor-widget__width-inherit elementor-widget elementor-widget-text-editor" data-e-type="widget" data-element_type="widget" data-id="236f793" data-widget_type="text-editor.default">
+    <div class="elementor-widget-container">
+    <p><span style="font-weight: 400;">Recebendo orientações personalizadas de quem já trilhou o caminho do </span><span style="font-weight: 400;">sucesso e ajudou outros a trilharem também.</span></p>
+    </div>
+    </div>
+    <div class="elementor-element elementor-element-662b674 elementor-align-center botao-normal elementor-widget elementor-widget-button" data-e-type="widget" data-element_type="widget" data-id="662b674" data-widget_type="button.default">
+    <div class="elementor-widget-container">
+    <div class="elementor-button-wrapper">
+    <a class="elementor-button elementor-button-link elementor-size-sm elementor-animation-float" href="#" onclick="return false;">
+    <span class="elementor-button-content-wrapper">
+    <span class="elementor-button-text">AGENDAR SESSÃO ESTRATÉGICA</span>
+    </span>
+    </a>
+    </div>
+    </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 4 — LAYOUT & SPACING
+     ════════════════════════════════════════════════════════ -->
+<div id="layout" class="elementor-element e-flex e-con-boxed e-con e-parent e-lazyloaded" data-e-type="container" data-element_type="container" style="--padding-top:80px;--padding-bottom:80px;--padding-left:20px;--padding-right:20px;background-color:#4B4C47;">
+<div class="e-con-inner">
+<div class="elementor-element e-con-full e-flex e-con e-child" data-e-type="container" data-element_type="container" style="--flex-direction:column;--gap:40px 0;">
+
+<div class="ds-section-label ds-section-label-dark">04 — Layout &amp; Espaçamento</div>
+
+<div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 16px;">
+<div class="elementor-widget-container">
+<h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Padrões de Layout</h2>
+</div>
+</div>
+
+<div>
+  <span class="ds-state-label" style="font-family:'TT Norms Pro',Sans-serif;font-size:0.75rem;color:#FDFFEF;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:12px;">Hero — Row (45% texto + imagem)</span>
+  <div class="ds-layout-demo" style="padding:30px;background:#BFBFBD;">
+    <div style="display:flex;gap:0;align-items:center;">
+      <div style="flex:0 0 45%;padding:20px;">
+        <div style="background:#181818;height:14px;width:30%;border-radius:4px;margin-bottom:12px;"></div>
+        <div style="background:#181818;height:24px;width:80%;border-radius:4px;margin-bottom:8px;"></div>
+        <div style="background:#181818;height:24px;width:60%;border-radius:4px;margin-bottom:16px;"></div>
+        <div style="background:#4B4C47;height:10px;width:90%;border-radius:4px;margin-bottom:6px;"></div>
+        <div style="background:#4B4C47;height:10px;width:75%;border-radius:4px;margin-bottom:20px;"></div>
+        <div style="background:linear-gradient(45deg,#4B4C47,#94968D);height:40px;width:60%;border-radius:2px;"></div>
+      </div>
+      <div style="flex:1;display:flex;justify-content:center;padding:20px;">
+        <div style="background:#18181830;height:160px;width:60%;border-radius:10px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <span class="ds-state-label" style="font-family:'TT Norms Pro',Sans-serif;font-size:0.75rem;color:#FDFFEF;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:12px;">Secção — Row (50% texto + 50% lista com borda esquerda)</span>
+  <div class="ds-layout-demo" style="padding:30px;background:#181818;">
+    <div style="display:flex;gap:0;">
+      <div style="flex:1;padding:20px;">
+        <div style="background:#FDFFEF;height:18px;width:70%;border-radius:4px;margin-bottom:8px;opacity:0.7;"></div>
+        <div style="background:#FDFFEF;height:18px;width:50%;border-radius:4px;opacity:0.7;"></div>
+      </div>
+      <div style="flex:1;border-left:1px solid #C6C8BA40;padding:20px 0 20px 30px;">
+        <div style="background:#FDFFEF;height:8px;width:85%;border-radius:4px;margin-bottom:14px;opacity:0.5;"></div>
+        <div style="border-top:1px solid #C6C8BA85;padding-top:14px;"><div style="background:#FDFFEF;height:8px;width:75%;border-radius:4px;margin-bottom:14px;opacity:0.5;"></div></div>
+        <div style="border-top:1px solid #C6C8BA85;padding-top:14px;"><div style="background:#FDFFEF;height:8px;width:80%;border-radius:4px;opacity:0.5;"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <span class="ds-state-label" style="font-family:'TT Norms Pro',Sans-serif;font-size:0.75rem;color:#FDFFEF;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:12px;">Grid — 3 colunas × 2 linhas (icon boxes)</span>
+  <div class="ds-layout-demo" style="padding:30px;background:#4B4C47;">
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="background:#FDFFEF;height:16px;width:40%;border-radius:4px;margin:0 auto;opacity:0.7;"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+      <div style="background:linear-gradient(45deg,#FDFFEF00,#FDFFEF29);border:1px solid #C6C8BA85;border-radius:10px;padding:20px;">
+        <div style="background:#18181847;width:32px;height:32px;border-radius:50%;margin-bottom:10px;"></div>
+        <div style="background:#FDFFEF;height:10px;width:60%;border-radius:4px;margin-bottom:8px;opacity:0.7;"></div>
+        <div style="background:#FDFFEF;height:6px;width:80%;border-radius:4px;opacity:0.4;"></div>
+      </div>
+      <div style="background:linear-gradient(45deg,#FDFFEF00,#FDFFEF29);border:1px solid #C6C8BA85;border-radius:10px;padding:20px;">
+        <div style="background:#18181847;width:32px;height:32px;border-radius:50%;margin-bottom:10px;"></div>
+        <div style="background:#FDFFEF;height:10px;width:55%;border-radius:4px;margin-bottom:8px;opacity:0.7;"></div>
+        <div style="background:#FDFFEF;height:6px;width:75%;border-radius:4px;opacity:0.4;"></div>
+      </div>
+      <div style="background:linear-gradient(45deg,#FDFFEF00,#FDFFEF29);border:1px solid #C6C8BA85;border-radius:10px;padding:20px;">
+        <div style="background:#18181847;width:32px;height:32px;border-radius:50%;margin-bottom:10px;"></div>
+        <div style="background:#FDFFEF;height:10px;width:65%;border-radius:4px;margin-bottom:8px;opacity:0.7;"></div>
+        <div style="background:#FDFFEF;height:6px;width:70%;border-radius:4px;opacity:0.4;"></div>
+      </div>
+      <div style="background:linear-gradient(45deg,#FDFFEF00,#FDFFEF29);border:1px solid #C6C8BA85;border-radius:10px;padding:20px;">
+        <div style="background:#18181847;width:32px;height:32px;border-radius:50%;margin-bottom:10px;"></div>
+        <div style="background:#FDFFEF;height:10px;width:50%;border-radius:4px;margin-bottom:8px;opacity:0.7;"></div>
+        <div style="background:#FDFFEF;height:6px;width:85%;border-radius:4px;opacity:0.4;"></div>
+      </div>
+      <div style="background:linear-gradient(45deg,#FDFFEF00,#FDFFEF29);border:1px solid #C6C8BA85;border-radius:10px;padding:20px;">
+        <div style="background:#18181847;width:32px;height:32px;border-radius:50%;margin-bottom:10px;"></div>
+        <div style="background:#FDFFEF;height:10px;width:58%;border-radius:4px;margin-bottom:8px;opacity:0.7;"></div>
+        <div style="background:#FDFFEF;height:6px;width:72%;border-radius:4px;opacity:0.4;"></div>
+      </div>
+      <div style="background:linear-gradient(45deg,#FDFFEF00,#FDFFEF29);border:1px solid #C6C8BA85;border-radius:10px;padding:20px;">
+        <div style="background:#18181847;width:32px;height:32px;border-radius:50%;margin-bottom:10px;"></div>
+        <div style="background:#FDFFEF;height:10px;width:62%;border-radius:4px;margin-bottom:8px;opacity:0.7;"></div>
+        <div style="background:#FDFFEF;height:6px;width:78%;border-radius:4px;opacity:0.4;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 16px;">
+  <div class="elementor-widget-container">
+  <h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Espaçamentos (Section Padding)</h2>
+  </div>
+  </div>
+
+  <table class="ds-type-table">
+    <tr>
+      <td class="ds-type-name">Hero</td>
+      <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:0.9rem;color:#FDFFEF;">100px top / 100px bottom / 20px left-right</span></td>
+      <td class="ds-type-spec">Hero section</td>
+    </tr>
+    <tr>
+      <td class="ds-type-name">Section</td>
+      <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:0.9rem;color:#FDFFEF;">50px top / 50px bottom / 20px left-right</span></td>
+      <td class="ds-type-spec">Seções padrão</td>
+    </tr>
+    <tr>
+      <td class="ds-type-name">CTA</td>
+      <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:0.9rem;color:#FDFFEF;">100px top / 100px bottom / 20px left-right</span></td>
+      <td class="ds-type-spec">Seções de destaque</td>
+    </tr>
+    <tr>
+      <td class="ds-type-name">Card</td>
+      <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:0.9rem;color:#FDFFEF;">60px top-bottom / 40px left-right</span></td>
+      <td class="ds-type-spec">Card CTA</td>
+    </tr>
+    <tr>
+      <td class="ds-type-name">Icon Box</td>
+      <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:0.9rem;color:#FDFFEF;">15px all sides</span></td>
+      <td class="ds-type-spec">Padding interno</td>
+    </tr>
+    <tr>
+      <td class="ds-type-name">Gap — Row</td>
+      <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:0.9rem;color:#FDFFEF;">0px (seções) / 20px (grid)</span></td>
+      <td class="ds-type-spec">Flexbox / Grid gap</td>
+    </tr>
+    <tr>
+      <td class="ds-type-name">Border Radius</td>
+      <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:0.9rem;color:#FDFFEF;">10px (cards, imagens) / 2px (botões)</span></td>
+      <td class="ds-type-spec">Cantos arredondados</td>
+    </tr>
+  </table>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 5 — MOTION & INTERACTION
+     ════════════════════════════════════════════════════════ -->
+<div id="motion" class="elementor-element e-flex e-con-boxed e-con e-parent e-lazyloaded" data-e-type="container" data-element_type="container" style="--padding-top:80px;--padding-bottom:80px;--padding-left:20px;--padding-right:20px;background-color:#181818;">
+<div class="e-con-inner">
+<div class="elementor-element e-con-full e-flex e-con e-child" data-e-type="container" data-element_type="container" style="--flex-direction:column;--gap:40px 0;">
+
+<div class="ds-section-label ds-section-label-dark">05 — Movimento &amp; Interação</div>
+
+<div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 16px;">
+<div class="elementor-widget-container">
+<h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Galeria de Movimentos</h2>
+</div>
+</div>
+
+<div>
+  <span class="ds-state-label" style="font-family:'TT Norms Pro',Sans-serif;font-size:0.75rem;color:#94968D;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:20px;">Hover Float — elementor-animation-float (passe o rato)</span>
+  <div class="ds-component-row">
+    <div class="ds-motion-item">
+      <div class="elementor-element elementor-element-f47000b elementor-align-left botao-normal elementor-widget elementor-widget-button" data-e-type="widget" data-element_type="widget" data-id="f47000b" data-widget_type="button.default">
+      <div class="elementor-widget-container">
+      <div class="elementor-button-wrapper">
+      <a class="elementor-button elementor-button-link elementor-size-sm elementor-animation-float" href="#" onclick="return false;">
+      <span class="elementor-button-content-wrapper">
+      <span class="elementor-button-text">BOTÃO COM FLOAT</span>
+      </span>
+      </a>
+      </div>
+      </div>
+      </div>
+      <span class="ds-state-label">elementor-animation-float</span>
+    </div>
+  </div>
+</div>
+
+<div>
+  <span class="ds-state-label" style="font-family:'TT Norms Pro',Sans-serif;font-size:0.75rem;color:#94968D;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:20px;">Button Hover Transition — 3s duration</span>
+  <div class="ds-component-row">
+    <div class="ds-motion-item">
+      <div class="elementor-element elementor-element-9ad062d elementor-align-left botao-normal elementor-widget elementor-widget-button" data-e-type="widget" data-element_type="widget" data-id="9ad062d" data-widget_type="button.default">
+      <div class="elementor-widget-container">
+      <div class="elementor-button-wrapper">
+      <a class="elementor-button elementor-button-link elementor-size-sm elementor-animation-float" href="#" onclick="return false;">
+      <span class="elementor-button-content-wrapper">
+      <span class="elementor-button-text">HOVER: BG TRANSITION 3S</span>
+      </span>
+      </a>
+      </div>
+      </div>
+      </div>
+      <span class="ds-state-label">transition-duration: 3s</span>
+    </div>
+  </div>
+</div>
+
+<div>
+  <span class="ds-state-label" style="font-family:'TT Norms Pro',Sans-serif;font-size:0.75rem;color:#94968D;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:20px;">Color Transition — Icon List (0.3s)</span>
+  <div style="max-width:500px;border-left:1px solid #C6C8BA40;padding-left:30px;">
+    <div class="elementor-element elementor-element-8d51f57 elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list" data-e-type="widget" data-element_type="widget" data-id="8d51f57" data-widget_type="icon-list.default">
+    <div class="elementor-widget-container">
+    <ul class="elementor-icon-list-items">
+    <li class="elementor-icon-list-item">
+    <span class="elementor-icon-list-text">Gerar mais receita e aumentar as suas margens de lucro.</span>
+    </li>
+    <li class="elementor-icon-list-item">
+    <span class="elementor-icon-list-text">Ter mais tempo para trabalhar NO negócio.</span>
+    </li>
+    <li class="elementor-icon-list-item">
+    <span class="elementor-icon-list-text">Escalar 3 a 5 vezes mais rápido.</span>
+    </li>
+    </ul>
+    </div>
+    </div>
+  </div>
+  <span class="ds-state-label" style="font-family:'TT Norms Pro',Sans-serif;font-size:0.65rem;color:#94968D;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-top:8px;">transition: color 0.3s (icon &amp; text)</span>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 6 — ICONS
+     ════════════════════════════════════════════════════════ -->
+<div id="icons" class="elementor-element e-flex e-con-boxed e-con e-parent e-lazyloaded" data-e-type="container" data-element_type="container" style="--padding-top:80px;--padding-bottom:80px;--padding-left:20px;--padding-right:20px;background-color:#4B4C47;">
+<div class="e-con-inner">
+<div class="elementor-element e-con-full e-flex e-con e-child" data-e-type="container" data-element_type="container" style="--flex-direction:column;">
+
+<div class="ds-section-label ds-section-label-dark">06 — Ícones</div>
+
+<div class="elementor-element elementor-widget elementor-widget-heading" data-e-type="widget" data-element_type="widget" data-widget_type="heading.default" style="margin-bottom: 40px;">
+<div class="elementor-widget-container">
+<h2 class="elementor-heading-title elementor-size-default" style="font-family:'TT Norms Pro',Sans-serif;font-size:2.3rem;font-weight:400;text-transform:uppercase;color:#FDFFEF;">Biblioteca de Ícones</h2>
+</div>
+</div>
+
+<div class="ds-icon-grid">
+  <div class="ds-icon-item">
+    <div style="background:#18181847;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <i aria-hidden="true" class="icon icon-document" style="font-size:21px;color:#FDFFEF;"></i>
+    </div>
+    <span>icon-document</span>
+  </div>
+  <div class="ds-icon-item">
+    <div style="background:#18181847;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <i aria-hidden="true" class="icon icon-internet" style="font-size:21px;color:#FDFFEF;"></i>
+    </div>
+    <span>icon-internet</span>
+  </div>
+  <div class="ds-icon-item">
+    <div style="background:#18181847;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <i aria-hidden="true" class="icon icon-rocket-ship" style="font-size:21px;color:#FDFFEF;"></i>
+    </div>
+    <span>icon-rocket-ship</span>
+  </div>
+  <div class="ds-icon-item">
+    <div style="background:#18181847;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <i aria-hidden="true" class="icon icon-Target" style="font-size:21px;color:#FDFFEF;"></i>
+    </div>
+    <span>icon-Target</span>
+  </div>
+  <div class="ds-icon-item">
+    <div style="background:#18181847;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <i aria-hidden="true" class="icon icon-brain" style="font-size:21px;color:#FDFFEF;"></i>
+    </div>
+    <span>icon-brain</span>
+  </div>
+  <div class="ds-icon-item">
+    <div style="background:#18181847;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <i aria-hidden="true" class="icon icon-support" style="font-size:21px;color:#FDFFEF;"></i>
+    </div>
+    <span>icon-support</span>
+  </div>
+  <div class="ds-icon-item">
+    <div style="background:#18181847;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <i aria-hidden="true" class="icon icon-calendar-full" style="font-size:21px;color:#FDFFEF;"></i>
+    </div>
+    <span>icon-calendar-full</span>
+  </div>
+  <div class="ds-icon-item">
+    <div style="background:#18181847;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <i aria-hidden="true" class="icon icon-search11" style="font-size:21px;color:#FDFFEF;"></i>
+    </div>
+    <span>icon-search11</span>
+  </div>
+  <div class="ds-icon-item">
+    <div style="background:#18181847;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <i aria-hidden="true" class="icon icon-checked" style="font-size:21px;color:#FDFFEF;"></i>
+    </div>
+    <span>icon-checked</span>
+  </div>
+  <div class="ds-icon-item">
+    <div style="background:#18181847;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <i aria-hidden="true" class="icon icon-down-arrow1" style="font-size:21px;color:#FDFFEF;"></i>
+    </div>
+    <span>icon-down-arrow1</span>
+  </div>
+  <div class="ds-icon-item">
+    <div style="background:#18181847;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <i aria-hidden="true" class="icon icon-up-arrow" style="font-size:21px;color:#FDFFEF;"></i>
+    </div>
+    <span>icon-up-arrow</span>
+  </div>
+</div>
+
+<div style="margin-top:40px;">
+  <span class="ds-state-label" style="font-family:'TT Norms Pro',Sans-serif;font-size:0.75rem;color:#94968D;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:12px;">Tamanho padrão dos ícones</span>
+  <table class="ds-type-table">
+    <tr style="border-color:#C6C8BA40;">
+      <td class="ds-type-name" style="color:#94968D;">Icon Box</td>
+      <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:0.9rem;color:#FDFFEF;">21px — dentro de stacked circle (#18181847)</span></td>
+      <td class="ds-type-spec">font-size: 21px</td>
+    </tr>
+    <tr style="border-color:#C6C8BA40;">
+      <td class="ds-type-name" style="color:#94968D;">Icon List</td>
+      <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:0.9rem;color:#FDFFEF;">14px — inline com texto</span></td>
+      <td class="ds-type-spec">font-size: 14px</td>
+    </tr>
+    <tr style="border-color:#C6C8BA40;">
+      <td class="ds-type-name" style="color:#94968D;">Accordion</td>
+      <td class="ds-type-preview"><span style="font-family:'TT Norms Pro',Sans-serif;font-size:0.9rem;color:#FDFFEF;">Inherit — setas open/close</span></td>
+      <td class="ds-type-spec">icon-down-arrow1 / icon-up-arrow</td>
+    </tr>
+  </table>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     FOOTER
+     ════════════════════════════════════════════════════════ -->
+<div class="elementor-element elementor-element-c6c0371 e-flex e-con-boxed e-con e-parent e-lazyloaded" data-e-type="container" data-element_type="container" data-id="c6c0371" data-settings='{"background_background":"classic"}'>
+<div class="e-con-inner">
+<div class="elementor-element elementor-element-d8b768f e-con-full e-flex e-con e-child" data-e-type="container" data-element_type="container" data-id="d8b768f">
+<div class="elementor-element elementor-element-c29165b elementor-widget elementor-widget-text-editor" data-e-type="widget" data-element_type="widget" data-id="c29165b" data-widget_type="text-editor.default">
+<div class="elementor-widget-container">
+No Blank Page — Design System
+</div>
+</div>
+</div>
+<div class="elementor-element elementor-element-71b8f0d e-con-full e-flex e-con e-child" data-e-type="container" data-element_type="container" data-id="71b8f0d">
+<div class="elementor-element elementor-element-f1cd6e8 elementor-widget elementor-widget-text-editor" data-e-type="widget" data-element_type="widget" data-id="f1cd6e8" data-widget_type="text-editor.default">
+<div class="elementor-widget-container">
+Desenvolvido por
+</div>
+</div>
+<div class="elementor-element elementor-element-a611f44 elementor-widget__width-initial elementor-widget elementor-widget-image" data-e-type="widget" data-element_type="widget" data-id="a611f44" data-widget_type="image.default">
+<div class="elementor-widget-container">
+<a href="https://rezultdigital.com/" rel="noopener" target="_blank">
+<img alt="" class="attachment-large size-large wp-image-1406" decoding="async" height="512" loading="lazy" src="assets/cropped-favicon-rezult_ae03ef859323.png" width="512"/>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+</body>
+</html>

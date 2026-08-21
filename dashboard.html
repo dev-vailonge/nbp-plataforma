@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>No Blank Page — Dashboard</title>
+<link href="assets/reset_0f9ee9f4f517.css" rel="stylesheet"/>
+<link href="assets/theme_0669b57c8fb5.css" rel="stylesheet"/>
+<link href="assets/frontend_0822fffedd00.css" rel="stylesheet"/>
+<link href="assets/widget-heading_f12c63fad7fa.css" rel="stylesheet"/>
+<link href="assets/widget-icon-box_b101ae1760ed.css" rel="stylesheet"/>
+<link href="assets/ekiticons_4dfc472e5fa2.css" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="assets/nbp-theme.css"/>
+<script>(function(){try{var t=localStorage.getItem("nbp-theme")||"dark";var pl=window.matchMedia&&!window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",(t==="light"||(t==="system"&&pl))?"light":"dark");}catch(e){}})();</script>
+<style>
+:root {
+  --bg: #151515;
+  --bg-surface: #1C1C1C;
+  --bg-card: #181818;
+  --bg-elev: #222222;
+  --border: #C6C8BA1F;
+  --border-strong: #C6C8BA33;
+  --text: #FDFFEF;
+  --text-muted: #94968D;
+  --text-subtle: #6B6C63;
+  --sage: #C6C8BA;
+  --down: #C9A39A;
+  --sidebar-w: 244px;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "TT Norms Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+               Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; }
+
+.app { display: flex; min-height: 100vh; }
+
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w);
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 22px 14px 18px;
+  z-index: 10;
+}
+.sidebar-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 4px 10px 18px;
+  margin-bottom: 6px;
+}
+.brand-mark {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: radial-gradient(circle at 30% 30%, #FDFFEF 0%, #C6C8BA 55%, #4B4C47 100%);
+  box-shadow: 0 0 18px rgba(253, 255, 239, 0.18);
+  flex-shrink: 0;
+}
+.brand-name {
+  font-size: 0.82rem; font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.sidebar-profile {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  background: rgba(253, 255, 239, 0.015);
+  border-radius: 12px;
+  margin-bottom: 22px;
+  transition: border-color 0.25s ease, background 0.25s ease;
+  cursor: pointer;
+}
+.sidebar-profile:hover {
+  border-color: var(--border-strong);
+  background: rgba(253, 255, 239, 0.04);
+}
+.profile-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #C6C8BA 0%, #4B4C47 100%);
+  color: #181818;
+  font-weight: 700; font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(253, 255, 239, 0.15);
+}
+.profile-info { min-width: 0; flex: 1; }
+.profile-name {
+  font-size: 0.88rem; font-weight: 600;
+  color: var(--text);
+  line-height: 1.25;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.profile-plan {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.66rem; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+.profile-plan::before {
+  content: ""; width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #C6C8BA;
+  box-shadow: 0 0 6px rgba(198, 200, 186, 0.7);
+}
+.sidebar-label {
+  font-size: 0.64rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  padding: 0 12px;
+  margin: 4px 0 10px;
+}
+.sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 0.92rem; font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.nav-item i { width: 18px; font-size: 16px; text-align: center; color: inherit; opacity: 0.85; }
+.nav-item:hover { color: var(--text); background: rgba(253, 255, 239, 0.04); }
+.nav-item.active { color: var(--text); background: rgba(253, 255, 239, 0.06); }
+.nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 18px;
+  border-radius: 2px;
+  background: var(--text);
+  box-shadow: 0 0 10px rgba(253, 255, 239, 0.6);
+}
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 2px;
+}
+
+/* ── Main ── */
+.main {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  padding: 28px 44px 72px;
+  min-height: 100vh;
+  max-width: 1280px;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.topbar-icon-btn {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+.topbar .topbar-icon-btn:last-child { margin-left: auto; }
+.topbar-icon-btn:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--bg-elev);
+}
+.mobile-toggle { display: none; }
+
+/* ── Profile header ── */
+.dash-name {
+  font-size: 2.55rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0 0 22px;
+  color: var(--text);
+}
+.dash-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.72fr);
+  gap: 28px 40px;
+  align-items: start;
+  margin-bottom: 48px;
+}
+.dash-bio {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+  max-width: 52ch;
+}
+
+.meta-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px 28px;
+}
+.meta-item { min-width: 0; }
+.meta-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text-subtle);
+  margin-bottom: 4px;
+}
+.meta-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+/* ── Snapshot ── */
+.snap-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+}
+.snap-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.snap-note {
+  font-size: 0.82rem;
+  color: var(--text-subtle);
+  white-space: nowrap;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+.kpi {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 18px 16px;
+  min-height: 148px;
+  display: flex;
+  flex-direction: column;
+}
+.kpi-label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+.kpi-value {
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  line-height: 1.15;
+  margin-top: auto;
+}
+.kpi-value .unit {
+  font-size: 0.72em;
+  font-weight: 600;
+  margin-left: 4px;
+}
+.kpi-foot {
+  margin-top: 12px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  line-height: 1.35;
+}
+.kpi-foot.up { color: var(--sage); }
+.kpi-foot.down { color: var(--down); }
+.kpi-foot i { font-size: 11px; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  background: #FDFFEF;
+  color: #181818;
+}
+.pill.muted {
+  background: rgba(198, 200, 186, 0.14);
+  color: var(--sage);
+}
+
+/* ── Revenue chart ── */
+.chart-section {
+  margin-top: 52px;
+}
+.chart-section-title {
+  margin: 0 0 16px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.snap-head .chart-section-title { margin: 0; }
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 22px 8px;
+}
+.chart-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.chart-card-head p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.legend-swatch {
+  width: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background: #FDFFEF;
+}
+.legend-swatch.sage { background: var(--sage); }
+.legend-swatch.dashed {
+  height: 0;
+  background: none;
+  border-top: 2px dashed #FDFFEF;
+}
+.chart-svg-wrap { width: 100%; }
+.chart-svg-wrap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+/* ── Metrics comparison ── */
+.metrics-section {
+  margin-top: 52px;
+}
+.metrics-compare {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+.metrics-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 24px 10px;
+  min-width: 0;
+}
+.metrics-when {
+  margin: 0 0 14px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.metrics-kicker {
+  margin: 0 0 8px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.metrics-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.92rem;
+}
+.metrics-row:last-child { border-bottom: none; }
+.metrics-row dt {
+  margin: 0;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.metrics-row dd {
+  margin: 0;
+  color: var(--text);
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+.metrics-row dd .hint {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--text-subtle);
+  margin-top: 2px;
+  white-space: normal;
+}
+.metrics-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+/* ── Milestones ── */
+.milestones-section { margin-top: 52px; }
+.milestones-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 8px 28px 8px 22px;
+}
+.ms-item {
+  display: grid;
+  grid-template-columns: 72px 22px minmax(0, 1fr) 118px;
+  gap: 8px 18px;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+.ms-item:last-child { border-bottom: none; }
+.ms-date {
+  text-align: right;
+  padding-top: 2px;
+}
+.ms-date b {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.ms-date span {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-subtle);
+  margin-top: 2px;
+}
+.ms-rail {
+  position: relative;
+  justify-self: center;
+  width: 12px;
+  align-self: stretch;
+}
+.ms-rail::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  bottom: -26px;
+  width: 1px;
+  background: var(--border-strong);
+  transform: translateX(-50%);
+}
+.ms-item:last-child .ms-rail::before { bottom: auto; height: 0; }
+.ms-dot {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 11px;
+  height: 11px;
+  margin: 6px auto 0;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 0 4px var(--bg-card);
+}
+.ms-dot.open {
+  background: var(--bg-card);
+  border: 1.5px solid var(--text);
+}
+.ms-body { min-width: 0; padding-right: 12px; }
+.ms-body h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.ms-body p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+.ms-metric {
+  text-align: right;
+  padding-top: 2px;
+}
+.ms-metric b {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  line-height: 1.1;
+}
+.ms-metric span {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  color: var(--text-subtle);
+}
+
+@media (max-width: 1180px) {
+  .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 980px) {
+  .dash-hero { grid-template-columns: 1fr; }
+  .dash-bio { max-width: none; }
+  .meta-card { max-width: 480px; }
+}
+@media (max-width: 860px) {
+  .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; padding: 20px 20px 60px; }
+  .mobile-toggle { display: inline-flex !important; margin-left: 0; }
+  .dash-name { font-size: 2rem; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .chart-card { padding: 16px 12px 4px; }
+  .metrics-compare { grid-template-columns: 1fr; }
+  .metrics-arrow { transform: rotate(90deg); margin: 0 auto; }
+  .ms-item {
+    grid-template-columns: 64px 18px minmax(0, 1fr);
+    gap: 6px 12px;
+  }
+  .ms-metric {
+    grid-column: 3;
+    text-align: left;
+    padding: 8px 0 0;
+  }
+  .milestones-card { padding: 4px 16px; }
+}
+@media (max-width: 520px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  .meta-card { grid-template-columns: 1fr; gap: 16px; max-width: none; }
+  .snap-head { flex-direction: column; gap: 4px; }
+  .snap-note { white-space: normal; }
+  .metrics-row dd { white-space: normal; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar" id="sidebar" aria-label="Navegação principal">
+    <div class="sidebar-brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">No Blank Page</span>
+    </div>
+
+    <a class="sidebar-profile" href="profile.html">
+      <div class="profile-avatar">RB</div>
+      <div class="profile-info">
+        <div class="profile-name">Roque Buarque</div>
+        <span class="profile-plan">Pro Plan</span>
+      </div>
+      <i class="fa-solid fa-chevron-right" style="color: var(--text-subtle); font-size: 12px;" aria-hidden="true"></i>
+    </a>
+
+    <div class="sidebar-label">Workspace</div>
+
+    <nav class="sidebar-nav" aria-label="Menu">
+      <a class="nav-item" href="platform.html">
+        <i class="fa-solid fa-house" aria-hidden="true"></i>
+        <span>Início</span>
+      </a>
+      <a class="nav-item" href="action-plan.html">
+        <i class="fa-solid fa-flag-checkered" aria-hidden="true"></i>
+        <span>Plano de ação</span>
+      </a>
+      <a class="nav-item active" href="dashboard.html">
+        <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" href="content.html">
+        <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+        <span>Cursos</span>
+      </a>
+      <a class="nav-item" href="community.html">
+        <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+        <span>Comunidade</span>
+      </a>
+      <a class="nav-item" href="calendar.html">
+        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+        <span>Calendário</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a class="nav-item" href="settings.html">
+        <i class="fa-solid fa-gear" aria-hidden="true"></i>
+        <span>Settings</span>
+      </a>
+      <a class="nav-item" href="index2.html">
+        <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+        <span>Sair</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="topbar-icon-btn mobile-toggle" id="mobileToggle" aria-label="Abrir menu">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
+      <button class="topbar-icon-btn" aria-label="Notificações">
+        <i class="fa-regular fa-bell" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <h1 class="dash-name">Roque Buarque</h1>
+
+    <section class="dash-hero" aria-label="Perfil do negócio">
+      <p class="dash-bio">
+        Escola de programação que leva iniciantes do zero ao primeiro emprego. Formação prática em desenvolvimento web, turmas ao vivo, mentoria semanal e projetos reais para portfólio e entrevistas. Oferta âncora: Programa Carreira (1.970 EUR, 6 meses), turmas mensais, foco em transição de carreira.
+      </p>
+
+      <dl class="meta-card">
+        <div class="meta-item">
+          <dt class="meta-label">Consultor</dt>
+          <dd class="meta-value">João Mafra</dd>
+        </div>
+        <div class="meta-item">
+          <dt class="meta-label">Empresa</dt>
+          <dd class="meta-value">Escola Nova Era Tech · Remoto</dd>
+        </div>
+        <div class="meta-item">
+          <dt class="meta-label">Entrada</dt>
+          <dd class="meta-value">Outubro 2025</dd>
+        </div>
+        <div class="meta-item">
+          <dt class="meta-label">Última sessão</dt>
+          <dd class="meta-value">04 Maio 2026</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section aria-labelledby="snap-title">
+      <div class="snap-head">
+        <h2 class="snap-title" id="snap-title">Snapshot atual</h2>
+        <span class="snap-note">Variação vs entrada · Out 2025</span>
+      </div>
+
+      <div class="kpi-grid">
+        <article class="kpi">
+          <div class="kpi-label">Receita mensal · Abril</div>
+          <div class="kpi-value">16.430<span class="unit">EUR</span></div>
+          <div class="kpi-foot up">
+            <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+            +239 % · 4.850 → 16.430
+          </div>
+        </article>
+
+        <article class="kpi">
+          <div class="kpi-label">Ticket médio</div>
+          <div class="kpi-value">1.970<span class="unit">EUR</span></div>
+          <div class="kpi-foot up">
+            <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+            +103 % · 970 → 1.970
+          </div>
+        </article>
+
+        <article class="kpi">
+          <div class="kpi-label">LTV</div>
+          <div class="kpi-value">3.940<span class="unit">EUR</span></div>
+          <div class="kpi-foot">
+            <span class="pill">meta 3.800 · atingida</span>
+          </div>
+        </article>
+
+        <article class="kpi">
+          <div class="kpi-label">CAC</div>
+          <div class="kpi-value">—</div>
+          <div class="kpi-foot">
+            <span class="pill muted">em apuramento</span>
+          </div>
+        </article>
+
+        <article class="kpi">
+          <div class="kpi-label">Margem de lucro</div>
+          <div class="kpi-value">38%</div>
+          <div class="kpi-foot down">
+            <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
+            52 % → 38 % (Abr 26)
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chart-section" aria-labelledby="chart-title">
+      <h2 class="chart-section-title" id="chart-title">Evolução da receita mensal</h2>
+      <div class="chart-card">
+        <div class="chart-card-head">
+          <p>Receita mensal e lucro líquido, em euros.</p>
+          <div class="legend" aria-hidden="true">
+            <span class="legend-item"><span class="legend-swatch"></span> Receita mensal</span>
+            <span class="legend-item"><span class="legend-swatch sage"></span> Lucro líquido</span>
+            <span class="legend-item"><span class="legend-swatch dashed"></span> Meta NBP</span>
+          </div>
+        </div>
+        <div class="chart-svg-wrap" id="revenueChart"></div>
+      </div>
+    </section>
+
+    <section class="metrics-section" aria-labelledby="metrics-title">
+      <h2 class="chart-section-title" id="metrics-title">Acompanhamento de métricas</h2>
+      <div class="metrics-compare">
+        <article class="metrics-card">
+          <p class="metrics-when">Entrada · Out 2025</p>
+          <h3 class="metrics-kicker">Métricas importantes</h3>
+          <dl>
+            <div class="metrics-row">
+              <dt>Receita mensal Out (fechado)</dt>
+              <dd>4.850 EUR</dd>
+            </div>
+            <div class="metrics-row">
+              <dt>Ticket médio</dt>
+              <dd>~970 EUR</dd>
+            </div>
+            <div class="metrics-row">
+              <dt>Alunos ativos</dt>
+              <dd>—</dd>
+            </div>
+            <div class="metrics-row">
+              <dt>Matrículas fechadas/mês</dt>
+              <dd>—</dd>
+            </div>
+            <div class="metrics-row">
+              <dt>LTV</dt>
+              <dd>~1.940 EUR (6m)</dd>
+            </div>
+            <div class="metrics-row">
+              <dt>CAC</dt>
+              <dd>—</dd>
+            </div>
+            <div class="metrics-row">
+              <dt>Margem de lucro</dt>
+              <dd>52% (2.522 EUR)</dd>
+            </div>
+          </dl>
+        </article>
+
+        <div class="metrics-arrow" aria-hidden="true">
+          <i class="fa-solid fa-arrow-right"></i>
+        </div>
+
+        <article class="metrics-card">
+          <p class="metrics-when">Hoje · Abril 2026 (fechado)</p>
+          <h3 class="metrics-kicker">Métricas importantes</h3>
+          <dl>
+            <div class="metrics-row">
+              <dt>Receita mensal</dt>
+              <dd>16.430 EUR</dd>
+            </div>
+            <div class="metrics-row">
+              <dt>Ticket médio</dt>
+              <dd>1.970 EUR</dd>
+            </div>
+            <div class="metrics-row">
+              <dt>Alunos ativos</dt>
+              <dd>19</dd>
+            </div>
+            <div class="metrics-row">
+              <dt>Matrículas fechadas/mês</dt>
+              <dd>8<span class="hint">incluindo 09-Abr e 14-Abr</span></dd>
+            </div>
+            <div class="metrics-row">
+              <dt>LTV (6 meses + mentoria)</dt>
+              <dd>3.940 EUR</dd>
+            </div>
+            <div class="metrics-row">
+              <dt>CAC</dt>
+              <dd>—</dd>
+            </div>
+            <div class="metrics-row">
+              <dt>Margem de lucro</dt>
+              <dd>38% (6.243 EUR)</dd>
+            </div>
+          </dl>
+        </article>
+      </div>
+    </section>
+
+    <section class="milestones-section" aria-labelledby="ms-title">
+      <div class="snap-head">
+        <h2 class="chart-section-title" id="ms-title">Marcos da evolução</h2>
+        <span class="snap-note">Oito meses de aceleração com João Mafra</span>
+      </div>
+
+      <div class="milestones-card">
+        <article class="ms-item">
+          <div class="ms-date"><b>02 Out</b><span>2025</span></div>
+          <div class="ms-rail"><span class="ms-dot"></span></div>
+          <div class="ms-body">
+            <h3>Sessão #01 · Kick-off NBP</h3>
+            <p>Diagnóstico da Escola Nova Era Tech: Roque entregava 1:1 e conteúdos soltos. Validar o Programa Carreira como oferta âncora, sair do modo professor-freela e tratar a escola como negócio — turmas, ticket e operação.</p>
+          </div>
+          <div class="ms-metric"><b>4.850</b><span>Receita / mês</span></div>
+        </article>
+
+        <article class="ms-item">
+          <div class="ms-date"><b>03 Nov</b><span>2025</span></div>
+          <div class="ms-rail"><span class="ms-dot open"></span></div>
+          <div class="ms-body">
+            <h3>Sessão #02 · Unidade económica modelada</h3>
+            <p>Ticket (~970 EUR), LTV a 6 meses, CAC por apurar e tamanho de turma. Meta de novembro: fechar 6 matrículas e deixar de vender aulas avulsas. Margem ainda alta (52%) porque o fundador entrega quase tudo.</p>
+          </div>
+          <div class="ms-metric"><b>4.850</b><span>Receita / mês</span></div>
+        </article>
+
+        <article class="ms-item">
+          <div class="ms-date"><b>28 Nov</b><span>2025</span></div>
+          <div class="ms-rail"><span class="ms-dot"></span></div>
+          <div class="ms-body">
+            <h3>Sessão #03 · Oferta única e turmas mensais</h3>
+            <p>Programa Carreira fechado em 6 meses. Fim das mentorias avulsas. Primeiro CRM de matrículas e calendário de turmas. Receita sobe com a turma de novembro — ainda sem canal previsível, mas com oferta clara.</p>
+          </div>
+          <div class="ms-metric"><b>6.420</b><span>Receita / mês</span></div>
+        </article>
+
+        <article class="ms-item">
+          <div class="ms-date"><b>06 Jan</b><span>2026</span></div>
+          <div class="ms-rail"><span class="ms-dot open"></span></div>
+          <div class="ms-body">
+            <h3>Sessão #04 · Planeamento 2026</h3>
+            <p>Meta anual: 22.000 EUR/mês até setembro. Funil conteúdo → aula aberta → turma. Social selling no LinkedIn e Instagram. Dezembro caiu (5.180) — planear o Q1 para não depender do calendário lectivo.</p>
+          </div>
+          <div class="ms-metric"><b>5.180</b><span>Receita / mês</span></div>
+        </article>
+
+        <article class="ms-item">
+          <div class="ms-date"><b>03 Fev</b><span>2026</span></div>
+          <div class="ms-rail"><span class="ms-dot"></span></div>
+          <div class="ms-body">
+            <h3>Sessão #05 · Sair do operacional</h3>
+            <p>Contratar dois tutores para lives e correção de projetos. Roque fica em vendas, currículo e empregabilidade. Ticket sobe para o pack 1.970 EUR. Janeiro fecha 7.900 — primeira prova de que a oferta única converte.</p>
+          </div>
+          <div class="ms-metric"><b>7.900</b><span>Receita / mês</span></div>
+        </article>
+
+        <article class="ms-item">
+          <div class="ms-date"><b>09 Mar</b><span>2026</span></div>
+          <div class="ms-rail"><span class="ms-dot open"></span></div>
+          <div class="ms-body">
+            <h3>Sessão #06 · Mentoria de emprego</h3>
+            <p>Extensão de 3 meses pós-formação (entrevistas, GitHub, indicação a empresas). LTV passa a 3.940 EUR. Fevereiro em 9.840. Margem comprime com tutores — troca consciente de margem por escala.</p>
+          </div>
+          <div class="ms-metric"><b>9.840</b><span>Receita / mês</span></div>
+        </article>
+
+        <article class="ms-item">
+          <div class="ms-date"><b>13 Abr</b><span>2026</span></div>
+          <div class="ms-rail"><span class="ms-dot"></span></div>
+          <div class="ms-body">
+            <h3>Sessão #07 · Duas turmas em paralelo</h3>
+            <p>Onboarding documentado. Março fecha 11.250. Capacidade para 19 alunos ativos sem o fundador nas aulas todas as noites. Próximo gargalo: aquisição previsível (CAC ainda em apuramento).</p>
+          </div>
+          <div class="ms-metric"><b>11.250</b><span>Receita / mês</span></div>
+        </article>
+
+        <article class="ms-item">
+          <div class="ms-date"><b>04 Mai</b><span>2026</span></div>
+          <div class="ms-rail"><span class="ms-dot open"></span></div>
+          <div class="ms-body">
+            <h3>Sessão #08 · Snapshot e próximo ciclo</h3>
+            <p>Abril fechado em 16.430 EUR, 8 matrículas no mês. Meta NBP 22.000 em setembro. Foco do próximo ciclo: canal de aquisição previsível e medir CAC — a operação já aguenta a escala.</p>
+          </div>
+          <div class="ms-metric"><b>16.430</b><span>Receita / mês</span></div>
+        </article>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  var toggle  = document.getElementById("mobileToggle");
+  var sidebar = document.getElementById("sidebar");
+  if (toggle && sidebar) {
+    toggle.addEventListener("click", function (e) {
+      e.stopPropagation();
+      sidebar.classList.toggle("open");
+    });
+    document.addEventListener("click", function (e) {
+      if (window.innerWidth > 860) return;
+      if (!sidebar.contains(e.target) && e.target !== toggle) {
+        sidebar.classList.remove("open");
+      }
+    });
+  }
+
+  function fmt(n) {
+    return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+
+  function drawRevenueChart() {
+    var host = document.getElementById("revenueChart");
+    if (!host) return;
+
+    var months = ["Out 25","Nov 25","Dez 25","Jan 26","Fev 26","Mar 26","Abr 26","Mai 26","Jun 26","Jul 26","Ago 26","Set 26"];
+    var revenue = [4850, 6420, 5180, 7900, 9840, 11250, 16430];
+    var profit  = [2522, 3210, 2486, 3555, 4133, 4500, 6243];
+    var profitShow = { 0: true, 5: true, 6: true };
+    var last = 6;
+    var goalI = 11;
+    var goalV = 22000;
+    var yMax = 25000;
+
+    var W = 1100, H = 430;
+    var pad = { t: 36, r: 56, b: 42, l: 58 };
+    var pw = W - pad.l - pad.r;
+    var ph = H - pad.t - pad.b;
+    var n = months.length;
+
+    function x(i) { return pad.l + (i / (n - 1)) * pw; }
+    function y(v) { return pad.t + ph - (v / yMax) * ph; }
+
+    function linePath(vals) {
+      var d = "";
+      for (var i = 0; i < vals.length; i++) {
+        d += (i ? " L " : "M ") + x(i).toFixed(1) + " " + y(vals[i]).toFixed(1);
+      }
+      return d;
+    }
+
+    var ns = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", "Receita mensal da Escola Nova Era Tech de 4.850 euros em outubro de 2025 a 16.430 em abril de 2026, com meta de 22.000 em setembro.");
+
+    var defs = document.createElementNS(ns, "defs");
+    defs.innerHTML =
+      '<linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0%" stop-color="#FDFFEF" stop-opacity="0.22"/>' +
+        '<stop offset="100%" stop-color="#FDFFEF" stop-opacity="0"/>' +
+      "</linearGradient>";
+    svg.appendChild(defs);
+
+    var ticks = [0, 5000, 10000, 15000, 20000, 25000];
+    ticks.forEach(function (t) {
+      var gy = y(t);
+      var grid = document.createElementNS(ns, "line");
+      grid.setAttribute("x1", pad.l);
+      grid.setAttribute("x2", W - pad.r);
+      grid.setAttribute("y1", gy);
+      grid.setAttribute("y2", gy);
+      grid.setAttribute("stroke", "rgba(253,255,239,0.08)");
+      grid.setAttribute("stroke-width", "1");
+      svg.appendChild(grid);
+
+      var lab = document.createElementNS(ns, "text");
+      lab.setAttribute("x", pad.l - 10);
+      lab.setAttribute("y", gy + 4);
+      lab.setAttribute("text-anchor", "end");
+      lab.setAttribute("fill", "#6B6C63");
+      lab.setAttribute("font-size", "11");
+      lab.setAttribute("font-family", "TT Norms Pro, sans-serif");
+      lab.textContent = t === 0 ? "0" : fmt(t);
+      svg.appendChild(lab);
+    });
+
+    var entryX = x(0);
+    var entry = document.createElementNS(ns, "line");
+    entry.setAttribute("x1", entryX);
+    entry.setAttribute("x2", entryX);
+    entry.setAttribute("y1", pad.t);
+    entry.setAttribute("y2", pad.t + ph);
+    entry.setAttribute("stroke", "rgba(253,255,239,0.35)");
+    entry.setAttribute("stroke-width", "1");
+    entry.setAttribute("stroke-dasharray", "2 5");
+    svg.appendChild(entry);
+
+    var entryLab = document.createElementNS(ns, "text");
+    entryLab.setAttribute("x", entryX + 8);
+    entryLab.setAttribute("y", pad.t + 14);
+    entryLab.setAttribute("fill", "#94968D");
+    entryLab.setAttribute("font-size", "11");
+    entryLab.setAttribute("font-family", "TT Norms Pro, sans-serif");
+    entryLab.textContent = "Entrada NBP · 02 Out";
+    svg.appendChild(entryLab);
+
+    var area = document.createElementNS(ns, "path");
+    area.setAttribute("d",
+      linePath(revenue) +
+      " L " + x(last).toFixed(1) + " " + y(0).toFixed(1) +
+      " L " + x(0).toFixed(1) + " " + y(0).toFixed(1) + " Z"
+    );
+    area.setAttribute("fill", "url(#revFill)");
+    svg.appendChild(area);
+
+    var revLine = document.createElementNS(ns, "path");
+    revLine.setAttribute("d", linePath(revenue));
+    revLine.setAttribute("fill", "none");
+    revLine.setAttribute("stroke", "#FDFFEF");
+    revLine.setAttribute("stroke-width", "2.2");
+    revLine.setAttribute("stroke-linecap", "round");
+    revLine.setAttribute("stroke-linejoin", "round");
+    svg.appendChild(revLine);
+
+    var profitLine = document.createElementNS(ns, "path");
+    profitLine.setAttribute("d", linePath(profit));
+    profitLine.setAttribute("fill", "none");
+    profitLine.setAttribute("stroke", "#C6C8BA");
+    profitLine.setAttribute("stroke-width", "2.2");
+    profitLine.setAttribute("stroke-linecap", "round");
+    profitLine.setAttribute("stroke-linejoin", "round");
+    svg.appendChild(profitLine);
+
+    var meta = document.createElementNS(ns, "line");
+    meta.setAttribute("x1", x(last));
+    meta.setAttribute("y1", y(revenue[last]));
+    meta.setAttribute("x2", x(goalI));
+    meta.setAttribute("y2", y(goalV));
+    meta.setAttribute("stroke", "#FDFFEF");
+    meta.setAttribute("stroke-width", "1.8");
+    meta.setAttribute("stroke-dasharray", "6 6");
+    svg.appendChild(meta);
+
+    function dot(cx, cy, r, fill, stroke, sw) {
+      var c = document.createElementNS(ns, "circle");
+      c.setAttribute("cx", cx);
+      c.setAttribute("cy", cy);
+      c.setAttribute("r", r);
+      c.setAttribute("fill", fill);
+      if (stroke) {
+        c.setAttribute("stroke", stroke);
+        c.setAttribute("stroke-width", sw || 1.6);
+      }
+      svg.appendChild(c);
+    }
+
+    function label(cx, cy, text, color, dy) {
+      var t = document.createElementNS(ns, "text");
+      t.setAttribute("x", cx);
+      t.setAttribute("y", cy + (dy || -12));
+      t.setAttribute("text-anchor", "middle");
+      t.setAttribute("fill", color);
+      t.setAttribute("font-size", "11");
+      t.setAttribute("font-weight", "600");
+      t.setAttribute("font-family", "TT Norms Pro, sans-serif");
+      t.textContent = text;
+      svg.appendChild(t);
+    }
+
+    for (var i = 0; i < revenue.length; i++) {
+      var rx = x(i), ry = y(revenue[i]);
+      var big = i === last;
+      dot(rx, ry, big ? 5 : 3.6, "#FDFFEF");
+      var txt = fmt(revenue[i]) + (big ? " EUR" : "");
+      label(rx, ry, txt, "#FDFFEF", big ? -16 : -12);
+    }
+
+    for (var p = 0; p < profit.length; p++) {
+      var px = x(p), py = y(profit[p]);
+      dot(px, py, 3.4, "#C6C8BA");
+      if (profitShow[p]) {
+        label(px, py, fmt(profit[p]) + " EUR", "#C6C8BA", -12);
+      }
+    }
+
+    var gx = x(goalI), gy = y(goalV);
+    dot(gx, gy, 5.5, "#181818", "#FDFFEF", 2);
+    label(gx, gy, "22.000 EUR", "#FDFFEF", -14);
+
+    months.forEach(function (m, i) {
+      var show = i === 0 || i === last || i === goalI || i < 7;
+      if (!show) return;
+      var tx = document.createElementNS(ns, "text");
+      tx.setAttribute("x", x(i));
+      tx.setAttribute("y", H - 14);
+      tx.setAttribute("text-anchor", "middle");
+      tx.setAttribute("fill", "#6B6C63");
+      tx.setAttribute("font-size", "11");
+      tx.setAttribute("font-family", "TT Norms Pro, sans-serif");
+      tx.textContent = m;
+      svg.appendChild(tx);
+    });
+
+    host.innerHTML = "";
+    host.appendChild(svg);
+  }
+
+  drawRevenueChart();
+})();
+</script>
+</body>
+</html>
