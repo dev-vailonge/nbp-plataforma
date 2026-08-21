@@ -525,6 +525,140 @@ button { font: inherit; }
 .quick-title { font-weight: 600; }
 .quick-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
 
+/* Weekly audio — mentor Mafra */
+.audio-week {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 40px;
+}
+.audio-week::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(180deg, #FDFFEF 0%, #C6C8BA 100%);
+  box-shadow: 0 0 12px rgba(253, 255, 239, 0.35);
+}
+.audio-week-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.audio-week-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #181818;
+  background: linear-gradient(135deg, #FDFFEF 0%, #C6C8BA 55%, #8A8B82 100%);
+  box-shadow: 0 0 0 1px rgba(253, 255, 239, 0.2), 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+.audio-week-copy { min-width: 0; flex: 1; }
+.audio-week-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  margin-bottom: 6px;
+}
+.audio-week-kicker i { color: #C6C8BA; font-size: 11px; }
+.audio-week-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.audio-week-sub {
+  margin: 5px 0 0;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+.audio-week-badge {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #181818;
+  background: #C6C8BA;
+}
+.audio-player {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(253, 255, 239, 0.02);
+}
+.audio-play {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  flex-shrink: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #181818;
+  background: linear-gradient(135deg, #FDFFEF 0%, #C6C8BA 100%);
+  box-shadow: 0 6px 18px rgba(198, 200, 186, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.audio-play:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 22px rgba(198, 200, 186, 0.35);
+}
+.audio-play i { font-size: 15px; margin-left: 2px; }
+.audio-play.is-playing i { margin-left: 0; }
+.audio-wave {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.audio-progress {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(198, 200, 186, 0.12);
+  cursor: pointer;
+  overflow: hidden;
+}
+.audio-progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #C6C8BA, #FDFFEF);
+  transition: width 0.1s linear;
+}
+.audio-times {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+.audio-week audio { display: none; }
+
 /* Stats */
 .stats-grid {
   display: grid;
@@ -806,6 +940,8 @@ button { font: inherit; }
   .quick-actions { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: 1fr; }
   .topbar-search { display: none; }
+  .audio-week { padding: 18px; }
+  .audio-week-badge { display: none; }
 }
 .mobile-toggle { display: none; }
 </style>
@@ -860,6 +996,10 @@ button { font: inherit; }
         <i class="fa-regular fa-calendar" aria-hidden="true"></i>
         <span>Calendário</span>
       </a>
+      <a class="nav-item" href="support.html">
+        <i class="fa-regular fa-comments" aria-hidden="true"></i>
+        <span>Suporte</span>
+      </a>
     </nav>
 
     <div class="sidebar-footer">
@@ -867,7 +1007,7 @@ button { font: inherit; }
         <i class="fa-solid fa-gear" aria-hidden="true"></i>
         <span>Settings</span>
       </a>
-      <a class="nav-item" href="index2.html">
+      <a class="nav-item" href="index.html">
         <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
         <span>Sair</span>
       </a>
@@ -883,7 +1023,6 @@ button { font: inherit; }
       <button class="topbar-icon-btn mobile-toggle" id="mobileToggle" aria-label="Abrir menu">
         <i class="fa-solid fa-bars" aria-hidden="true"></i>
       </button>
-      <h1 class="topbar-title">Início</h1>
       <div class="topbar-search">
         <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
         <input type="text" placeholder="Buscar cursos, tarefas, eventos..."/>
@@ -900,6 +1039,40 @@ button { font: inherit; }
       <p class="chat-sub">
         Menos operação, mais faturação. Continue de onde parou e avance no seu desafio.
       </p>
+
+      <!-- Áudio da semana — mentor Mafra -->
+      <article class="audio-week" aria-labelledby="audio-week-title">
+        <div class="audio-week-top">
+          <div class="audio-week-avatar" aria-hidden="true">JM</div>
+          <div class="audio-week-copy">
+            <div class="audio-week-kicker">
+              <i class="fa-solid fa-headphones" aria-hidden="true"></i>
+              Áudio da semana
+            </div>
+            <h3 class="audio-week-title" id="audio-week-title">Priorize o canal que já converte</h3>
+            <p class="audio-week-sub">Mentor Mafra · Semana 18–24 ago · ~6 min</p>
+          </div>
+          <span class="audio-week-badge">Novo</span>
+        </div>
+
+        <div class="audio-player" data-audio-player>
+          <button type="button" class="audio-play" id="audioPlayBtn" aria-label="Reproduzir áudio da semana">
+            <i class="fa-solid fa-play" aria-hidden="true"></i>
+          </button>
+          <div class="audio-wave">
+            <div class="audio-progress" id="audioProgress" role="slider" aria-label="Progresso do áudio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+              <div class="audio-progress-fill" id="audioProgressFill"></div>
+            </div>
+            <div class="audio-times">
+              <span id="audioCurrent">0:00</span>
+              <span id="audioDuration">6:42</span>
+            </div>
+          </div>
+        </div>
+        <audio id="weeklyAudio" preload="metadata" src="assets/audio/semana-atual.mp3">
+          O seu browser não suporta áudio.
+        </audio>
+      </article>
 
       <!-- Quick actions -->
       <div class="section-label">Ações rápidas</div>
@@ -1181,6 +1354,67 @@ button { font: inherit; }
     requestAnimationFrame(function () {
       requestAnimationFrame(function () { fill.style.width = "38.4%"; });
     });
+  }
+
+  /* Weekly audio player */
+  var audio = document.getElementById("weeklyAudio");
+  var playBtn = document.getElementById("audioPlayBtn");
+  var progress = document.getElementById("audioProgress");
+  var fillBar = document.getElementById("audioProgressFill");
+  var curEl = document.getElementById("audioCurrent");
+  var durEl = document.getElementById("audioDuration");
+
+  function fmtTime(s) {
+    if (!isFinite(s) || s < 0) return "0:00";
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return m + ":" + (sec < 10 ? "0" : "") + sec;
+  }
+
+  function setPlaying(on) {
+    if (!playBtn) return;
+    playBtn.classList.toggle("is-playing", on);
+    playBtn.setAttribute("aria-label", on ? "Pausar áudio" : "Reproduzir áudio da semana");
+    playBtn.innerHTML = on
+      ? '<i class="fa-solid fa-pause" aria-hidden="true"></i>'
+      : '<i class="fa-solid fa-play" aria-hidden="true"></i>';
+  }
+
+  if (audio && playBtn) {
+    playBtn.addEventListener("click", function () {
+      if (audio.paused) {
+        audio.play().then(function () { setPlaying(true); }).catch(function () {
+          setPlaying(false);
+        });
+      } else {
+        audio.pause();
+        setPlaying(false);
+      }
+    });
+
+    audio.addEventListener("loadedmetadata", function () {
+      if (isFinite(audio.duration)) durEl.textContent = fmtTime(audio.duration);
+    });
+    audio.addEventListener("timeupdate", function () {
+      var pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      fillBar.style.width = pct + "%";
+      progress.setAttribute("aria-valuenow", Math.round(pct));
+      curEl.textContent = fmtTime(audio.currentTime);
+    });
+    audio.addEventListener("ended", function () {
+      setPlaying(false);
+      fillBar.style.width = "0%";
+      curEl.textContent = "0:00";
+      progress.setAttribute("aria-valuenow", "0");
+    });
+
+    function seek(clientX) {
+      if (!audio.duration) return;
+      var rect = progress.getBoundingClientRect();
+      var ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+      audio.currentTime = ratio * audio.duration;
+    }
+    progress.addEventListener("click", function (e) { seek(e.clientX); });
   }
 
   /* Count-up for stat values */
