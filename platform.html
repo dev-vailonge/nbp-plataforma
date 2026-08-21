@@ -587,6 +587,12 @@ button { font: inherit; }
   font-size: 0.86rem;
   color: var(--text-muted);
 }
+.audio-week-sub a {
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.audio-week-sub a:hover { color: var(--text); }
 .audio-week-badge {
   flex-shrink: 0;
   padding: 4px 10px;
@@ -935,6 +941,77 @@ button { font: inherit; }
   .main { margin-left: 0; padding: 24px 20px 60px; }
   .topbar-search input { width: 180px; }
   .mobile-toggle { display: inline-flex !important; }
+
+  #desafio.panel { padding: 18px 16px 20px; overflow: hidden; }
+  #desafio .panel-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  #desafio .panel-flag {
+    text-align: left;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(253, 255, 239, 0.03);
+    font-size: 0.84rem;
+  }
+  #desafio .panel-flag br { display: none; }
+  #desafio .journey-scroll {
+    margin: 0 -16px;
+    padding: 4px 16px 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  #desafio .journey-track {
+    display: flex;
+    align-items: flex-start;
+    width: max-content;
+    min-width: 100%;
+    gap: 0;
+    padding-bottom: 4px;
+  }
+  #desafio .journey-line,
+  #desafio .journey-fill {
+    left: 44px;
+    right: 44px;
+    top: 26px;
+  }
+  #desafio .step {
+    flex: 0 0 108px;
+    width: 108px;
+    padding: 0 8px;
+  }
+  #desafio .step-figure { height: 52px; }
+  #desafio .step-node {
+    --size: 22px !important;
+    width: 22px;
+    height: 22px;
+    font-size: 9px;
+  }
+  #desafio .step.current .step-node {
+    width: 26px;
+    height: 26px;
+  }
+  #desafio .step-name {
+    font-size: 0.72rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  #desafio .step-sub {
+    font-size: 0.66rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 @media (max-width: 560px) {
   .quick-actions { grid-template-columns: 1fr; }
@@ -942,6 +1019,11 @@ button { font: inherit; }
   .topbar-search { display: none; }
   .audio-week { padding: 18px; }
   .audio-week-badge { display: none; }
+
+  #desafio .step {
+    flex: 0 0 96px;
+    width: 96px;
+  }
 }
 .mobile-toggle { display: none; }
 </style>
@@ -987,6 +1069,10 @@ button { font: inherit; }
       <a class="nav-item" href="content.html">
         <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
         <span>Cursos</span>
+      </a>
+      <a class="nav-item" href="audios.html">
+        <i class="fa-solid fa-headphones" aria-hidden="true"></i>
+        <span>Áudios</span>
       </a>
       <a class="nav-item" href="community.html">
         <i class="fa-solid fa-user-group" aria-hidden="true"></i>
@@ -1050,7 +1136,7 @@ button { font: inherit; }
               Áudio da semana
             </div>
             <h3 class="audio-week-title" id="audio-week-title">Priorize o canal que já converte</h3>
-            <p class="audio-week-sub">Mentor Mafra · Semana 18–24 ago · ~6 min</p>
+            <p class="audio-week-sub">Mentor Mafra · Semana 18–24 ago · ~6 min · <a href="audios.html">Ver todos</a></p>
           </div>
           <span class="audio-week-badge">Novo</span>
         </div>
@@ -1353,6 +1439,16 @@ button { font: inherit; }
   if (fill) {
     requestAnimationFrame(function () {
       requestAnimationFrame(function () { fill.style.width = "38.4%"; });
+    });
+  }
+
+  /* Keep current journey step in view on mobile */
+  var currentStep = document.querySelector("#desafio .step.current");
+  var journeyScroll = document.querySelector("#desafio .journey-scroll");
+  if (currentStep && journeyScroll && window.innerWidth <= 860) {
+    requestAnimationFrame(function () {
+      var left = currentStep.offsetLeft - (journeyScroll.clientWidth / 2) + (currentStep.offsetWidth / 2);
+      journeyScroll.scrollLeft = Math.max(0, left);
     });
   }
 
