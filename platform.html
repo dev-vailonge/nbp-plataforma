@@ -80,18 +80,15 @@ button { font: inherit; }
   margin-bottom: 6px;
 }
 .brand-mark {
-  width: 30px;
-  height: 30px;
+  width: 32px; height: 32px;
   border-radius: 8px;
-  background: radial-gradient(circle at 30% 30%, #FDFFEF 0%, #C6C8BA 55%, #4B4C47 100%);
-  box-shadow: 0 0 18px rgba(253, 255, 239, 0.18);
+  background: #2A2926;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
 .brand-name {
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 1rem; font-weight: 500;
+  letter-spacing: 0.07em;
   color: var(--text);
 }
 
@@ -239,11 +236,12 @@ button { font: inherit; }
 .main {
   flex: 1;
   margin-left: var(--sidebar-w);
-  padding: 32px 40px 60px;
+  padding: 28px 40px 80px;
   min-height: 100vh;
+  max-width: 1180px;
 }
 .topbar {
-  display: flex;
+  display: none;
   align-items: center;
   gap: 20px;
   margin-bottom: 40px;
@@ -761,7 +759,7 @@ button { font: inherit; }
 }
 .journey-line {
   position: absolute;
-  top: 28px;
+  top: 24px;
   left: 5.5%;
   right: 5.5%;
   height: 2px;
@@ -771,7 +769,7 @@ button { font: inherit; }
 }
 .journey-fill {
   position: absolute;
-  top: 28px;
+  top: 24px;
   left: 5.5%;
   width: 0;
   height: 2px;
@@ -793,41 +791,46 @@ button { font: inherit; }
   min-width: 0;
 }
 .step-figure {
-  height: 56px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .step-node {
-  --size: 22px;
-  width: var(--size);
-  height: var(--size);
-  border-radius: 50%;
-  background: #2a2a28;
-  border: 2px solid var(--border-strong);
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-subtle);
-  font-size: 10px;
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  transition: transform 0.4s ease, filter 0.4s ease;
 }
+.step-mark {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+.step-mark-sq { fill: #C6CABE; transition: fill 0.25s ease; }
+.step-mark-dot { fill: #2A2926; transition: fill 0.25s ease; }
 .step.done .step-node {
-  background: radial-gradient(circle at 30% 30%, #FDFFEF 0%, #C6C8BA 60%, #6B6C63 100%);
-  border-color: #C6C8BA;
-  color: #181818;
+  filter: drop-shadow(0 0 8px rgba(198, 200, 186, 0.35));
 }
 .step.current .step-node {
-  background: radial-gradient(circle at 30% 30%, #FDFFEF 0%, #C6C8BA 62%, #6B6C63 100%);
-  border-color: #FDFFEF;
-  border-style: solid;
-  box-shadow: 0 0 0 4px rgba(253,255,239,0.12), 0 0 24px rgba(253,255,239,0.35);
+  width: 26px;
+  height: 26px;
   animation: nodePulse 3s ease-in-out infinite;
 }
-.step.locked .step-node { border-style: dashed; background: #232320; }
+.step.current .step-mark {
+  width: 26px;
+  height: 26px;
+}
+.step.current .step-mark-sq { fill: #FDFFEF; }
+.step.current .step-mark-dot { fill: #2A2926; }
+.step.locked .step-mark-sq { fill: #4B4C47; }
+.step.locked .step-mark-dot { fill: #232320; }
+.step.locked .step-node { opacity: 0.85; }
 @keyframes nodePulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(253,255,239,0.12), 0 0 20px rgba(253,255,239,0.3); }
-  50% { box-shadow: 0 0 0 6px rgba(253,255,239,0.08), 0 0 32px rgba(253,255,239,0.5); }
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(253,255,239,0.25)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 14px rgba(253,255,239,0.45)); transform: scale(1.06); }
 }
 .step-name {
   font-size: 0.8rem;
@@ -939,7 +942,7 @@ button { font: inherit; }
   }
   .sidebar.open { transform: translateX(0); }
   .main { margin-left: 0; padding: 24px 20px 60px; }
-  .topbar-search input { width: 180px; }
+  .topbar { display: flex; margin-bottom: 20px; }
   .mobile-toggle { display: inline-flex !important; }
 
   #desafio.panel { padding: 18px 16px 20px; overflow: hidden; }
@@ -981,23 +984,23 @@ button { font: inherit; }
   #desafio .journey-fill {
     left: 44px;
     right: 44px;
-    top: 26px;
+    top: 22px;
   }
   #desafio .step {
     flex: 0 0 108px;
     width: 108px;
     padding: 0 8px;
   }
-  #desafio .step-figure { height: 52px; }
-  #desafio .step-node {
-    --size: 22px !important;
-    width: 22px;
-    height: 22px;
-    font-size: 9px;
+  #desafio .step-figure { height: 44px; }
+  #desafio .step-node,
+  #desafio .step-mark {
+    width: 20px;
+    height: 20px;
   }
-  #desafio .step.current .step-node {
-    width: 26px;
-    height: 26px;
+  #desafio .step.current .step-node,
+  #desafio .step.current .step-mark {
+    width: 24px;
+    height: 24px;
   }
   #desafio .step-name {
     font-size: 0.72rem;
@@ -1016,7 +1019,6 @@ button { font: inherit; }
 @media (max-width: 560px) {
   .quick-actions { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: 1fr; }
-  .topbar-search { display: none; }
   .audio-week { padding: 18px; }
   .audio-week-badge { display: none; }
 
@@ -1038,8 +1040,10 @@ button { font: inherit; }
   <aside class="sidebar" id="sidebar" aria-label="Navegação principal">
 
     <div class="sidebar-brand">
-      <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-name">No Blank Page</span>
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><rect width="20" height="20" fill="#C6CABE"/><circle cx="10" cy="10" r="6.2" fill="#2A2926"/></svg>
+      </span>
+      <span class="brand-name">NBP</span>
     </div>
 
     <a class="sidebar-profile" href="profile.html">
@@ -1062,6 +1066,14 @@ button { font: inherit; }
         <i class="fa-solid fa-flag-checkered" aria-hidden="true"></i>
         <span>Plano de ação</span>
       </a>
+      <a class="nav-item" href="documents.html">
+        <i class="fa-regular fa-folder" aria-hidden="true"></i>
+        <span>Documentos</span>
+      </a>
+      <a class="nav-item" href="meetings.html">
+        <i class="fa-solid fa-video" aria-hidden="true"></i>
+        <span>Reuniões 1:1</span>
+      </a>
       <a class="nav-item" href="dashboard.html">
         <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
         <span>Dashboard</span>
@@ -1070,9 +1082,9 @@ button { font: inherit; }
         <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
         <span>Cursos</span>
       </a>
-      <a class="nav-item" href="audios.html">
-        <i class="fa-solid fa-headphones" aria-hidden="true"></i>
-        <span>Áudios</span>
+      <a class="nav-item" href="talks.html">
+        <i class="fa-solid fa-microphone-lines" aria-hidden="true"></i>
+        <span>Mafra Talks</span>
       </a>
       <a class="nav-item" href="community.html">
         <i class="fa-solid fa-user-group" aria-hidden="true"></i>
@@ -1109,13 +1121,6 @@ button { font: inherit; }
       <button class="topbar-icon-btn mobile-toggle" id="mobileToggle" aria-label="Abrir menu">
         <i class="fa-solid fa-bars" aria-hidden="true"></i>
       </button>
-      <div class="topbar-search">
-        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-        <input type="text" placeholder="Buscar cursos, tarefas, eventos..."/>
-      </div>
-      <button class="topbar-icon-btn" aria-label="Notificações">
-        <i class="fa-regular fa-bell" aria-hidden="true"></i>
-      </button>
     </div>
 
     <section class="home" aria-label="Início">
@@ -1136,7 +1141,7 @@ button { font: inherit; }
               Áudio da semana
             </div>
             <h3 class="audio-week-title" id="audio-week-title">Priorize o canal que já converte</h3>
-            <p class="audio-week-sub">Mentor Mafra · Semana 18–24 ago · ~6 min · <a href="audios.html">Ver todos</a></p>
+            <p class="audio-week-sub">Mentor Mafra · Semana 18–24 ago · ~6 min · <a href="talks.html">Ver todos</a></p>
           </div>
           <span class="audio-week-badge">Novo</span>
         </div>
@@ -1243,47 +1248,47 @@ button { font: inherit; }
               <div class="journey-fill" id="journeyFill" aria-hidden="true"></div>
 
               <div class="step done">
-                <div class="step-figure"><div class="step-node" style="--size:16px"><i class="fa-solid fa-check" aria-hidden="true"></i></div></div>
+                <div class="step-figure"><div class="step-node"><svg class="step-mark" viewBox="0 0 20 20" aria-hidden="true"><rect class="step-mark-sq" width="20" height="20"/><circle class="step-mark-dot" cx="10" cy="10" r="6.2"/></svg></div></div>
                 <div class="step-name">Página em branco</div>
                 <div class="step-sub">01 jul</div>
               </div>
               <div class="step done">
-                <div class="step-figure"><div class="step-node" style="--size:20px"><i class="fa-solid fa-check" aria-hidden="true"></i></div></div>
+                <div class="step-figure"><div class="step-node"><svg class="step-mark" viewBox="0 0 20 20" aria-hidden="true"><rect class="step-mark-sq" width="20" height="20"/><circle class="step-mark-dot" cx="10" cy="10" r="6.2"/></svg></div></div>
                 <div class="step-name">Posicionamento</div>
                 <div class="step-sub">08 jul</div>
               </div>
               <div class="step done">
-                <div class="step-figure"><div class="step-node" style="--size:24px"><i class="fa-solid fa-check" aria-hidden="true"></i></div></div>
+                <div class="step-figure"><div class="step-node"><svg class="step-mark" viewBox="0 0 20 20" aria-hidden="true"><rect class="step-mark-sq" width="20" height="20"/><circle class="step-mark-dot" cx="10" cy="10" r="6.2"/></svg></div></div>
                 <div class="step-name">Oferta irresistível</div>
                 <div class="step-sub">18 jul</div>
               </div>
               <div class="step current">
-                <div class="step-figure"><div class="step-node" style="--size:30px"></div></div>
+                <div class="step-figure"><div class="step-node"><svg class="step-mark" viewBox="0 0 20 20" aria-hidden="true"><rect class="step-mark-sq" width="20" height="20"/><circle class="step-mark-dot" cx="10" cy="10" r="6.2"/></svg></div></div>
                 <div class="step-name">Aquisição de clientes</div>
                 <div class="step-sub">45%</div>
               </div>
               <div class="step locked">
-                <div class="step-figure"><div class="step-node" style="--size:32px"></div></div>
+                <div class="step-figure"><div class="step-node"><svg class="step-mark" viewBox="0 0 20 20" aria-hidden="true"><rect class="step-mark-sq" width="20" height="20"/><circle class="step-mark-dot" cx="10" cy="10" r="6.2"/></svg></div></div>
                 <div class="step-name">Vendas previsíveis</div>
                 <div class="step-sub">dia 45</div>
               </div>
               <div class="step locked">
-                <div class="step-figure"><div class="step-node" style="--size:36px"></div></div>
+                <div class="step-figure"><div class="step-node"><svg class="step-mark" viewBox="0 0 20 20" aria-hidden="true"><rect class="step-mark-sq" width="20" height="20"/><circle class="step-mark-dot" cx="10" cy="10" r="6.2"/></svg></div></div>
                 <div class="step-name">Processos</div>
                 <div class="step-sub">dia 60</div>
               </div>
               <div class="step locked">
-                <div class="step-figure"><div class="step-node" style="--size:40px"></div></div>
+                <div class="step-figure"><div class="step-node"><svg class="step-mark" viewBox="0 0 20 20" aria-hidden="true"><rect class="step-mark-sq" width="20" height="20"/><circle class="step-mark-dot" cx="10" cy="10" r="6.2"/></svg></div></div>
                 <div class="step-name">Equipa</div>
                 <div class="step-sub">dia 80</div>
               </div>
               <div class="step locked">
-                <div class="step-figure"><div class="step-node" style="--size:44px"></div></div>
+                <div class="step-figure"><div class="step-node"><svg class="step-mark" viewBox="0 0 20 20" aria-hidden="true"><rect class="step-mark-sq" width="20" height="20"/><circle class="step-mark-dot" cx="10" cy="10" r="6.2"/></svg></div></div>
                 <div class="step-name">Delegação</div>
                 <div class="step-sub">dia 100</div>
               </div>
               <div class="step locked">
-                <div class="step-figure"><div class="step-node" style="--size:48px">?</div></div>
+                <div class="step-figure"><div class="step-node"><svg class="step-mark" viewBox="0 0 20 20" aria-hidden="true"><rect class="step-mark-sq" width="20" height="20"/><circle class="step-mark-dot" cx="10" cy="10" r="6.2"/></svg></div></div>
                 <div class="step-name">Escala</div>
                 <div class="step-sub">continue para descobrir</div>
               </div>

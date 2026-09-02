@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>No Blank Page — Documentos</title>
+<link href="assets/reset_0f9ee9f4f517.css" rel="stylesheet"/>
+<link href="assets/theme_0669b57c8fb5.css" rel="stylesheet"/>
+<link href="assets/frontend_0822fffedd00.css" rel="stylesheet"/>
+<link href="assets/widget-heading_f12c63fad7fa.css" rel="stylesheet"/>
+<link href="assets/widget-icon-box_b101ae1760ed.css" rel="stylesheet"/>
+<link href="assets/ekiticons_4dfc472e5fa2.css" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="assets/nbp-theme.css"/>
+<script>(function(){try{var t=localStorage.getItem("nbp-theme")||"dark";var pl=window.matchMedia&&!window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",(t==="light"||(t==="system"&&pl))?"light":"dark");}catch(e){}})();</script>
+<style>
+:root {
+  --bg: #151515;
+  --bg-surface: #1C1C1C;
+  --bg-elev: #222222;
+  --border: #C6C8BA1F;
+  --border-strong: #C6C8BA33;
+  --text: #FDFFEF;
+  --text-muted: #94968D;
+  --text-subtle: #6B6C63;
+  --sage: #C6C8BA;
+  --sidebar-w: 244px;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "TT Norms Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+               Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; }
+
+.app { display: flex; min-height: 100vh; }
+
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w);
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  padding: 22px 14px 18px;
+  z-index: 100;
+}
+.sidebar-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 4px 10px 18px; margin-bottom: 6px;
+}
+.brand-mark {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: #2A2926;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.brand-name {
+  font-size: 1rem; font-weight: 500;
+  letter-spacing: 0.07em;
+  color: var(--text);
+}
+.sidebar-profile {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px; border: 1px solid var(--border);
+  background: rgba(253, 255, 239, 0.015);
+  border-radius: 12px; margin-bottom: 22px;
+  transition: border-color 0.25s ease, background 0.25s ease; cursor: pointer;
+}
+.sidebar-profile:hover {
+  border-color: var(--border-strong);
+  background: rgba(253, 255, 239, 0.04);
+}
+.profile-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, #C6C8BA 0%, #4B4C47 100%);
+  color: #181818; font-weight: 700; font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(253, 255, 239, 0.15);
+}
+.profile-info { min-width: 0; flex: 1; }
+.profile-name {
+  font-size: 0.88rem; font-weight: 600; color: var(--text);
+  line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.profile-plan {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.66rem; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-muted); margin-top: 3px;
+}
+.profile-plan::before {
+  content: ""; width: 5px; height: 5px; border-radius: 50%;
+  background: #C6C8BA; box-shadow: 0 0 6px rgba(198, 200, 186, 0.7);
+}
+.sidebar-label {
+  font-size: 0.64rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-subtle); padding: 0 12px; margin: 4px 0 10px;
+}
+.sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 10px;
+  color: var(--text-muted); font-size: 0.92rem; font-weight: 500;
+  cursor: pointer; position: relative;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.nav-item i { width: 18px; font-size: 16px; text-align: center; color: inherit; opacity: 0.85; }
+.nav-item:hover { color: var(--text); background: rgba(253, 255, 239, 0.04); }
+.nav-item.active { color: var(--text); background: rgba(253, 255, 239, 0.06); }
+.nav-item.active::before {
+  content: ""; position: absolute; left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 18px; border-radius: 2px;
+  background: var(--text); box-shadow: 0 0 10px rgba(253, 255, 239, 0.6);
+}
+.sidebar-footer {
+  margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 2px;
+}
+
+.main {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  padding: 28px 40px 80px;
+  min-height: 100vh;
+  max-width: 1180px;
+}
+.topbar {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 22px;
+}
+.topbar-title { font-size: 1.4rem; font-weight: 600; margin: 0; color: var(--text); }
+.topbar-title small {
+  display: block; font-size: 0.8rem; font-weight: 400;
+  color: var(--text-muted); margin-top: 2px;
+}
+.topbar-icon-btn {
+  width: 38px; height: 38px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--bg-surface);
+  color: var(--text-muted);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+.topbar-icon-btn:hover { color: var(--text); border-color: var(--border-strong); background: var(--bg-elev); }
+.mobile-toggle { display: none; }
+
+.page { max-width: none; }
+.docs-meta {
+  margin: 0 0 18px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+.docs-bc {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 18px;
+  font-size: 0.88rem;
+}
+.docs-bc button {
+  border: none; background: none; padding: 0;
+  color: var(--text-muted); cursor: pointer; font: inherit;
+}
+.docs-bc button:hover { color: var(--text); }
+.docs-bc .sep { color: var(--text-subtle); }
+.docs-bc .cur { color: var(--text); }
+
+.folder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.folder-card {
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex; align-items: center; gap: 12px;
+  text-align: left; color: var(--text); cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.folder-card:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-elev);
+}
+.folder-ic {
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(198, 200, 186, 0.08);
+  border: 1px solid var(--border);
+  color: var(--sage);
+  font-size: 16px;
+}
+.folder-name {
+  display: block; font-size: 0.9rem; font-weight: 600; line-height: 1.35;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.folder-count { display: block; font-size: 0.74rem; color: var(--text-subtle); margin-top: 2px; }
+
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.file-card {
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+  cursor: pointer;
+}
+.file-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+.file-thumb {
+  height: 84px;
+  background: #1a1a18;
+  display: flex; align-items: center; justify-content: center;
+  border-bottom: 1px solid var(--border);
+  font-size: 28px;
+}
+.file-body { padding: 12px; }
+.file-name {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.file-type {
+  margin: 6px 0 0;
+  font-size: 0.72rem;
+  color: var(--text-subtle);
+}
+
+.docs-empty {
+  border: 1px dashed var(--border-strong);
+  border-radius: 12px;
+  padding: 42px 16px;
+  text-align: center;
+}
+.docs-empty h3 { margin: 0 0 6px; font-size: 1rem; color: var(--text); }
+.docs-empty p { margin: 0; font-size: 0.86rem; color: var(--text-muted); }
+
+.sidebar-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 90; border: 0; padding: 0; cursor: pointer;
+}
+.sidebar-backdrop.show { display: block; }
+
+@media (max-width: 860px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; padding: 24px 20px 60px; }
+  .mobile-toggle { display: inline-flex !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <button type="button" class="sidebar-backdrop" id="sidebarBackdrop" aria-label="Fechar menu" hidden></button>
+
+  <aside class="sidebar" id="sidebar" aria-label="Navegação principal">
+    <div class="sidebar-brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><rect width="20" height="20" fill="#C6CABE"/><circle cx="10" cy="10" r="6.2" fill="#2A2926"/></svg>
+      </span>
+      <span class="brand-name">NBP</span>
+    </div>
+
+    <a class="sidebar-profile" href="profile.html">
+      <div class="profile-avatar">RB</div>
+      <div class="profile-info">
+        <div class="profile-name">Roque Buarque</div>
+        <div class="profile-plan">Membro ativo</div>
+      </div>
+    </a>
+
+    <div class="sidebar-label">Menu</div>
+    <nav class="sidebar-nav" aria-label="Menu">
+      <a class="nav-item" href="platform.html">
+        <i class="fa-solid fa-house" aria-hidden="true"></i>
+        <span>Início</span>
+      </a>
+      <a class="nav-item" href="action-plan.html">
+        <i class="fa-solid fa-flag-checkered" aria-hidden="true"></i>
+        <span>Plano de ação</span>
+      </a>
+      <a class="nav-item active" href="documents.html">
+        <i class="fa-regular fa-folder" aria-hidden="true"></i>
+        <span>Documentos</span>
+      </a>
+      <a class="nav-item" href="meetings.html">
+        <i class="fa-solid fa-video" aria-hidden="true"></i>
+        <span>Reuniões 1:1</span>
+      </a>
+      <a class="nav-item" href="dashboard.html">
+        <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" href="content.html">
+        <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+        <span>Cursos</span>
+      </a>
+      <a class="nav-item" href="talks.html">
+        <i class="fa-solid fa-microphone-lines" aria-hidden="true"></i>
+        <span>Mafra Talks</span>
+      </a>
+      <a class="nav-item" href="community.html">
+        <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+        <span>Comunidade</span>
+      </a>
+      <a class="nav-item" href="calendar.html">
+        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+        <span>Calendário</span>
+      </a>
+      <a class="nav-item" href="support.html">
+        <i class="fa-regular fa-comments" aria-hidden="true"></i>
+        <span>Suporte</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a class="nav-item" href="settings.html">
+        <i class="fa-solid fa-gear" aria-hidden="true"></i>
+        <span>Settings</span>
+      </a>
+      <a class="nav-item" href="index.html">
+        <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+        <span>Sair</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="topbar-icon-btn mobile-toggle" id="mobileToggle" aria-label="Abrir menu">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
+      <h1 class="topbar-title">
+        Documentos
+        <small>Materiais e ficheiros partilhados pelo mentor</small>
+      </h1>
+    </div>
+
+    <section class="page" aria-label="Documentos">
+      <div id="docsRoot"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  var TF = {
+    doc: { ic: "fa-file-word", color: "#7FB6EE", label: "Word" },
+    gdoc: { ic: "fa-file-lines", color: "#7FB6EE", label: "Documento" },
+    xls: { ic: "fa-file-excel", color: "#5FC7A4", label: "Excel" },
+    gsheet: { ic: "fa-table", color: "#5FC7A4", label: "Folha" },
+    pdf: { ic: "fa-file-pdf", color: "#E88585", label: "PDF" }
+  };
+
+  var DRV = {
+    raiz: {
+      pastas: ["p0", "p1", "p2", "p3", "p4", "ppa", "pt"],
+      fich: [
+        { n: "[AT] Mapa de…", t: "gsheet" },
+        { n: "DICTIONARY", t: "gdoc" },
+        { n: "Ebook.pdf", t: "pdf" },
+        { n: "Framework de…", t: "gdoc" },
+        { n: "Planilha Controlo…", t: "gsheet" },
+        { n: "Script de call…", t: "gdoc" }
+      ]
+    },
+    p0: { nome: "0 · Alinhamento de expectativas", pastas: [], fich: [] },
+    p1: {
+      nome: "1 · Identidade do Comunicador", pastas: [],
+      fich: [
+        { n: "Clareza e…", t: "doc" },
+        { n: "Dashboard Diário", t: "xls" },
+        { n: "Identidade Atual…", t: "doc" },
+        { n: "Livro de…", t: "doc" },
+        { n: "Nova…", t: "doc" },
+        { n: "Vida de Sonhos", t: "doc" }
+      ]
+    },
+    p2: {
+      nome: "2 · Posicionamento", pastas: [],
+      fich: [
+        { n: "Calendário de…", t: "xls" },
+        { n: "Posicionamento", t: "doc" }
+      ]
+    },
+    p3: {
+      nome: "3 · Oferta", pastas: [],
+      fich: [
+        { n: "Oferta", t: "doc" },
+        { n: "Transformação", t: "doc" }
+      ]
+    },
+    p4: {
+      nome: "4 · Conversão 10X", pastas: ["pev"],
+      fich: [
+        { n: "[NBP] Webinar · Ciclos de 7 dias", t: "gsheet" },
+        { n: "Conversão", t: "doc" },
+        { n: "Planilha de Evento", t: "gsheet" }
+      ]
+    },
+    pev: { nome: "Evento Presencial", pai: "p4", pastas: [], fich: [] },
+    ppa: {
+      nome: "Plano de Ação", pastas: [],
+      fich: [
+        { n: "[NBP] MODELO…", t: "xls" },
+        { n: "[NBP]…", t: "xls" }
+      ]
+    },
+    pt: { nome: "Templates", pastas: [], fich: [] }
+  };
+
+  var pAtual = "raiz";
+  var root = document.getElementById("docsRoot");
+
+  function countItems(p) {
+    return (p.pastas ? p.pastas.length : 0) + (p.fich ? p.fich.length : 0);
+  }
+
+  function render() {
+    var d = DRV[pAtual];
+    var bc = "";
+
+    if (pAtual === "raiz") {
+      bc = '<p class="docs-meta">' + d.pastas.length + " pastas · " + d.fich.length + " ficheiros soltos</p>";
+    } else {
+      var trail = '<button type="button" class="bcb" data-id="raiz">Documentos</button>';
+      if (d.pai) {
+        trail += '<span class="sep">/</span><button type="button" class="bcb" data-id="' + d.pai + '">' +
+          esc(DRV[d.pai].nome) + "</button>";
+      }
+      trail += '<span class="sep">/</span><span class="cur">' + esc(d.nome) + "</span>";
+      bc =
+        '<div class="docs-bc">' +
+          '<button type="button" id="volta" aria-label="Voltar"><i class="fa-solid fa-arrow-left"></i></button>' +
+          trail +
+        "</div>";
+    }
+
+    var h = "";
+    if (d.pastas.length) {
+      h += '<div class="folder-grid">' + d.pastas.map(function (id) {
+        var p = DRV[id];
+        var q = countItems(p);
+        return '<button type="button" class="folder-card fo" data-id="' + id + '">' +
+          '<span class="folder-ic"><i class="fa-solid fa-folder" aria-hidden="true"></i></span>' +
+          '<span style="min-width:0;flex:1">' +
+            '<span class="folder-name">' + esc(p.nome) + "</span>" +
+            '<span class="folder-count">' + (q ? q + (q === 1 ? " item" : " itens") : "vazia") + "</span>" +
+          "</span></button>";
+      }).join("") + "</div>";
+    }
+
+    if (d.fich.length) {
+      h += '<div class="file-grid">' + d.fich.map(function (f) {
+        var t = TF[f.t] || TF.gdoc;
+        return '<article class="file-card" tabindex="0" role="button" aria-label="' + esc(f.n) + '">' +
+          '<div class="file-thumb"><i class="fa-solid ' + t.ic + '" style="color:' + t.color + '" aria-hidden="true"></i></div>' +
+          '<div class="file-body">' +
+            '<p class="file-name">' + esc(f.n) + "</p>" +
+            '<p class="file-type">' + esc(t.label) + "</p>" +
+          "</div></article>";
+      }).join("") + "</div>";
+    }
+
+    if (!d.pastas.length && !d.fich.length) {
+      h = '<div class="docs-empty"><h3>Pasta vazia</h3><p>Ainda não há ficheiros partilhados aqui.</p></div>';
+    }
+
+    root.innerHTML = bc + h;
+
+    root.querySelectorAll(".fo").forEach(function (b) {
+      b.addEventListener("click", function () {
+        pAtual = b.getAttribute("data-id");
+        render();
+      });
+    });
+    root.querySelectorAll(".bcb").forEach(function (b) {
+      b.addEventListener("click", function () {
+        pAtual = b.getAttribute("data-id");
+        render();
+      });
+    });
+    var volta = document.getElementById("volta");
+    if (volta) {
+      volta.addEventListener("click", function () {
+        pAtual = d.pai || "raiz";
+        render();
+      });
+    }
+  }
+
+  render();
+
+  /* Mobile sidebar */
+  var toggle = document.getElementById("mobileToggle");
+  var sidebar = document.getElementById("sidebar");
+  var backdrop = document.getElementById("sidebarBackdrop");
+  function setSidebarOpen(open) {
+    if (!sidebar) return;
+    sidebar.classList.toggle("open", open);
+    if (toggle) toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    if (backdrop) {
+      backdrop.classList.toggle("show", open);
+      backdrop.hidden = !open;
+    }
+    document.body.style.overflow = open && window.innerWidth <= 860 ? "hidden" : "";
+  }
+  if (toggle && sidebar) {
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      setSidebarOpen(!sidebar.classList.contains("open"));
+    });
+    if (backdrop) backdrop.addEventListener("click", function () { setSidebarOpen(false); });
+    document.addEventListener("click", function (e) {
+      if (window.innerWidth > 860) return;
+      if (!sidebar.classList.contains("open")) return;
+      if (sidebar.contains(e.target) || toggle.contains(e.target)) return;
+      setSidebarOpen(false);
+    });
+  }
+})();
+</script>
+</body>
+</html>

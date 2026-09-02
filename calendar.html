@@ -68,16 +68,15 @@ button { font: inherit; }
   margin-bottom: 6px;
 }
 .brand-mark {
-  width: 30px; height: 30px;
+  width: 32px; height: 32px;
   border-radius: 8px;
-  background: radial-gradient(circle at 30% 30%, #FDFFEF 0%, #C6C8BA 55%, #4B4C47 100%);
-  box-shadow: 0 0 18px rgba(253, 255, 239, 0.18);
+  background: #2A2926;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
 .brand-name {
-  font-size: 0.82rem; font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 1rem; font-weight: 500;
+  letter-spacing: 0.07em;
   color: var(--text);
 }
 .sidebar-profile {
@@ -169,200 +168,251 @@ button { font: inherit; }
 .main {
   flex: 1;
   margin-left: var(--sidebar-w);
-  padding: 40px 48px 80px;
+  padding: 28px 40px 80px;
   min-height: 100vh;
   max-width: 1180px;
 }
 
-/* Top title block (big serif look to match reference print) */
 .page-title {
-  font-size: clamp(2.4rem, 4.4vw, 3.3rem);
-  font-weight: 700;
-  line-height: 1.05;
-  margin: 0 0 14px;
-  color: var(--text);
-  letter-spacing: -0.01em;
-}
-.page-subtitle {
-  margin: 0 0 48px;
-  color: var(--text-muted);
-  font-size: 1rem;
-  max-width: 640px;
-  line-height: 1.6;
-}
-
-/* Section header with filter */
-.events-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 22px;
-}
-.events-header h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.01em;
-}
-.filter-btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 9px 16px;
-  font-size: 0.85rem; font-weight: 500;
-  color: var(--text);
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  border-radius: 999px;
-  cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-}
-.filter-btn i { font-size: 12px; color: var(--text-muted); }
-.filter-btn:hover {
-  border-color: var(--border-strong);
-  background: var(--bg-elev);
-}
-
-/* ═══════════════════════════════════
-   EVENTS LIST
-   ═══════════════════════════════════ */
-.events-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.event {
-  display: flex;
-  align-items: stretch;
-  gap: 20px;
-  padding: 18px;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  border-radius: 16px;
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
-  cursor: pointer;
-}
-.event:hover {
-  border-color: var(--border-strong);
-  background: var(--bg-elev);
-  transform: translateY(-1px);
-}
-
-/* Date block */
-.event-date {
-  flex-shrink: 0;
-  width: 88px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: rgba(253, 255, 239, 0.02);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 14px 8px;
-  gap: 4px;
-}
-.event-day {
-  font-size: 2.1rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--text);
-  letter-spacing: -0.02em;
-}
-.event-month {
-  font-size: 0.72rem;
+  font-size: clamp(1.9rem, 3.2vw, 2.3rem);
   font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-/* Body */
-.event-body {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 8px;
-}
-.event-title {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 20px;
   color: var(--text);
   letter-spacing: -0.01em;
 }
-.event-meta {
+
+.cal-tabs {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
   flex-wrap: wrap;
-  font-size: 0.85rem;
-  color: var(--text-muted);
 }
-.event-meta-item {
+.cal-tab {
+  border: none;
+  background: none;
+  padding: 0 0 12px;
+  font-size: 0.98rem;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-}
-.event-meta-item i { color: var(--text-subtle); font-size: 12px; }
-.event-sep {
-  width: 3px; height: 3px;
-  border-radius: 50%;
-  background: var(--text-subtle);
-}
-.event-desc {
-  margin: 0;
-  font-size: 0.92rem;
+  gap: 8px;
   color: var(--text-muted);
-  line-height: 1.55;
-  max-width: 720px;
+  cursor: pointer;
+  box-shadow: none;
 }
-
-/* Tag next to date block (optional accent) */
-.event-tag {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 3px 10px;
-  font-size: 0.68rem; font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.cal-tab i { font-size: 15px; opacity: 0.85; }
+.cal-tab:hover { color: var(--text); }
+.cal-tab.active {
   color: var(--text);
-  background: rgba(198, 200, 186, 0.1);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  align-self: flex-start;
+  box-shadow: inset 0 -2px 0 0 #C6C8BA;
 }
-
-/* Empty-state friendly spacing when list is empty */
-.events-empty {
-  text-align: center;
-  padding: 60px 20px;
+.cal-nav {
+  margin-left: auto;
+  display: flex;
+  gap: 2px;
+  padding-bottom: 10px;
+  align-items: center;
+}
+.cal-nav button {
+  border: none;
+  background: none;
+  padding: 5px 10px;
+  font-size: 0.95rem;
   color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+}
+.cal-nav button:hover {
+  color: var(--text);
+  background: rgba(253, 255, 239, 0.04);
+}
+
+.cal-month {
+  margin: 0 0 16px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.cal-weekdays span {
+  font-size: 0.84rem;
+  color: var(--text-subtle);
+  padding: 0 0 10px 8px;
+  text-transform: lowercase;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-left: 1px solid var(--border);
+  border-top: 1px solid var(--border);
+}
+.cal-cell {
+  min-height: 96px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 7px 8px;
+  background: transparent;
+}
+.cal-cell.out {
+  background: #181816;
+}
+.cal-daynum {
+  margin: 0 0 6px;
+  text-align: right;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+.cal-cell.out .cal-daynum { color: #5C5B55; }
+.cal-daynum .today {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: #C6C8BA;
+  color: #1A1A18;
+  font-weight: 600;
+}
+
+.cal-pill {
+  display: block;
+  border-radius: 5px;
+  padding: 3px 7px;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cal-pill.tutoria { background: #16293D; color: #8FBEEA; }
+.cal-pill.growth { background: #123028; color: #5FC7A4; }
+.cal-pill.scale { background: #33260F; color: #E0AC5E; }
+
+.cal-legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+.cal-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.cal-legend i {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.cal-legend .dot-t { background: #5DA9F0; }
+.cal-legend .dot-g { background: #3FBE93; }
+.cal-legend .dot-s { background: #D19A4E; }
+
+/* List view */
+.cal-list { display: flex; flex-direction: column; }
+.cal-list-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 2px;
+  border-bottom: 1px solid var(--border);
+}
+.cal-list-date {
+  flex: 0 0 78px;
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+.cal-list-bar {
+  width: 3px; flex: 0 0 3px; height: 34px;
+  border-radius: 2px;
+}
+.cal-list-bar.tutoria { background: #5DA9F0; }
+.cal-list-bar.growth { background: #3FBE93; }
+.cal-list-bar.scale { background: #D19A4E; }
+.cal-list-title {
+  display: block;
+  font-size: 1.02rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.cal-list-sub {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Gallery view */
+.cal-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.cal-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-surface);
+  transition: border-color 0.2s ease;
+}
+.cal-card:hover { border-color: var(--border-strong); }
+.cal-card-thumb {
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: flex-end;
+  padding: 10px;
+}
+.cal-card-thumb.tutoria { background: #16293D; }
+.cal-card-thumb.growth { background: #123028; }
+.cal-card-thumb.scale { background: #33260F; }
+.cal-card-date {
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+.cal-card-thumb.tutoria .cal-card-date { color: #8FBEEA; }
+.cal-card-thumb.growth .cal-card-date { color: #5FC7A4; }
+.cal-card-thumb.scale .cal-card-date { color: #E0AC5E; }
+.cal-card-body { padding: 12px 14px; }
+.cal-card-body p {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.cal-card-body span {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+.cal-empty {
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1rem;
   border: 1px dashed var(--border);
-  border-radius: 14px;
+  border-radius: 12px;
 }
 
-/* ═══════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════ */
-@media (max-width: 860px) {
-  .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
-  .sidebar.open { transform: translateX(0); }
-  .main { margin-left: 0; padding: 28px 20px 70px; }
-  .mobile-toggle { display: inline-flex !important; }
-
-  .event { flex-direction: column; padding: 16px; }
-  .event-date {
-    width: auto;
-    flex-direction: row;
-    gap: 8px;
-    padding: 10px 14px;
-    align-self: flex-start;
-  }
-  .event-day { font-size: 1.6rem; }
-}
 .mobile-toggle { display: none; }
 .mobile-toggle-wrap {
-  display: flex; align-items: center;
-  gap: 12px; margin-bottom: 24px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 .mobile-toggle-wrap button {
   width: 38px; height: 38px;
@@ -373,6 +423,17 @@ button { font: inherit; }
   display: inline-flex; align-items: center; justify-content: center;
   cursor: pointer;
 }
+
+@media (max-width: 860px) {
+  .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; padding: 28px 20px 70px; }
+  .mobile-toggle-wrap { display: flex; }
+  .mobile-toggle { display: inline-flex !important; }
+  .cal-cell { min-height: 72px; padding: 5px; }
+  .cal-pill { font-size: 0.72rem; padding: 2px 5px; }
+  .cal-weekdays span { padding-left: 4px; font-size: 0.76rem; }
+}
 </style>
 </head>
 <body>
@@ -382,8 +443,10 @@ button { font: inherit; }
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar" aria-label="Navegação principal">
     <div class="sidebar-brand">
-      <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-name">No Blank Page</span>
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><rect width="20" height="20" fill="#C6CABE"/><circle cx="10" cy="10" r="6.2" fill="#2A2926"/></svg>
+      </span>
+      <span class="brand-name">NBP</span>
     </div>
 
     <a class="sidebar-profile" href="profile.html">
@@ -406,6 +469,14 @@ button { font: inherit; }
         <i class="fa-solid fa-flag-checkered" aria-hidden="true"></i>
         <span>Plano de ação</span>
       </a>
+      <a class="nav-item" href="documents.html">
+        <i class="fa-regular fa-folder" aria-hidden="true"></i>
+        <span>Documentos</span>
+      </a>
+      <a class="nav-item" href="meetings.html">
+        <i class="fa-solid fa-video" aria-hidden="true"></i>
+        <span>Reuniões 1:1</span>
+      </a>
       <a class="nav-item" href="dashboard.html">
         <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
         <span>Dashboard</span>
@@ -414,9 +485,9 @@ button { font: inherit; }
         <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
         <span>Cursos</span>
       </a>
-      <a class="nav-item" href="audios.html">
-        <i class="fa-solid fa-headphones" aria-hidden="true"></i>
-        <span>Áudios</span>
+      <a class="nav-item" href="talks.html">
+        <i class="fa-solid fa-microphone-lines" aria-hidden="true"></i>
+        <span>Mafra Talks</span>
       </a>
       <a class="nav-item" href="community.html">
         <i class="fa-solid fa-user-group" aria-hidden="true"></i>
@@ -446,101 +517,169 @@ button { font: inherit; }
 
   <!-- MAIN -->
   <main class="main">
-
     <div class="mobile-toggle-wrap">
       <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir menu">
         <i class="fa-solid fa-bars" aria-hidden="true"></i>
       </button>
     </div>
 
-    <h1 class="page-title">Eventos</h1>
-    <p class="page-subtitle">
-      Participe dos eventos da No Blank Page, ligue-se à comunidade
-      e avance com tutoria em crescimento, finanças e estratégia.
-    </p>
+    <h1 class="page-title">Calendário de eventos</h1>
 
-    <div class="events-header">
-      <h2>Todos os eventos</h2>
-      <button class="filter-btn" type="button">
-        <i class="fa-solid fa-sliders" aria-hidden="true"></i>
-        Filtrar
+    <div class="cal-tabs" role="tablist">
+      <button type="button" class="cal-tab active" data-v="cal" role="tab" aria-selected="true">
+        <i class="fa-regular fa-calendar" aria-hidden="true"></i> Calendário
       </button>
+      <button type="button" class="cal-tab" data-v="lst" role="tab" aria-selected="false">
+        <i class="fa-solid fa-list-ul" aria-hidden="true"></i> Todos os eventos
+      </button>
+      <button type="button" class="cal-tab" data-v="gal" role="tab" aria-selected="false">
+        <i class="fa-solid fa-border-all" aria-hidden="true"></i> Galeria
+      </button>
+      <div class="cal-nav">
+        <button type="button" id="calPrev" aria-label="Mês anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+        <button type="button" id="calToday">Hoje</button>
+        <button type="button" id="calNext" aria-label="Mês seguinte"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+      </div>
     </div>
 
-    <section class="events-list" aria-label="Lista de eventos">
-
-      <article class="event">
-        <div class="event-date">
-          <span class="event-day">22</span>
-          <span class="event-month">Abr</span>
-        </div>
-        <div class="event-body">
-          <h3 class="event-title">Encontro de abertura: da página em branco à primeira oferta</h3>
-          <div class="event-meta">
-            <span class="event-meta-item"><i class="fa-regular fa-calendar"></i> Live Workshop</span>
-            <span class="event-sep" aria-hidden="true"></span>
-            <span class="event-meta-item"><i class="fa-regular fa-clock"></i> 19:00 – 20:30</span>
-            <span class="event-sep" aria-hidden="true"></span>
-            <span class="event-meta-item"><i class="fa-solid fa-video"></i> Online · Google Meet</span>
-          </div>
-          <p class="event-desc">
-            Abra a trilha da No Blank Page com João Mafra. Vamos mapear o seu negócio,
-            identificar gargalos e definir o primeiro marco do desafio de aquisição.
-          </p>
-        </div>
-      </article>
-
-      <article class="event">
-        <div class="event-date">
-          <span class="event-day">29</span>
-          <span class="event-month">Abr</span>
-        </div>
-        <div class="event-body">
-          <h3 class="event-title">Mesa redonda: tráfego pago com previsibilidade</h3>
-          <div class="event-meta">
-            <span class="event-meta-item"><i class="fa-regular fa-comments"></i> Mesa redonda</span>
-            <span class="event-sep" aria-hidden="true"></span>
-            <span class="event-meta-item"><i class="fa-regular fa-clock"></i> 17:00 – 18:15</span>
-            <span class="event-sep" aria-hidden="true"></span>
-            <span class="event-meta-item"><i class="fa-solid fa-video"></i> Online · Zoom</span>
-          </div>
-          <p class="event-desc">
-            Convidados contam como estão a otimizar campanhas, reduzir CAC
-            e escalar ads sem viver reféns do operacional.
-          </p>
-        </div>
-      </article>
-
-      <article class="event">
-        <div class="event-date">
-          <span class="event-day">07</span>
-          <span class="event-month">Mai</span>
-        </div>
-        <div class="event-body">
-          <h3 class="event-title">Clube do livro: “A Startup Enxuta”</h3>
-          <div class="event-meta">
-            <span class="event-meta-item"><i class="fa-solid fa-book-open"></i> Clube do livro</span>
-            <span class="event-sep" aria-hidden="true"></span>
-            <span class="event-meta-item"><i class="fa-regular fa-clock"></i> 20:00 – 21:30</span>
-            <span class="event-sep" aria-hidden="true"></span>
-            <span class="event-meta-item"><i class="fa-solid fa-video"></i> Online · Google Meet</span>
-          </div>
-          <p class="event-desc">
-            Encontro mensal do Clube do Livro. Vamos partilhar aprendizados da leitura
-            e discutir como validar hipóteses mais rápido com processos claros.
-          </p>
-        </div>
-      </article>
-
-    </section>
-
+    <p class="cal-month" id="calMonthLabel"></p>
+    <div id="calRoot"></div>
   </main>
 </div>
 
 <script>
 (function () {
-  /* Mobile sidebar toggle */
-  var toggle  = document.getElementById("mobileToggle");
+  var MES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  var DIAS = ["seg","ter","qua","qui","sex","sáb","dom"];
+  var HOJE = new Date(2026, 7, 21);
+  var ROT = ["Desenv. pessoal", "Financeira", "Conteúdo", "IA"];
+  var ACC = [
+    { lb: "GROWTH", kind: "growth", sub: "Accountability" },
+    { lb: "SCALE", kind: "scale", sub: "Accountability" }
+  ];
+
+  var cy = 2026, cmo = 7, view = "cal";
+  var root = document.getElementById("calRoot");
+  var monthLabel = document.getElementById("calMonthLabel");
+
+  function ky(d) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  function evd(d) {
+    var o = [], w = d.getDay(), n = Math.floor((d.getDate() - 1) / 7);
+    if (w === 2) o.push({ lb: ROT[n % 4], kind: "tutoria", sub: "Tutoria" });
+    if (w === 4) {
+      var a = ACC[n % 2];
+      o.push({ lb: a.lb, kind: a.kind, sub: a.sub });
+    }
+    return o;
+  }
+
+  function render() {
+    monthLabel.textContent = MES[cmo] + " de " + cy;
+    var h = "";
+
+    if (view === "cal") {
+      h += '<div class="cal-weekdays">' + DIAS.map(function (x) {
+        return "<span>" + x + "</span>";
+      }).join("") + "</div>";
+      h += '<div class="cal-grid">';
+      var off = (new Date(cy, cmo, 1).getDay() + 6) % 7;
+      var st = new Date(cy, cmo, 1 - off);
+      for (var i = 0; i < 42; i++) {
+        var dd = new Date(st);
+        dd.setDate(st.getDate() + i);
+        var out = dd.getMonth() !== cmo;
+        var hj = ky(dd) === ky(HOJE);
+        var es = out ? [] : evd(dd);
+        h += '<div class="cal-cell' + (out ? " out" : "") + '">' +
+          '<p class="cal-daynum">' +
+            (hj ? '<span class="today">' + dd.getDate() + "</span>" : dd.getDate()) +
+          "</p>" +
+          es.map(function (e) {
+            return '<span class="cal-pill ' + e.kind + '">' + e.lb + "</span>";
+          }).join("") +
+        "</div>";
+      }
+      h += "</div>";
+      h += '<div class="cal-legend">' +
+        '<span><i class="dot-t" aria-hidden="true"></i>tutoria · terças</span>' +
+        '<span><i class="dot-g" aria-hidden="true"></i>growth · quintas</span>' +
+        '<span><i class="dot-s" aria-hidden="true"></i>scale · quintas</span>' +
+      "</div>";
+    } else if (view === "lst") {
+      var dim = new Date(cy, cmo + 1, 0).getDate();
+      var rows = "";
+      for (var j = 1; j <= dim; j++) {
+        var dt = new Date(cy, cmo, j);
+        rows += evd(dt).map(function (e) {
+          return '<div class="cal-list-row">' +
+            '<span class="cal-list-date">' + DIAS[(dt.getDay() + 6) % 7] + " " + j + "</span>" +
+            '<span class="cal-list-bar ' + e.kind + '" aria-hidden="true"></span>' +
+            "<span>" +
+              '<span class="cal-list-title">' + e.lb + "</span>" +
+              '<span class="cal-list-sub">18h00 · ' + e.sub + "</span>" +
+            "</span>" +
+          "</div>";
+        }).join("");
+      }
+      h += rows || '<div class="cal-empty">Sem eventos neste mês.</div>';
+    } else {
+      var dm = new Date(cy, cmo + 1, 0).getDate();
+      var cards = "";
+      for (var q = 1; q <= dm; q++) {
+        var t2 = new Date(cy, cmo, q);
+        cards += evd(t2).map(function (e) {
+          return '<article class="cal-card">' +
+            '<div class="cal-card-thumb ' + e.kind + '">' +
+              '<span class="cal-card-date">' + q + " " + MES[cmo].slice(0, 3) + "</span>" +
+            "</div>" +
+            '<div class="cal-card-body">' +
+              "<p>" + e.lb + "</p>" +
+              "<span>" + e.sub + "</span>" +
+            "</div>" +
+          "</article>";
+        }).join("");
+      }
+      h += cards
+        ? '<div class="cal-gallery">' + cards + "</div>"
+        : '<div class="cal-empty">Sem eventos neste mês.</div>';
+    }
+
+    root.innerHTML = h;
+  }
+
+  document.querySelectorAll(".cal-tab").forEach(function (b) {
+    b.addEventListener("click", function () {
+      view = b.getAttribute("data-v");
+      document.querySelectorAll(".cal-tab").forEach(function (x) {
+        var on = x === b;
+        x.classList.toggle("active", on);
+        x.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      render();
+    });
+  });
+
+  document.getElementById("calPrev").addEventListener("click", function () {
+    cmo--;
+    if (cmo < 0) { cmo = 11; cy--; }
+    render();
+  });
+  document.getElementById("calNext").addEventListener("click", function () {
+    cmo++;
+    if (cmo > 11) { cmo = 0; cy++; }
+    render();
+  });
+  document.getElementById("calToday").addEventListener("click", function () {
+    cy = 2026; cmo = 7;
+    render();
+  });
+
+  render();
+
+  var toggle = document.getElementById("mobileToggle");
   var sidebar = document.getElementById("sidebar");
   if (toggle && sidebar) {
     toggle.addEventListener("click", function (e) {

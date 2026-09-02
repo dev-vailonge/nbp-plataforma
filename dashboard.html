@@ -65,16 +65,15 @@ button { font: inherit; }
   margin-bottom: 6px;
 }
 .brand-mark {
-  width: 30px; height: 30px;
+  width: 32px; height: 32px;
   border-radius: 8px;
-  background: radial-gradient(circle at 30% 30%, #FDFFEF 0%, #C6C8BA 55%, #4B4C47 100%);
-  box-shadow: 0 0 18px rgba(253, 255, 239, 0.18);
+  background: #2A2926;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
 .brand-name {
-  font-size: 0.82rem; font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 1rem; font-weight: 500;
+  letter-spacing: 0.07em;
   color: var(--text);
 }
 .sidebar-profile {
@@ -164,9 +163,9 @@ button { font: inherit; }
 .main {
   flex: 1;
   margin-left: var(--sidebar-w);
-  padding: 28px 44px 72px;
+  padding: 28px 40px 80px;
   min-height: 100vh;
-  max-width: 1280px;
+  max-width: 1180px;
 }
 .topbar {
   display: flex;
@@ -609,8 +608,10 @@ button { font: inherit; }
 
   <aside class="sidebar" id="sidebar" aria-label="Navegação principal">
     <div class="sidebar-brand">
-      <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-name">No Blank Page</span>
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><rect width="20" height="20" fill="#C6CABE"/><circle cx="10" cy="10" r="6.2" fill="#2A2926"/></svg>
+      </span>
+      <span class="brand-name">NBP</span>
     </div>
 
     <a class="sidebar-profile" href="profile.html">
@@ -633,6 +634,14 @@ button { font: inherit; }
         <i class="fa-solid fa-flag-checkered" aria-hidden="true"></i>
         <span>Plano de ação</span>
       </a>
+      <a class="nav-item" href="documents.html">
+        <i class="fa-regular fa-folder" aria-hidden="true"></i>
+        <span>Documentos</span>
+      </a>
+      <a class="nav-item" href="meetings.html">
+        <i class="fa-solid fa-video" aria-hidden="true"></i>
+        <span>Reuniões 1:1</span>
+      </a>
       <a class="nav-item active" href="dashboard.html">
         <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
         <span>Dashboard</span>
@@ -641,9 +650,9 @@ button { font: inherit; }
         <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
         <span>Cursos</span>
       </a>
-      <a class="nav-item" href="audios.html">
-        <i class="fa-solid fa-headphones" aria-hidden="true"></i>
-        <span>Áudios</span>
+      <a class="nav-item" href="talks.html">
+        <i class="fa-solid fa-microphone-lines" aria-hidden="true"></i>
+        <span>Mafra Talks</span>
       </a>
       <a class="nav-item" href="community.html">
         <i class="fa-solid fa-user-group" aria-hidden="true"></i>
@@ -675,9 +684,6 @@ button { font: inherit; }
     <div class="topbar">
       <button class="topbar-icon-btn mobile-toggle" id="mobileToggle" aria-label="Abrir menu">
         <i class="fa-solid fa-bars" aria-hidden="true"></i>
-      </button>
-      <button class="topbar-icon-btn" aria-label="Notificações">
-        <i class="fa-regular fa-bell" aria-hidden="true"></i>
       </button>
     </div>
 

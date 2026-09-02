@@ -68,16 +68,15 @@ button { font: inherit; }
   margin-bottom: 6px;
 }
 .brand-mark {
-  width: 30px; height: 30px;
+  width: 32px; height: 32px;
   border-radius: 8px;
-  background: radial-gradient(circle at 30% 30%, #FDFFEF 0%, #C6C8BA 55%, #4B4C47 100%);
-  box-shadow: 0 0 18px rgba(253, 255, 239, 0.18);
+  background: #2A2926;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
 .brand-name {
-  font-size: 0.82rem; font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 1rem; font-weight: 500;
+  letter-spacing: 0.07em;
   color: var(--text);
 }
 .sidebar-profile {
@@ -169,8 +168,9 @@ button { font: inherit; }
 .main {
   flex: 1;
   margin-left: var(--sidebar-w);
-  padding: 32px 40px 60px;
+  padding: 28px 40px 80px;
   min-height: 100vh;
+  max-width: 1180px;
 }
 .topbar {
   display: flex; align-items: center; gap: 20px;
@@ -184,11 +184,10 @@ button { font: inherit; }
   margin-top: 2px;
 }
 .topbar-search {
-  margin-left: auto;
   position: relative;
 }
 .topbar-search input {
-  width: 320px;
+  width: 260px;
   background: var(--bg-surface);
   border: 1px solid var(--border) !important;
   color: var(--text);
@@ -239,18 +238,24 @@ button { font: inherit; }
    CATEGORIES
    ═══════════════════════════════════ */
 .categories-header {
-  display: flex; align-items: baseline; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
   margin-bottom: 14px;
 }
+.categories-header-copy { min-width: 0; flex: 1; }
 .categories-header h2 {
   margin: 0;
   font-size: 1.05rem; font-weight: 600;
   color: var(--text);
 }
 .categories-header p {
-  margin: 0;
+  margin: 4px 0 0;
   color: var(--text-muted);
   font-size: 0.82rem;
+}
+.categories-tools {
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
 }
 .categories {
   display: grid;
@@ -371,15 +376,15 @@ button { font: inherit; }
 .course-thumb-art i {
   color: rgba(253, 255, 239, 0.85);
 }
-/* Gradient-based "hero" backgrounds per course */
-.bg-a { background: linear-gradient(135deg, #0b1730 0%, #1e3a8a 55%, #7c3aed 100%); }
-.bg-b { background: linear-gradient(135deg, #2a0a2f 0%, #7c2d7a 55%, #c026d3 100%); }
-.bg-c { background: linear-gradient(135deg, #0b1a2e 0%, #0f3a6d 55%, #2563eb 100%); }
+/* Gradient-based "hero" backgrounds per course — NBP palette */
+.bg-a { background: linear-gradient(135deg, #1a1a18 0%, #2a2a26 55%, #4B4C47 100%); }
+.bg-b { background: linear-gradient(135deg, #151515 0%, #2c2d28 55%, #C6C8BA55 100%); }
+.bg-c { background: linear-gradient(135deg, #0f1412 0%, #1c2a24 55%, #3d5a4c 100%); }
 .bg-d { background: linear-gradient(135deg, #1a1a1a 0%, #3a2d28 55%, #7c5a3a 100%); }
 .bg-e { background: linear-gradient(135deg, #132020 0%, #1c3d3d 55%, #19a186 100%); }
-.bg-f { background: linear-gradient(135deg, #1a1220 0%, #4a2d63 55%, #a855f7 100%); }
+.bg-f { background: linear-gradient(135deg, #181816 0%, #2e2f2a 55%, #6B6C63 100%); }
 .bg-g { background: linear-gradient(135deg, #0a1f1a 0%, #11402f 55%, #34d399 100%); }
-.bg-h { background: linear-gradient(135deg, #1a1208 0%, #4a2e08 55%, #f59e0b 100%); }
+.bg-h { background: linear-gradient(135deg, #1a1208 0%, #4a2e08 55%, #C6C8BA 100%); }
 
 .course-thumb-title {
   position: absolute;
@@ -424,6 +429,262 @@ button { font: inherit; }
 .course-duration i { color: var(--text-subtle); font-size: 11px; }
 
 /* ═══════════════════════════════════
+   LIVE SESSIONS (Tutorias / Accountability)
+   ═══════════════════════════════════ */
+.live-intro {
+  margin: 0 0 16px;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+.live-block { margin-bottom: 26px; }
+.live-head {
+  min-height: 42px;
+  margin-bottom: 12px;
+}
+.live-head-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.4;
+}
+.live-head-title i { font-size: 15px; }
+.live-head-sub {
+  margin: 3px 0 0;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.live-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #45443E #24231F;
+}
+.live-row::-webkit-scrollbar { height: 8px; }
+.live-row::-webkit-scrollbar-track { background: #24231F; border-radius: 5px; }
+.live-row::-webkit-scrollbar-thumb { background: #45443E; border-radius: 5px; }
+
+.live-card {
+  flex: 0 0 150px;
+  width: 150px;
+  text-align: left;
+  border: none !important;
+  background: transparent !important;
+  padding: 0;
+  color: var(--text) !important;
+  cursor: pointer;
+  font: inherit;
+}
+.live-card:hover,
+.live-card:focus {
+  background: transparent !important;
+  color: var(--text) !important;
+}
+.live-next {
+  flex: 0 0 150px;
+  width: 150px;
+  aspect-ratio: 16 / 9;
+  box-sizing: border-box;
+  border: 1px dashed #C6C8BA66 !important;
+  border-radius: 10px;
+  background: var(--bg-surface) !important;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+  color: var(--text);
+  cursor: default;
+  font: inherit;
+}
+.live-next-label {
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+.live-next-when {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  font-weight: 500;
+  color: var(--text);
+}
+.live-thumb {
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: filter 0.2s ease, transform 0.15s ease;
+}
+.live-card:hover .live-thumb { filter: brightness(1.08); transform: translateY(-1px); }
+.live-thumb i { font-size: 20px; }
+.live-date {
+  position: absolute;
+  top: 6px; left: 7px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  padding: 1px 8px;
+  font-size: 0.7rem;
+}
+.live-progress {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: rgba(255, 255, 239, 0.15);
+}
+.live-progress > span { display: block; height: 100%; }
+.live-card-title {
+  margin: 0;
+  height: 36px;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.live-card-meta {
+  margin: 3px 0 0;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.live-t .live-head-title i { color: #BBD7F4; }
+.live-t .live-next { border-color: #BBD7F4 !important; }
+.live-t .live-next-label { color: #BBD7F4; }
+.live-t .live-thumb { background: #1E4E7E; }
+.live-t .live-thumb i,
+.live-t .live-date { color: #BBD7F4; }
+.live-t .live-progress > span { background: #BBD7F4; }
+
+.live-a .live-head-title i { color: #F3D6A6; }
+.live-a .live-next { border-color: #F3D6A6 !important; }
+.live-a .live-next-label { color: #F3D6A6; }
+.live-a .live-thumb { background: #6B4310; }
+.live-a .live-thumb i,
+.live-a .live-date { color: #F3D6A6; }
+.live-a .live-progress > span { background: #F3D6A6; }
+
+.courses-divider {
+  border-top: 1px solid var(--border);
+  padding-top: 22px;
+  margin: 8px 0 22px;
+}
+.courses-divider p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+.live-player {
+  display: none;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 28px;
+}
+.live-player.is-open { display: block; }
+.live-player-back {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 0.84rem;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+.live-player-back:hover { border-color: var(--border-strong); background: var(--bg-elev); }
+.live-player-layout {
+  display: flex; gap: 20px; flex-wrap: wrap;
+}
+.live-player-main { flex: 1; min-width: 260px; }
+.live-player-stage {
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px;
+}
+.live-player-stage i { font-size: 40px; }
+.live-player-kicker {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.live-player-title {
+  margin: 6px 0 4px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.live-player-dur {
+  margin: 0 0 14px;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+.live-player-done {
+  width: 100%;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+.live-player-done:hover { background: var(--bg-elev); }
+.live-player-side {
+  width: 230px;
+  flex: 0 0 230px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+.live-player-side h3 {
+  margin: 0 0 10px;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+.live-player-side button {
+  display: flex; gap: 8px; align-items: flex-start;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.live-player-side button:hover,
+.live-player-side button.active {
+  background: var(--bg-elev);
+  color: var(--text);
+}
+.live-player-side button i { margin-top: 2px; width: 14px; flex-shrink: 0; }
+.live-player-side button .done { color: #5FC7A4; }
+.live-browse.is-hidden { display: none; }
+#recordedCourses.is-hidden { display: none; }
+
+/* ═══════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════ */
 @media (max-width: 1100px) {
@@ -436,11 +697,16 @@ button { font: inherit; }
   .topbar-search input { width: 180px; }
   .categories { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .mobile-toggle { display: inline-flex !important; }
+  .live-player-side { width: 100%; flex: 1 1 100%; }
+  .categories-tools { width: 100%; }
+  .categories-tools .topbar-search { flex: 1; }
+  .categories-tools .topbar-search input { width: 100%; }
 }
 @media (max-width: 520px) {
   .categories { grid-template-columns: 1fr 1fr; gap: 10px; }
   .cat-card { padding: 14px; gap: 10px; }
   .cat-icon { width: 34px; height: 34px; }
+  .categories-tools { flex-wrap: wrap; }
 }
 .mobile-toggle { display: none; }
 </style>
@@ -452,8 +718,10 @@ button { font: inherit; }
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar" aria-label="Navegação principal">
     <div class="sidebar-brand">
-      <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-name">No Blank Page</span>
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><rect width="20" height="20" fill="#C6CABE"/><circle cx="10" cy="10" r="6.2" fill="#2A2926"/></svg>
+      </span>
+      <span class="brand-name">NBP</span>
     </div>
 
     <a class="sidebar-profile" href="profile.html">
@@ -476,6 +744,14 @@ button { font: inherit; }
         <i class="fa-solid fa-flag-checkered" aria-hidden="true"></i>
         <span>Plano de ação</span>
       </a>
+      <a class="nav-item" href="documents.html">
+        <i class="fa-regular fa-folder" aria-hidden="true"></i>
+        <span>Documentos</span>
+      </a>
+      <a class="nav-item" href="meetings.html">
+        <i class="fa-solid fa-video" aria-hidden="true"></i>
+        <span>Reuniões 1:1</span>
+      </a>
       <a class="nav-item" href="dashboard.html">
         <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
         <span>Dashboard</span>
@@ -484,9 +760,9 @@ button { font: inherit; }
         <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
         <span>Cursos</span>
       </a>
-      <a class="nav-item" href="audios.html">
-        <i class="fa-solid fa-headphones" aria-hidden="true"></i>
-        <span>Áudios</span>
+      <a class="nav-item" href="talks.html">
+        <i class="fa-solid fa-microphone-lines" aria-hidden="true"></i>
+        <span>Mafra Talks</span>
       </a>
       <a class="nav-item" href="community.html">
         <i class="fa-solid fa-user-group" aria-hidden="true"></i>
@@ -523,22 +799,60 @@ button { font: inherit; }
       </button>
       <h1 class="topbar-title">
         Cursos
-        <small>Aulas gravadas e trilhas da No Blank Page.</small>
+        <small>Sessões ao vivo e trilhas gravadas da No Blank Page.</small>
       </h1>
-      <div class="topbar-search">
-        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-        <input type="text" placeholder="Pesquise aqui"/>
-      </div>
-      <button class="topbar-btn" type="button">
-        <i class="fa-solid fa-sliders" aria-hidden="true"></i>
-        Mais filtros
-      </button>
+    </div>
+
+    <!-- LIVE SESSIONS -->
+    <div id="liveBrowse" class="live-browse">
+      <p class="live-intro">Sessões ao vivo · gravação disponível no dia seguinte</p>
+
+      <section class="live-block live-t" aria-label="Tutorias">
+        <header class="live-head">
+          <p class="live-head-title">
+            <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+            Tutorias
+          </p>
+          <p class="live-head-sub">terças, 18h00 · ensino e dúvidas</p>
+        </header>
+        <div class="live-row" id="rowTutorias"></div>
+      </section>
+
+      <section class="live-block live-a" aria-label="Accountability">
+        <header class="live-head">
+          <p class="live-head-title">
+            <i class="fa-solid fa-people-group" aria-hidden="true"></i>
+            Accountability
+          </p>
+          <p class="live-head-sub">quintas, 18h00 · números e compromissos</p>
+        </header>
+        <div class="live-row" id="rowAccountability"></div>
+      </section>
+    </div>
+
+    <div id="livePlayer" class="live-player" aria-live="polite"></div>
+
+    <div id="recordedCourses">
+    <div class="courses-divider">
+      <p>Cursos · ao teu ritmo</p>
     </div>
 
     <!-- CATEGORIES -->
     <div class="categories-header">
-      <h2>Explore por categoria</h2>
-      <p>Selecione a categoria para filtrar os conteúdos abaixo</p>
+      <div class="categories-header-copy">
+        <h2>Explore por categoria</h2>
+        <p>Selecione a categoria para filtrar os conteúdos abaixo</p>
+      </div>
+      <div class="categories-tools">
+        <div class="topbar-search">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input type="text" placeholder="Pesquise aqui" aria-label="Pesquisar cursos"/>
+        </div>
+        <button class="topbar-btn" type="button">
+          <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+          Mais filtros
+        </button>
+      </div>
     </div>
 
     <div class="categories" id="categories">
@@ -719,12 +1033,165 @@ button { font: inherit; }
       </article>
 
     </section>
+    </div>
 
   </main>
 </div>
 
 <script>
 (function () {
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  var LIVE = [
+    {
+      id: "t",
+      t: "Tutorias",
+      sub: "terças, 18h00 · ensino e dúvidas",
+      c: "#1E4E7E",
+      l: "#BBD7F4",
+      ic: "fa-graduation-cap",
+      next: "ter, 25 ago · IA",
+      kicker: "Tutoria de terça",
+      ls: [
+        { t: "Conteúdo", d: "46 min", dt: "18 ago", p: 0 },
+        { t: "Financeira", d: "52 min", dt: "11 ago", p: 100 },
+        { t: "Desenvolvimento pessoal", d: "41 min", dt: "4 ago", p: 0 },
+        { t: "IA", d: "58 min", dt: "28 jul", p: 0 },
+        { t: "Conteúdo", d: "49 min", dt: "21 jul", p: 0 }
+      ]
+    },
+    {
+      id: "a",
+      t: "Accountability",
+      sub: "quintas, 18h00 · números e compromissos",
+      c: "#6B4310",
+      l: "#F3D6A6",
+      ic: "fa-people-group",
+      next: "qui, 27 ago · SCALE",
+      kicker: "Accountability de quinta",
+      ls: [
+        { t: "GROWTH", d: "34 min", dt: "20 ago", p: 0 },
+        { t: "SCALE", d: "29 min", dt: "13 ago", p: 100 },
+        { t: "GROWTH", d: "51 min", dt: "6 ago", p: 0 },
+        { t: "SCALE", d: "26 min", dt: "30 jul", p: 0 }
+      ]
+    }
+  ];
+
+  var player = null;
+  var browse = document.getElementById("liveBrowse");
+  var playerEl = document.getElementById("livePlayer");
+  var recorded = document.getElementById("recordedCourses");
+
+  function renderRows() {
+    LIVE.forEach(function (m) {
+      var row = document.getElementById(m.id === "t" ? "rowTutorias" : "rowAccountability");
+      if (!row) return;
+      var next =
+        '<div class="live-next" aria-label="Próxima sessão">' +
+          '<p class="live-next-label">a seguir</p>' +
+          '<p class="live-next-when">' + esc(m.next) + "</p>" +
+        "</div>";
+      var cards = m.ls.map(function (l, li) {
+        var icon = l.p === 100 ? "fa-circle-check" : m.ic;
+        var progress = l.p > 0 && l.p < 100
+          ? '<div class="live-progress"><span style="width:' + l.p + '%"></span></div>'
+          : "";
+        return (
+          '<button type="button" class="live-card" data-m="' + m.id + '" data-l="' + li + '">' +
+            '<div class="live-thumb">' +
+              '<span class="live-date">' + esc(l.dt) + "</span>" +
+              '<i class="fa-solid ' + icon + '" aria-hidden="true"></i>' +
+              progress +
+            "</div>" +
+            '<p class="live-card-title">' + esc(l.t) + "</p>" +
+            '<p class="live-card-meta">' + esc(l.d) + "</p>" +
+          "</button>"
+        );
+      }).join("");
+      row.innerHTML = next + cards;
+    });
+
+    document.querySelectorAll(".live-card").forEach(function (b) {
+      b.addEventListener("click", function () {
+        openPlayer(b.getAttribute("data-m"), +b.getAttribute("data-l"));
+      });
+    });
+  }
+
+  function findMod(id) {
+    for (var i = 0; i < LIVE.length; i++) if (LIVE[i].id === id) return LIVE[i];
+    return null;
+  }
+
+  function openPlayer(mid, li) {
+    player = { m: mid, l: li };
+    renderPlayer();
+    browse.classList.add("is-hidden");
+    if (recorded) recorded.classList.add("is-hidden");
+    playerEl.classList.add("is-open");
+    playerEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function closePlayer() {
+    player = null;
+    playerEl.classList.remove("is-open");
+    playerEl.innerHTML = "";
+    browse.classList.remove("is-hidden");
+    if (recorded) recorded.classList.remove("is-hidden");
+    renderRows();
+  }
+
+  function renderPlayer() {
+    var m = findMod(player.m);
+    if (!m) return;
+    var l = m.ls[player.l];
+    playerEl.innerHTML =
+      '<button type="button" class="live-player-back" id="liveBack">' +
+        '<i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Voltar' +
+      "</button>" +
+      '<div class="live-player-layout">' +
+        '<div class="live-player-main">' +
+          '<div class="live-player-stage" style="background:' + m.c + '">' +
+            '<i class="fa-solid fa-play" style="color:' + m.l + '" aria-hidden="true"></i>' +
+          "</div>" +
+          '<p class="live-player-kicker">' + esc(m.kicker) + " · " + esc(l.dt) + "</p>" +
+          '<p class="live-player-title">' + esc(l.t) + "</p>" +
+          '<p class="live-player-dur">' + esc(l.d) + "</p>" +
+          '<button type="button" class="live-player-done" id="liveDone">' +
+            (l.p === 100 ? "Concluída" : "Marcar como concluída") +
+          "</button>" +
+        "</div>" +
+        '<aside class="live-player-side">' +
+          "<h3>Outras sessões</h3>" +
+          m.ls.map(function (x, j) {
+            return (
+              '<button type="button" class="pli' + (j === player.l ? " active" : "") + '" data-j="' + j + '">' +
+                '<i class="fa-solid ' + (x.p === 100 ? "fa-circle-check done" : "fa-circle") + '" aria-hidden="true"></i>' +
+                "<span>" + esc(x.t) + (x.dt ? " · " + esc(x.dt) : "") + "</span>" +
+              "</button>"
+            );
+          }).join("") +
+        "</aside>" +
+      "</div>";
+
+    document.getElementById("liveBack").onclick = closePlayer;
+    document.getElementById("liveDone").onclick = function () {
+      l.p = l.p === 100 ? 0 : 100;
+      renderPlayer();
+    };
+    playerEl.querySelectorAll(".pli").forEach(function (b) {
+      b.onclick = function () {
+        player.l = +b.getAttribute("data-j");
+        renderPlayer();
+      };
+    });
+  }
+
+  renderRows();
+
   /* Category active toggle */
   var cats = document.querySelectorAll("#categories .cat-card");
   cats.forEach(function (c) {
