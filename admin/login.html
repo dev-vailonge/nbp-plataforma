@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>NBP · Backoffice — Entrar</title>
+<meta name="color-scheme" content="dark"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="../assets/nbp-admin.css"/>
+<script src="../assets/nbp-admin.js"></script>
+</head>
+<body>
+<div class="auth-wrap">
+  <form class="auth-card" id="loginForm">
+    <div class="sidebar-brand" style="padding:0 0 12px">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><rect width="20" height="20" fill="#C6CABE"/><circle cx="10" cy="10" r="6.2" fill="#2A2926"/></svg>
+      </span>
+      <span class="brand-name">NBP</span>
+    </div>
+    <span class="brand-badge" style="margin:0 0 16px">Backoffice</span>
+    <h1>Entrar na gestão</h1>
+    <p>Qualquer email e palavra-passe servem neste protótipo. Nada fica no servidor.</p>
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" autocomplete="username" placeholder="equipa@nbp.pt"/>
+    </div>
+    <div class="field">
+      <label for="password">Palavra-passe</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••"/>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">Entrar</button>
+    </div>
+    <p class="auth-note"><a href="../login.html">Portal do membro</a></p>
+  </form>
+</div>
+<script>
+(function () {
+  if (NBPAdmin.loggedIn()) {
+    window.location.replace("index.html");
+    return;
+  }
+  document.getElementById("loginForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    NBPAdmin.login();
+    window.location.href = "index.html";
+  });
+})();
+</script>
+</body>
+</html>

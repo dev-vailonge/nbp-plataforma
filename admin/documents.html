@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>NBP · Backoffice — Documentos</title>
+<meta name="color-scheme" content="dark"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="../assets/nbp-admin.css"/>
+<script src="../assets/nbp-admin.js"></script>
+</head>
+<body>
+<script>NBPAdmin.requireAuth();</script>
+<button class="sidebar-backdrop" id="sidebarBackdrop" type="button" aria-label="Fechar menu"></button>
+<div class="app-wrap">
+<div class="app">
+  <aside class="sidebar" id="sidebar" aria-label="Navegação"></aside>
+  <main class="main">
+    <div class="topbar">
+      <button class="topbar-icon-btn mobile-toggle" id="mobileToggle" aria-label="Abrir menu">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Documentos</h1>
+        <p class="page-sub">Árvore partilhada com o portal do membro. Upload é só um nome e um tipo.</p>
+      </div>
+      <div class="page-actions">
+        <button type="button" class="btn" id="newFolder">Nova pasta</button>
+        <button type="button" class="btn btn-primary" id="newFile">Novo ficheiro</button>
+      </div>
+    </div>
+    <div class="docs-bc" id="bc"></div>
+    <div id="root"></div>
+  </main>
+</div>
+</div>
+<script>
+(function () {
+  var A = NBPAdmin;
+  A.mountShell("documents");
+  var current = "raiz";
+
+  function trail(data, id) {
+    var parts = [];
+    var cur = data.folders[id];
+    while (cur) {
+      parts.unshift(cur);
+      cur = cur.parent ? data.folders[cur.parent] : null;
+    }
+    return parts;
+  }
+
+  function render() {
+    var data = A.load();
+    var folder = data.folders[current] || data.folders.raiz;
+    current = folder.id;
+    var bc = trail(data, current).map(function (f, i, arr) {
+      if (i === arr.length - 1) return '<span class="cur">' + A.esc(f.nome) + "</span>";
+      return '<button type="button" data-id="' + A.esc(f.id) + '">' + A.esc(f.nome) + "</button><span>/</span>";
+    }).join(" ");
+    document.getElementById("bc").innerHTML = bc;
+    document.getElementById("bc").querySelectorAll("button[data-id]").forEach(function (b) {
+      b.onclick = function () { current = b.getAttribute("data-id"); render(); };
+    });
+
+    var html = "";
+    if (folder.pastas && folder.pastas.length) {
+      html += '<div class="folder-grid">';
+      folder.pastas.forEach(function (id) {
+        var p = data.folders[id];
+        if (!p) return;
+        html += '<div class="folder-card">' +
+          '<button type="button" data-open="' + A.esc(id) + '" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;border:0;background:none;padding:0;color:inherit;text-align:left">' +
+            '<span class="folder-ic"><i class="fa-solid fa-folder" aria-hidden="true"></i></span>' +
+            '<span><span class="folder-name">' + A.esc(p.nome) + '</span>' +
+            '<span class="folder-count">' + A.countItems(p) + " itens</span></span></button>" +
+          '<div class="card-actions">' +
+            '<button type="button" class="icon-btn" data-ren="' + A.esc(id) + '" aria-label="Renomear"><i class="fa-solid fa-pen" aria-hidden="true"></i></button>' +
+            '<button type="button" class="icon-btn" data-del="' + A.esc(id) + '" aria-label="Remover"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>' +
+          "</div></div>";
+      });
+      html += "</div>";
+    }
+    if (folder.fich && folder.fich.length) {
+      html += '<div class="file-grid">';
+      folder.fich.forEach(function (f) {
+        var meta = A.FILE_TYPES[f.t] || A.FILE_TYPES.pdf;
+        html += '<div class="file-card">' +
+          '<span class="file-ic" style="color:' + meta.color + '"><i class="fa-solid ' + meta.ic + '" aria-hidden="true"></i></span>' +
+          '<span class="grow"><span class="file-name">' + A.esc(f.n) + '</span><span class="file-type">' + meta.label + "</span></span>" +
+          '<button type="button" class="icon-btn" data-delfile="' + A.esc(f.id) + '" aria-label="Remover ficheiro"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>' +
+        "</div>";
+      });
+      html += "</div>";
+    }
+    if (!html) html = '<div class="empty">Pasta vazia.</div>';
+    document.getElementById("root").innerHTML = html;
+
+    document.querySelectorAll("[data-open]").forEach(function (b) {
+      b.onclick = function () { current = b.getAttribute("data-open"); render(); };
+    });
+    document.querySelectorAll("[data-ren]").forEach(function (b) {
+      b.onclick = function (e) {
+        e.stopPropagation();
+        var fid = b.getAttribute("data-ren");
+        var p = A.load().folders[fid];
+        A.showModal({
+          title: "Renomear pasta",
+          bodyHtml: '<div class="field"><label for="nn">Nome</label><input id="nn" value="' + A.esc(p.nome) + '"/></div>',
+          okLabel: "Guardar",
+          onOk: function (box) {
+            var name = (box.querySelector("#nn").value || "").trim();
+            if (!name) return;
+            var d = A.load();
+            d.folders[fid].nome = name;
+            A.save(d);
+            A.closeModal();
+            A.toast("Pasta renomeada.");
+            render();
+          }
+        });
+      };
+    });
+    document.querySelectorAll("[data-del]").forEach(function (b) {
+      b.onclick = function (e) {
+        e.stopPropagation();
+        var fid = b.getAttribute("data-del");
+        var d = A.load();
+        var p = d.folders[fid];
+        if (A.countItems(p) > 0) {
+          A.toast("Só podes remover pastas vazias.");
+          return;
+        }
+        A.confirm("Remover a pasta «" + p.nome + "»?", function () {
+          d = A.load();
+          p = d.folders[fid];
+          var parent = d.folders[p.parent || "raiz"];
+          if (parent) parent.pastas = parent.pastas.filter(function (x) { return x !== fid; });
+          delete d.folders[fid];
+          A.save(d);
+          A.toast("Pasta removida.");
+          render();
+        });
+      };
+    });
+    document.querySelectorAll("[data-delfile]").forEach(function (b) {
+      b.onclick = function () {
+        var fid = b.getAttribute("data-delfile");
+        A.confirm("Remover este ficheiro?", function () {
+          var d = A.load();
+          var f = d.folders[current];
+          f.fich = f.fich.filter(function (x) { return x.id !== fid; });
+          A.save(d);
+          A.toast("Ficheiro removido.");
+          render();
+        });
+      };
+    });
+  }
+
+  document.getElementById("newFolder").addEventListener("click", function () {
+    A.showModal({
+      title: "Nova pasta",
+      bodyHtml: '<div class="field"><label for="nn">Nome</label><input id="nn" placeholder="Templates"/></div>',
+      okLabel: "Criar",
+      onOk: function (box) {
+        var name = (box.querySelector("#nn").value || "").trim();
+        if (!name) { A.toast("Dá um nome à pasta."); return; }
+        var d = A.load();
+        var id = A.uid("p");
+        d.folders[id] = { id: id, nome: name, parent: current, pastas: [], fich: [] };
+        d.folders[current].pastas.push(id);
+        A.save(d);
+        A.closeModal();
+        A.toast("Pasta criada.");
+        render();
+      }
+    });
+  });
+
+  document.getElementById("newFile").addEventListener("click", function () {
+    var opts = Object.keys(A.FILE_TYPES).map(function (k) {
+      return '<option value="' + k + '">' + A.FILE_TYPES[k].label + "</option>";
+    }).join("");
+    A.showModal({
+      title: "Novo ficheiro",
+      bodyHtml:
+        '<div class="field"><label for="fn">Nome</label><input id="fn" placeholder="Guião.pdf"/></div>' +
+        '<div class="field" style="margin-top:10px"><label for="ft">Tipo</label><select id="ft">' + opts + "</select></div>",
+      okLabel: "Adicionar",
+      onOk: function (box) {
+        var name = (box.querySelector("#fn").value || "").trim();
+        if (!name) { A.toast("Dá um nome ao ficheiro."); return; }
+        var d = A.load();
+        d.folders[current].fich.push({ id: A.uid("file"), n: name, t: box.querySelector("#ft").value });
+        A.save(d);
+        A.closeModal();
+        A.toast("Ficheiro adicionado.");
+        render();
+      }
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
