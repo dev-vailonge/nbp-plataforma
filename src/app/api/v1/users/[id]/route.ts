@@ -13,12 +13,15 @@ export async function GET(_req: NextRequest, ctx: RouteCtx) {
   const { data, error: dbError } = await supabase
     .from("nbp_users")
     .select("*")
-    .eq("id", id)
-    .single();
+    .or(`id.eq.${id},code.eq.${id}`)
+    .limit(1)
+    .maybeSingle();
 
   if (dbError) {
-    const status = dbError.code === "PGRST116" ? 404 : 500;
-    return err(status === 404 ? "not_found" : "db_error", dbError.message, status);
+    return err("db_error", dbError.message, 500);
+  }
+  if (!data) {
+    return err("not_found", "User not found.", 404);
   }
 
   return ok(data);

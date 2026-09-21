@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { ok, err, parseJson, JsonParseError } from "@/lib/api/http";
 import { requireRole } from "@/lib/api/auth";
+import type { NbpLesson } from "@/types/database";
 
 type RouteCtx = { params: Promise<{ id: string }> };
 
@@ -18,9 +19,26 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
     throw e;
   }
 
+  const allowed = [
+    "title",
+    "description",
+    "video_url",
+    "duration_label",
+    "session_label",
+    "status",
+    "sort_order",
+  ] as const;
+  const updates: Record<string, unknown> = {};
+  for (const key of allowed) {
+    if (key in body) updates[key] = body[key];
+  }
+  if (Object.keys(updates).length === 0) {
+    return err("bad_request", "Nenhum campo para actualizar.", 400);
+  }
+
   const { data, error: dbError } = await supabase
     .from("nbp_lessons")
-    .update(body as never)
+    .update(updates as Partial<NbpLesson>)
     .eq("id", id)
     .select()
     .single();
@@ -39,12 +57,9 @@ export async function DELETE(_req: NextRequest, ctx: RouteCtx) {
   const { supabase } = result.ctx;
   const { id } = await ctx.params;
 
-  const { error: dbError } = await supabase
-    .from("nbp_lessons")
-    .delete()
-    .eq("id", id);
+  const { error: dbError } = await supabase.from("nbp_lessons").delete().eq("id", id);
 
   if (dbError) return err("db_error", dbError.message, 500);
 
-  return ok({ deleted: true });
+  return ok({ ok: true });
 }

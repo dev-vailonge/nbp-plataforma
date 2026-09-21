@@ -55,6 +55,7 @@ export type NbpCourse = {
   code: string;
   title: string;
   subtitle: string | null;
+  cover_url: string | null;
   kind: CourseKind;
   sort_order: number;
 };
@@ -65,6 +66,7 @@ export type NbpModule = {
   course_id: string;
   title: string;
   subtitle: string | null;
+  cover_url: string | null;
   module_number: number | null;
   color: string | null;
   color_light: string | null;
@@ -76,6 +78,7 @@ export type NbpLesson = {
   code: string;
   module_id: string;
   title: string;
+  description: string | null;
   duration_label: string | null;
   session_label: string | null;
   status: PublishStatus;

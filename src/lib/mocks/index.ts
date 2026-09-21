@@ -257,45 +257,157 @@ export const currentConsultant = users.find((u) => u.code === "u-marta")!;
 export const members = users.filter((u) => u.role === "membro");
 
 export const courses: NbpCourse[] = [
-  { id: "crs-formacao", code: "crs-formacao", title: "Formação NBP", subtitle: "Percurso em 4 módulos", kind: "formacao", sort_order: 0 },
-  { id: "crs-tutoria", code: "crs-tutoria", title: "Tutorias", subtitle: "terças, 18h00 · ensino e dúvidas", kind: "tutoria", sort_order: 1 },
-  { id: "crs-acc", code: "crs-acc", title: "Accountability", subtitle: "quintas, 18h00 · números e compromissos", kind: "accountability", sort_order: 2 },
+  {
+    id: "crs-formacao",
+    code: "crs-formacao",
+    title: "Formação NBP",
+    subtitle: "Percurso completo em 4 módulos — do nicho às vendas.",
+    cover_url: "https://images.unsplash.com/photo-1522202176988-66273b2fe75e?w=800&q=80",
+    kind: "formacao",
+    sort_order: 0,
+  },
+  {
+    id: "crs-tutoria",
+    code: "crs-tutoria",
+    title: "Tutorias",
+    subtitle: "terças, 18h00 · ensino e dúvidas ao vivo com a equipa.",
+    cover_url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80",
+    kind: "tutoria",
+    sort_order: 1,
+  },
+  {
+    id: "crs-acc",
+    code: "crs-acc",
+    title: "Accountability",
+    subtitle: "quintas, 18h00 · números, metas e compromissos semanais.",
+    cover_url: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80",
+    kind: "accountability",
+    sort_order: 2,
+  },
 ];
 
 export const modules: NbpModule[] = [
-  { id: "mod-1", code: "mod-1", course_id: "crs-formacao", title: "Fundações", subtitle: "Módulo 1", module_number: 1, color: "#453C96", color_light: "#CFCBF7", sort_order: 0 },
-  { id: "mod-2", code: "mod-2", course_id: "crs-formacao", title: "Oferta e preço", subtitle: "Módulo 2", module_number: 2, color: "#125A47", color_light: "#B4E5D3", sort_order: 1 },
-  { id: "mod-3", code: "mod-3", course_id: "crs-formacao", title: "Aquisição", subtitle: "Módulo 3", module_number: 3, color: "#7C3218", color_light: "#F1C4B0", sort_order: 2 },
-  { id: "mod-4", code: "mod-4", course_id: "crs-formacao", title: "Vendas", subtitle: "Módulo 4", module_number: 4, color: "#7C2C46", color_light: "#F2C0D2", sort_order: 3 },
-  { id: "mod-t", code: "mod-t", course_id: "crs-tutoria", title: "Tutorias", subtitle: "terças, 18h00 · ensino e dúvidas", module_number: null, color: "#1E4E7E", color_light: "#BBD7F4", sort_order: 0 },
-  { id: "mod-a", code: "mod-a", course_id: "crs-acc", title: "Accountability", subtitle: "quintas, 18h00 · números e compromissos", module_number: null, color: "#6B4310", color_light: "#F3D6A6", sort_order: 0 },
+  {
+    id: "mod-1",
+    code: "mod-1",
+    course_id: "crs-formacao",
+    title: "Fundações",
+    subtitle: "Nicho, cliente ideal e diagnóstico da oferta actual.",
+    cover_url: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=80",
+    module_number: 1,
+    color: "#453C96",
+    color_light: "#CFCBF7",
+    sort_order: 0,
+  },
+  {
+    id: "mod-2",
+    code: "mod-2",
+    course_id: "crs-formacao",
+    title: "Oferta e preço",
+    subtitle: "Anatomia da oferta, ancoragem e escalões.",
+    cover_url: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&q=80",
+    module_number: 2,
+    color: "#125A47",
+    color_light: "#B4E5D3",
+    sort_order: 1,
+  },
+  {
+    id: "mod-3",
+    code: "mod-3",
+    course_id: "crs-formacao",
+    title: "Aquisição",
+    subtitle: "Um canal, prospeção e parcerias.",
+    cover_url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80",
+    module_number: 3,
+    color: "#7C3218",
+    color_light: "#F1C4B0",
+    sort_order: 2,
+  },
+  {
+    id: "mod-4",
+    code: "mod-4",
+    course_id: "crs-formacao",
+    title: "Vendas",
+    subtitle: "Descoberta, objeções e fecho.",
+    cover_url: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&q=80",
+    module_number: 4,
+    color: "#7C2C46",
+    color_light: "#F2C0D2",
+    sort_order: 3,
+  },
+  {
+    id: "mod-t",
+    code: "mod-t",
+    course_id: "crs-tutoria",
+    title: "Sessões de tutoria",
+    subtitle: "Gravações das terças — conteúdo, finanças, IA e mais.",
+    cover_url: "https://images.unsplash.com/photo-1588196748096-7d473bf6c0d0?w=400&q=80",
+    module_number: null,
+    color: "#1E4E7E",
+    color_light: "#BBD7F4",
+    sort_order: 0,
+  },
+  {
+    id: "mod-a",
+    code: "mod-a",
+    course_id: "crs-acc",
+    title: "Sessões de accountability",
+    subtitle: "Gravações das quintas — GROWTH e SCALE.",
+    cover_url: "https://images.unsplash.com/photo-1542744173-8e2bd1159915?w=400&q=80",
+    module_number: null,
+    color: "#6B4310",
+    color_light: "#F3D6A6",
+    sort_order: 0,
+  },
 ];
 
 export const lessons: NbpLesson[] = [
-  { id: "t.con", code: "t.con", module_id: "mod-t", title: "Conteúdo", duration_label: "46 min", session_label: "18 ago", status: "publicado", video_url: null, sort_order: 0 },
-  { id: "t.fin", code: "t.fin", module_id: "mod-t", title: "Financeira", duration_label: "52 min", session_label: "11 ago", status: "publicado", video_url: null, sort_order: 1 },
-  { id: "t.dp", code: "t.dp", module_id: "mod-t", title: "Desenvolvimento pessoal", duration_label: "41 min", session_label: "4 ago", status: "publicado", video_url: null, sort_order: 2 },
-  { id: "t.ia", code: "t.ia", module_id: "mod-t", title: "IA", duration_label: "58 min", session_label: "28 jul", status: "publicado", video_url: null, sort_order: 3 },
-  { id: "t.con2", code: "t.con2", module_id: "mod-t", title: "Conteúdo", duration_label: "49 min", session_label: "21 jul", status: "publicado", video_url: null, sort_order: 4 },
-  { id: "a.gro", code: "a.gro", module_id: "mod-a", title: "GROWTH", duration_label: "34 min", session_label: "20 ago", status: "publicado", video_url: null, sort_order: 0 },
-  { id: "a.sca", code: "a.sca", module_id: "mod-a", title: "SCALE", duration_label: "29 min", session_label: "13 ago", status: "publicado", video_url: null, sort_order: 1 },
-  { id: "a.gro2", code: "a.gro2", module_id: "mod-a", title: "GROWTH", duration_label: "51 min", session_label: "6 ago", status: "publicado", video_url: null, sort_order: 2 },
-  { id: "a.sca2", code: "a.sca2", module_id: "mod-a", title: "SCALE", duration_label: "26 min", session_label: "30 jul", status: "publicado", video_url: null, sort_order: 3 },
-  { id: "m1.1", code: "m1.1", module_id: "mod-1", title: "Porquê um nicho", duration_label: "9 min", session_label: null, status: "publicado", video_url: null, sort_order: 0 },
-  { id: "m1.2", code: "m1.2", module_id: "mod-1", title: "Mapear o cliente ideal", duration_label: "14 min", session_label: null, status: "publicado", video_url: null, sort_order: 1 },
-  { id: "m1.3", code: "m1.3", module_id: "mod-1", title: "Auditar a oferta atual", duration_label: "11 min", session_label: null, status: "publicado", video_url: null, sort_order: 2 },
-  { id: "m1.4", code: "m1.4", module_id: "mod-1", title: "Escolher o mercado", duration_label: "8 min", session_label: null, status: "rascunho", video_url: null, sort_order: 3 },
-  { id: "m2.1", code: "m2.1", module_id: "mod-2", title: "Anatomia de uma oferta", duration_label: "12 min", session_label: null, status: "publicado", video_url: null, sort_order: 0 },
-  { id: "m2.2", code: "m2.2", module_id: "mod-2", title: "Ancoragem de valor", duration_label: "16 min", session_label: null, status: "publicado", video_url: null, sort_order: 1 },
-  { id: "m2.3", code: "m2.3", module_id: "mod-2", title: "Definir a tua oferta principal", duration_label: "12 min", session_label: null, status: "publicado", video_url: null, sort_order: 2 },
-  { id: "m2.4", code: "m2.4", module_id: "mod-2", title: "Estrutura de escalões", duration_label: "18 min", session_label: null, status: "rascunho", video_url: null, sort_order: 3 },
-  { id: "m2.5", code: "m2.5", module_id: "mod-2", title: "Quando subir preços", duration_label: "10 min", session_label: null, status: "rascunho", video_url: null, sort_order: 4 },
-  { id: "m3.1", code: "m3.1", module_id: "mod-3", title: "Escolher um canal só", duration_label: "13 min", session_label: null, status: "rascunho", video_url: null, sort_order: 0 },
-  { id: "m3.2", code: "m3.2", module_id: "mod-3", title: "Guião de prospeção fria", duration_label: "21 min", session_label: null, status: "rascunho", video_url: null, sort_order: 1 },
-  { id: "m3.3", code: "m3.3", module_id: "mod-3", title: "Parcerias e referências", duration_label: "15 min", session_label: null, status: "rascunho", video_url: null, sort_order: 2 },
-  { id: "m4.1", code: "m4.1", module_id: "mod-4", title: "A chamada de descoberta", duration_label: "19 min", session_label: null, status: "publicado", video_url: null, sort_order: 0 },
-  { id: "m4.2", code: "m4.2", module_id: "mod-4", title: "Tratar objeções", duration_label: "23 min", session_label: null, status: "rascunho", video_url: null, sort_order: 1 },
+  { id: "t.con", code: "t.con", module_id: "mod-t", title: "Conteúdo", description: "Como planear e publicar conteúdo que gera conversas comerciais.", duration_label: "46 min", session_label: "18 ago", status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 0 },
+  { id: "t.fin", code: "t.fin", module_id: "mod-t", title: "Financeira", description: "Leitura de P&L simplificado e métricas que importam no NBP.", duration_label: "52 min", session_label: "11 ago", status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 1 },
+  { id: "t.dp", code: "t.dp", module_id: "mod-t", title: "Desenvolvimento pessoal", description: "Rotinas, foco e gestão de energia para fundadores.", duration_label: "41 min", session_label: "4 ago", status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 2 },
+  { id: "t.ia", code: "t.ia", module_id: "mod-t", title: "IA", description: "Fluxos práticos de IA para operação e conteúdo.", duration_label: "58 min", session_label: "28 jul", status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 3 },
+  { id: "t.con2", code: "t.con2", module_id: "mod-t", title: "Conteúdo", description: "Repetição do ciclo de conteúdo — novas perguntas da comunidade.", duration_label: "49 min", session_label: "21 jul", status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 4 },
+  { id: "a.gro", code: "a.gro", module_id: "mod-a", title: "GROWTH", description: "Revisão de metas de crescimento e bloqueios da semana.", duration_label: "34 min", session_label: "20 ago", status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 0 },
+  { id: "a.sca", code: "a.sca", module_id: "mod-a", title: "SCALE", description: "Números de escala: pipeline, conversão e capacidade.", duration_label: "29 min", session_label: "13 ago", status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 1 },
+  { id: "a.gro2", code: "a.gro2", module_id: "mod-a", title: "GROWTH", description: "Follow-up das metas GROWTH do mês.", duration_label: "51 min", session_label: "6 ago", status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 2 },
+  { id: "a.sca2", code: "a.sca2", module_id: "mod-a", title: "SCALE", description: "Checklist de escala operacional.", duration_label: "26 min", session_label: "30 jul", status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 3 },
+  { id: "m1.1", code: "m1.1", module_id: "mod-1", title: "Porquê um nicho", description: "Porque nicho bem escolhido acelera preço e aquisição.", duration_label: "9 min", session_label: null, status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 0 },
+  { id: "m1.2", code: "m1.2", module_id: "mod-1", title: "Mapear o cliente ideal", description: "Exercício prático de ICP com perguntas de descoberta.", duration_label: "14 min", session_label: null, status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 1 },
+  { id: "m1.3", code: "m1.3", module_id: "mod-1", title: "Auditar a oferta atual", description: "Checklist para perceber o que vender (e o que cortar).", duration_label: "11 min", session_label: null, status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 2 },
+  { id: "m1.4", code: "m1.4", module_id: "mod-1", title: "Escolher o mercado", description: "Critérios para decidir o mercado onde jogar nos próximos 90 dias.", duration_label: "8 min", session_label: null, status: "rascunho", video_url: null, sort_order: 3 },
+  { id: "m2.1", code: "m2.1", module_id: "mod-2", title: "Anatomia de uma oferta", description: "Promessa, prova, processo e preço numa página.", duration_label: "12 min", session_label: null, status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 0 },
+  { id: "m2.2", code: "m2.2", module_id: "mod-2", title: "Ancoragem de valor", description: "Como ancorar valor antes de falar de preço.", duration_label: "16 min", session_label: null, status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 1 },
+  { id: "m2.3", code: "m2.3", module_id: "mod-2", title: "Definir a tua oferta principal", description: "Template para a oferta core do negócio.", duration_label: "12 min", session_label: null, status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 2 },
+  { id: "m2.4", code: "m2.4", module_id: "mod-2", title: "Estrutura de escalões", description: "Good / better / best adaptado a serviços B2B.", duration_label: "18 min", session_label: null, status: "rascunho", video_url: null, sort_order: 3 },
+  { id: "m2.5", code: "m2.5", module_id: "mod-2", title: "Quando subir preços", description: "Sinais de mercado e script de aumento.", duration_label: "10 min", session_label: null, status: "rascunho", video_url: null, sort_order: 4 },
+  { id: "m3.1", code: "m3.1", module_id: "mod-3", title: "Escolher um canal só", description: "Porque foco num canal bate dispersão nos primeiros 90 dias.", duration_label: "13 min", session_label: null, status: "rascunho", video_url: null, sort_order: 0 },
+  { id: "m3.2", code: "m3.2", module_id: "mod-3", title: "Guião de prospeção fria", description: "Mensagens e sequência para outbound.", duration_label: "21 min", session_label: null, status: "rascunho", video_url: null, sort_order: 1 },
+  { id: "m3.3", code: "m3.3", module_id: "mod-3", title: "Parcerias e referências", description: "Como pedir e estruturar referrals.", duration_label: "15 min", session_label: null, status: "rascunho", video_url: null, sort_order: 2 },
+  { id: "m4.1", code: "m4.1", module_id: "mod-4", title: "A chamada de descoberta", description: "Agenda da call e perguntas que qualificam.", duration_label: "19 min", session_label: null, status: "publicado", video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sort_order: 0 },
+  { id: "m4.2", code: "m4.2", module_id: "mod-4", title: "Tratar objeções", description: "Objecções clássicas e respostas sem desconto.", duration_label: "23 min", session_label: null, status: "rascunho", video_url: null, sort_order: 1 },
 ];
+
+export type MockCourseDetail = NbpCourse & {
+  modules: (NbpModule & { lessons: NbpLesson[] })[];
+};
+
+/** Curso com módulos e aulas aninhados — útil no admin em modo demo. */
+export function getMockCourseDetail(courseId: string): MockCourseDetail | null {
+  const course = courses.find((c) => c.id === courseId);
+  if (!course) return null;
+  const mods = modules
+    .filter((m) => m.course_id === courseId)
+    .slice()
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map((mod) => ({
+      ...mod,
+      lessons: lessons
+        .filter((l) => l.module_id === mod.id)
+        .slice()
+        .sort((a, b) => a.sort_order - b.sort_order),
+    }));
+  return { ...course, modules: mods };
+}
 
 /** Conteúdos V2 — tracks ao vivo (Tutorias / Accountability). */
 export type LiveTrackSession = {
