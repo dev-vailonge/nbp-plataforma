@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Surfaces ── */
+  --color-nbp-bg: #111110;
+  --color-nbp-sup: #1a1a18;
+  --color-nbp-sup2: #201f1d;
+  --color-nbp-fill: #2a2926;
+  --color-nbp-rail: #161615;
+  --color-nbp-bd: #302f2c;
+  --color-nbp-bd2: #45443f;
+
+  /* ── Text ── */
+  --color-nbp-tx: #edebe4;
+  --color-nbp-tx2: #a5a39b;
+  --color-nbp-tx3: #77756e;
+  --color-nbp-cream: #fdffef;
+  --color-nbp-ink: #181818;
+
+  /* ── Brand ── */
+  --color-nbp-salvia: #c6cabe;
+  --color-nbp-violet: #a79fea;
+  --color-nbp-violet-soft: #c0baf2;
+  --color-nbp-violet-deep: #22203f;
+  --color-nbp-violet-bd: #4a4470;
+
+  /* ── Semantic ── */
+  --color-nbp-success: #5fc7a4;
+  --color-nbp-warn: #e0ac5e;
+  --color-nbp-warn-deep: #33260f;
+  --color-nbp-down: #c9a39a;
+  --color-nbp-info: #8fbeea;
+  --color-nbp-info-deep: #16293d;
+
+  /* ── Radius ── */
+  --radius-nbp-sm: 7px;
+  --radius-nbp-md: 10px;
+  --radius-nbp-lg: 12px;
+  --radius-nbp-xl: 14px;
+  --radius-nbp-2xl: 16px;
+  --radius-nbp-3xl: 18px;
+
+  /* ── Type ── */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --animate-nbp-pulse: nbp-pulse 3s ease-in-out infinite;
+}
+
+@keyframes nbp-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px rgba(253, 255, 239, 0.25));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(253, 255, 239, 0.45));
+    transform: scale(1.06);
+  }
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--color-nbp-bg);
+  color: var(--color-nbp-tx);
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-nbp-salvia) 28%, transparent);
+}
+
+input,
+select,
+textarea {
+  color: var(--color-nbp-tx);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-nbp-tx3);
+}
+
+/* Focus ring for native controls that opt in via .nbp-focus */
+.nbp-focus:focus-visible {
+  outline: none;
+  border-color: var(--color-nbp-salvia);
+  box-shadow: 0 0 0 3px rgba(198, 202, 190, 0.12);
+}
