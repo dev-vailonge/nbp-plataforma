@@ -13,6 +13,9 @@ import type {
   NbpSession,
   NbpTalk,
   NbpUser,
+  NbpOnboardingAnswer,
+  NbpOnboardingQuestion,
+  NbpOnboardingSection,
   Sector,
 } from "@/types/database";
 
@@ -1444,3 +1447,347 @@ export function formatSessionWhen(iso: string) {
   });
   return `${weekday}, ${day} às ${time}`;
 }
+
+const nowIso = "2026-09-01T10:00:00.000Z";
+
+type OnboardingSeed = {
+  id: string;
+  title: string;
+  description?: string;
+  questions: {
+    prompt: string;
+    help?: string;
+    kind?: "long_text" | "single_choice" | "multi_choice" | "range";
+    options?: { id: string; label: string }[];
+  }[];
+};
+
+const onboardingSeed: OnboardingSeed[] = [
+  {
+    id: "ob-quem",
+    title: "Quem é você?",
+    questions: [
+      { prompt: "Quais são os seus princípios e valores?" },
+      { prompt: "Do que você gosta?" },
+      { prompt: "O que você repudia?" },
+      {
+        prompt:
+          "Quais histórias, experiências únicas ou resultados fazem você ser diferente dos demais?",
+      },
+      { prompt: "Quais foram os seus 5 maiores sucessos?" },
+      { prompt: "Quais foram os seus 5 maiores fracassos?" },
+    ],
+  },
+  {
+    id: "ob-org",
+    title: "Identidade Organizacional",
+    questions: [
+      {
+        prompt: "Qual é o propósito da sua empresa?",
+        help: "Por que ela existe? Qual é a razão dela existir?",
+      },
+      {
+        prompt: "Qual é a visão da empresa?",
+        help: "Onde a empresa quer chegar?",
+      },
+      {
+        prompt: "Quais são os valores da empresa?",
+        help: "Como ela quer ser vista pela sociedade e pelo mercado?",
+      },
+      {
+        prompt: "Qual é a missão da empresa?",
+        help: "O que fazemos e para quem fazemos?",
+      },
+      {
+        prompt: "Quais são as crenças do seu mercado com as quais você não concorda?",
+      },
+      {
+        prompt: "Qual legado você quer deixar para o mercado e para o mundo?",
+      },
+    ],
+  },
+  {
+    id: "ob-nicho",
+    title: "Nicho de Mercado",
+    questions: [
+      {
+        prompt: "Qual é o seu nicho de mercado?",
+        kind: "single_choice",
+        options: [
+          { id: "educacao", label: "Educação" },
+          { id: "servicos", label: "Serviços" },
+          { id: "saude", label: "Saúde" },
+          { id: "marca", label: "Marca pessoal" },
+          { id: "outro", label: "Outro" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "ob-ajuda",
+    title: "Quem você ajuda?",
+    questions: [
+      { prompt: "Quem é o seu cliente ideal?" },
+      {
+        prompt: "Quais são as principais personas que você atende?",
+        help: "Pode escolher mais do que uma.",
+        kind: "multi_choice",
+        options: [
+          { id: "iniciante", label: "Iniciante" },
+          { id: "fundador", label: "Fundador" },
+          { id: "gestor", label: "Gestor" },
+          { id: "especialista", label: "Especialista" },
+          { id: "empresa", label: "Pequena empresa" },
+        ],
+      },
+      { prompt: "Quais são os principais desafios do seu cliente ideal?" },
+      { prompt: "Quais são os principais desejos do seu cliente ideal?" },
+      { prompt: "Quais são as principais dores que seu cliente comunica?" },
+      { prompt: "Qual é a dor interna ou real por trás dessas dores?" },
+    ],
+  },
+  {
+    id: "ob-promessa",
+    title: "Promessa",
+    questions: [
+      {
+        prompt: "Qual é a principal promessa da sua empresa/produto?",
+        help: "Formato sugerido: “Eu ajudo [cliente ideal] a alcançar [transformação].”",
+      },
+    ],
+  },
+  {
+    id: "ob-bigidea",
+    title: "Big Idea e Diferenciação",
+    questions: [
+      { prompt: "Quais benefícios sua persona recebe ao comprar de você?" },
+      {
+        prompt:
+          "Por que seu potencial cliente compraria de você e não de um concorrente?",
+      },
+      {
+        prompt:
+          "Como você comunica e entrega sua promessa de uma forma diferente do que o mercado está acostumado?",
+      },
+      { prompt: "Qual é o grande desejo do seu cliente ideal?" },
+      {
+        prompt:
+          "Qual maneira única você pode usar para comunicar esse desejo e se destacar no mercado?",
+      },
+      { prompt: "Qual é a sua promessa com mecanismo único / Big Idea?" },
+    ],
+  },
+  {
+    id: "ob-identidade",
+    title: "Nova Identidade",
+    description: "Essa é a parte mais pessoal do onboarding.",
+    questions: [
+      {
+        prompt:
+          "Como seria a melhor versão de você mesmo, capaz de realizar seus sonhos e objetivos?",
+      },
+      { prompt: "Quais competências e pontos fortes essa nova identidade teria?" },
+      {
+        prompt:
+          "Quais novos pontos fortes essa identidade teria que você ainda não tem hoje?",
+      },
+      { prompt: "Quais fraquezas da sua identidade atual deixariam de existir?" },
+      { prompt: "Quais bons hábitos essa nova identidade teria?" },
+      { prompt: "De quais maus hábitos essa nova identidade estaria livre?" },
+      {
+        prompt:
+          "De quais medos, preocupações e julgamentos essa identidade estaria livre?",
+      },
+      { prompt: "Como essa nova identidade se apresenta? Qual é a sua aparência/postura?" },
+      {
+        prompt:
+          "De quais acontecimentos e histórias do passado essa nova identidade teria se libertado?",
+      },
+      { prompt: "Quais novos traços de caráter essa nova identidade teria?" },
+      {
+        prompt:
+          "Como seria um dia normal dessa nova versão de você enquanto trabalha para atingir seus objetivos?",
+      },
+      {
+        prompt:
+          "O que essa nova identidade adoraria fazer que sua identidade atual evita ou detesta?",
+      },
+      {
+        prompt:
+          "Se outras pessoas estivessem falando positivamente sobre essa nova versão de você, o que diriam?",
+      },
+      {
+        prompt:
+          "Em quais momentos do passado você já se comportou como essa nova identidade?",
+      },
+      { prompt: "Como você se sentiu nesses momentos?" },
+    ],
+  },
+  {
+    id: "ob-hip",
+    title: "HIP — Hábitos e Identidade",
+    description: "Aqui entra o conceito de Habit–Identity Pairing.",
+    questions: [
+      { prompt: "Qual é a diferença entre sua identidade atual e sua nova identidade?" },
+      { prompt: "O que tem impedido você de avançar?" },
+      {
+        prompt:
+          "Quais comportamentos você precisaria demonstrar regularmente para diminuir essa diferença?",
+      },
+      {
+        prompt:
+          "O que precisa acontecer regularmente para você começar a acreditar que é esse tipo de pessoa?",
+      },
+      { prompt: "Quais pensamentos você teria com mais frequência?" },
+      { prompt: "Quais crenças mais úteis você teria?" },
+      { prompt: "De quais maus hábitos você se libertará?" },
+      {
+        prompt:
+          "Quais bons hábitos passarão a fazer parte naturalmente de quem você é?",
+      },
+    ],
+  },
+  {
+    id: "ob-evidencias",
+    title: "Evidências da Nova Identidade",
+    description:
+      "Essa seção serve para a pessoa perceber que já demonstrou características dessa identidade no passado.",
+    questions: [
+      {
+        prompt:
+          "Quais diferentes tipos de identidade você precisa adotar para se tornar quem deseja ser?",
+        help: "Exemplo: “Quero fazer exercícios regularmente” → “Sou uma pessoa ativa.”",
+      },
+      {
+        prompt:
+          "Em quais momentos do passado você já demonstrou características dessa identidade?",
+      },
+      {
+        prompt: "Quais situações específicas mostram que você já foi esse tipo de pessoa?",
+      },
+      { prompt: "Como você se sentiu nesses momentos?" },
+      {
+        prompt:
+          "Até que ponto você acredita hoje que essa nova identidade já existe dentro de você?",
+        kind: "range",
+      },
+      {
+        prompt: "Até que ponto você acredita que conseguirá manter essa nova identidade?",
+        kind: "range",
+      },
+      { prompt: "Existe alguma resistência ou dúvida impedindo você neste momento?" },
+      { prompt: "Como você pretende superar essas resistências?" },
+      {
+        prompt: "Qual é o seu grau de comprometimento com essa mudança?",
+        kind: "range",
+      },
+    ],
+  },
+  {
+    id: "ob-valores",
+    title: "Valores, Propósito e Visão Pessoal",
+    description:
+      "Valores, missão, propósito e visão. A visão pode ser dividida em negócios e finanças, saúde, família, relacionamentos, educação/lazer e questões mentais, emocionais e espirituais.",
+    questions: [
+      { prompt: "Quais são os seus valores fundamentais?", help: "Valores" },
+      { prompt: "Quais momentos da sua vida fizeram você se sentir mais feliz?" },
+      { prompt: "O que você estava fazendo nesses momentos?" },
+      { prompt: "Com quem você estava?" },
+      { prompt: "Quais fatores contribuíram para sua felicidade?" },
+      { prompt: "Quais momentos fizeram você se sentir mais orgulhoso?" },
+      { prompt: "Por que você se sentiu orgulhoso?" },
+      { prompt: "Quem compartilhou esse sentimento com você?" },
+      { prompt: "Quais momentos fizeram você se sentir mais realizado?" },
+      { prompt: "Qual necessidade ou desejo estava sendo satisfeito?" },
+      { prompt: "Como essa experiência deu sentido à sua vida?" },
+      { prompt: "Quais são seus 10 valores mais importantes?" },
+      { prompt: "Como você priorizaria esses valores?" },
+      { prompt: "Seus valores fazem você se sentir bem consigo mesmo?" },
+      { prompt: "Você sente orgulho dos seus principais valores?" },
+      {
+        prompt:
+          "Você se sentiria confortável em falar sobre eles para pessoas que respeita?",
+      },
+      { prompt: "Qual é o seu propósito?", help: "Missão e propósito" },
+      { prompt: "Qual é o seu “porquê” mais profundo?" },
+      { prompt: "Qual é a missão que você sente que possui?" },
+      {
+        prompt: "Como você define sucesso pessoal no final da sua vida?",
+        help: "Visão",
+      },
+      {
+        prompt: "O que gostaria que amigos, família, parceiro e colegas dissessem sobre você?",
+      },
+      { prompt: "Como você não gostaria de ser lembrado?" },
+      { prompt: "Como gostaria de ser lembrado?" },
+      { prompt: "Qual é sua visão para o final da sua vida?" },
+      { prompt: "Como você imagina sua vida daqui a 5, 10 ou 20 anos?" },
+    ],
+  },
+  {
+    id: "ob-genialidade",
+    title: "Personalidade e Zona de Genialidade",
+    description: "Personalidade, preferências e Zona de Genialidade.",
+    questions: [
+      {
+        prompt: "Quais são cinco coisas que você ama fazer e poderia fazer durante todo o dia?",
+      },
+      { prompt: "Quais são cinco coisas que você detesta fazer e tenta evitar?" },
+      { prompt: "Qual é a sua Zona de Genialidade?" },
+      {
+        prompt: "Quais atividades você gosta de fazer, faz muito bem e que geram maior impacto?",
+        help: "Gosta de fazer, faz muito bem e geram maior impacto.",
+      },
+    ],
+  },
+];
+
+export const onboardingSections: NbpOnboardingSection[] = onboardingSeed.map(
+  (section, index) => ({
+    id: section.id,
+    code: section.id,
+    title: section.title,
+    description: section.description ?? null,
+    sort_order: index,
+    created_at: nowIso,
+    updated_at: nowIso,
+  }),
+);
+
+export const onboardingQuestions: NbpOnboardingQuestion[] = onboardingSeed.flatMap(
+  (section) =>
+    section.questions.map((question, index) => ({
+      id: `${section.id}-q${index + 1}`,
+      code: `${section.id}-q${index + 1}`,
+      section_id: section.id,
+      prompt: question.prompt,
+      help_text: question.help ?? null,
+      kind: question.kind ?? "long_text",
+      options: question.options ?? null,
+      required: true,
+      sort_order: index,
+      created_at: nowIso,
+      updated_at: nowIso,
+    })),
+);
+
+const quemAnswers = [
+  "Clareza, consistência e responsabilidade com quem começa do zero.",
+  "Ensinar, desenhar ofertas e ver alguém fechar o primeiro cliente.",
+  "Prometer resultado sem processo e depender só da minha energia.",
+  "Levei iniciantes do zero ao primeiro emprego e estou a escalar turmas sem estar em todas as aulas.",
+  "Primeira turma cheia. Primeiro emprego de um aluno. Oferta a 2.400 € testada. Rotina de publicação. Equipa mínima a funcionar.",
+  "Lançar sem oferta fechada. Aceitar qualquer cliente. Trabalhar noites sem sistema. Adiar a contratação. Medir vaidade em vez de receita.",
+];
+
+export const onboardingAnswers: NbpOnboardingAnswer[] = quemAnswers.map(
+  (value, index) => ({
+    id: `ob-a-quem-${index + 1}`,
+    user_id: "m-roque",
+    question_id: `ob-quem-q${index + 1}`,
+    value_text: value,
+    value_json: null,
+    created_at: nowIso,
+    updated_at: nowIso,
+  }),
+);

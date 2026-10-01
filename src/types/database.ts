@@ -11,6 +11,13 @@ export type LiveEventType = "oneoff" | "override" | "cancel";
 export type LiveEventKind = "tutoria" | "growth" | "scale" | "presencial";
 export type StageStatus = "done" | "current" | "locked";
 export type ObjectiveColumn = "none" | "todo" | "done";
+export type OnboardingQuestionKind =
+  | "short_text"
+  | "long_text"
+  | "single_choice"
+  | "multi_choice"
+  | "yes_no"
+  | "range";
 export type SessionStatus = "scheduled" | "done" | "cancelled";
 
 export type TelaShape = {
@@ -181,6 +188,49 @@ export type NbpActionPlanObjective = {
   position: number;
 };
 
+export type OnboardingOption = { id: string; label: string };
+
+export type NbpOnboardingSection = {
+  id: string;
+  code: string;
+  title: string;
+  description: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type NbpOnboardingQuestion = {
+  id: string;
+  code: string;
+  section_id: string;
+  prompt: string;
+  help_text: string | null;
+  kind: OnboardingQuestionKind;
+  options: OnboardingOption[] | null;
+  required: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type NbpOnboardingAnswer = {
+  id: string;
+  user_id: string;
+  question_id: string;
+  value_text: string | null;
+  value_json: string[] | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type OnboardingProgress = {
+  total: number;
+  completed: number;
+  remaining: number;
+  percent: number;
+};
+
 export type NbpSession = {
   id: string;
   member_id: string;
@@ -272,6 +322,9 @@ export type Database = {
       nbp_community_members: TableDef<NbpCommunityMember>;
       nbp_community_messages: TableDef<NbpCommunityMessage>;
       nbp_community_reactions: TableDef<NbpCommunityReaction>;
+      nbp_onboarding_sections: TableDef<NbpOnboardingSection>;
+      nbp_onboarding_questions: TableDef<NbpOnboardingQuestion>;
+      nbp_onboarding_answers: TableDef<NbpOnboardingAnswer>;
     };
     Views: {
       nbp_member_stats: {

@@ -24,6 +24,7 @@ export const PORTAL_FOOTER_NAV: NavItem[] = [
 export const ADMIN_NAV: NavItem[] = [
   { href: "/admin", label: "Visão geral", icon: "fa-house" },
   { href: "/admin/membros", label: "Membros", icon: "fa-users" },
+  { href: "/admin/onboarding", label: "Onboarding", icon: "fa-list-check" },
   { href: "/admin/conteudos", label: "Conteúdos", icon: "fa-file-lines" },
   { href: "/admin/documentos", label: "Documentos", icon: "fa-folder" },
   { href: "/admin/talks", label: "Mafra Talks", icon: "fa-microphone-lines" },

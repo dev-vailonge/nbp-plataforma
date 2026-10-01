@@ -7,6 +7,7 @@ import { Button, ButtonLink } from "@/components/Button";
 import { PageHeader, Panel, PanelHead } from "@/components/Panel";
 import { PlanBadge } from "@/components/Pill";
 import { ProgressBar } from "@/components/ui";
+import { OnboardingEntry } from "@/components/OnboardingEntry";
 import {
   currentMember,
   currentPlan,
@@ -130,6 +131,8 @@ export default function PerfilPage() {
           </div>
         </Panel>
       </section>
+
+      <OnboardingEntry />
 
       <section
         className="mb-5 grid grid-cols-2 gap-3.5 max-[520px]:grid-cols-1 min-[1081px]:grid-cols-4"
