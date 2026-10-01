@@ -42,12 +42,33 @@ export function initials(name: string) {
 const now = "2026-09-17T10:00:00+01:00";
 
 function user(
-  partial: Omit<NbpUser, "auth_id" | "avatar_url" | "login_streak" | "last_login_on" | "created_at" | "updated_at"> &
-    Partial<Pick<NbpUser, "login_streak" | "last_login_on">>,
+  partial: Omit<
+    NbpUser,
+    | "auth_id"
+    | "avatar_url"
+    | "login_streak"
+    | "last_login_on"
+    | "created_at"
+    | "updated_at"
+    | "drive_folder_id"
+    | "phase"
+    | "phase_before_pause"
+    | "invite_token"
+  > &
+    Partial<
+      Pick<
+        NbpUser,
+        "login_streak" | "last_login_on" | "drive_folder_id" | "phase" | "phase_before_pause" | "invite_token"
+      >
+    >,
 ): NbpUser {
   return {
     auth_id: null,
     avatar_url: null,
+    drive_folder_id: null,
+    phase: "acompanhamento",
+    phase_before_pause: null,
+    invite_token: null,
     login_streak: 0,
     last_login_on: null,
     created_at: now,
@@ -233,6 +254,8 @@ export const users: NbpUser[] = [
     bio: "Apoio administrativo remoto a consultores.",
     gender: "f",
     membership_status: "inativo",
+    phase: "pausado",
+    phase_before_pause: "acompanhamento",
     consultant_id: "u-marta",
   }),
   user({

@@ -1,51 +1,62 @@
-import { Button } from "@/components/Button";
-import { PageHeader, Panel } from "@/components/Panel";
-import { FILE_META, documents, folders } from "@/lib/mocks";
-import { Fa } from "@/components/BrandMark";
+"use client";
 
-export const metadata = { title: "Documentos" };
+import { useEffect, useState } from "react";
+import { DriveBrowser } from "@/components/DriveBrowser";
+import { PageHeader, fieldControlClass } from "@/components/Panel";
+import { api } from "@/lib/api-client";
+import { users as mockUsers } from "@/lib/mocks";
+import type { NbpUser } from "@/types/database";
 
 export default function AdminDocumentosPage() {
+  const [members, setMembers] = useState<NbpUser[]>([]);
+  const [userId, setUserId] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    api<NbpUser[]>("/api/v1/users?role=membro").then((res) => {
+      if (cancelled) return;
+      const list = "error" in res ? mockUsers.filter((u) => u.role === "membro") : res.data;
+      setMembers(list);
+      setUserId((current) => current || list[0]?.id || "");
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const selected = members.find((m) => m.id === userId) ?? null;
+
   return (
     <>
       <PageHeader
         title="Documentos"
-        subtitle="Pastas e ficheiros por utilizador (mocks do membro Roque)."
-        actions={
-          <>
-            <Button type="button">Nova pasta</Button>
-            <Button variant="primary" type="button">
-              Novo ficheiro
-            </Button>
-          </>
-        }
+        subtitle="Cada membro lê a pasta do Drive partilhada no detalhe dele. Aqui vês a mesma árvore."
       />
-      <div className="flex flex-col gap-3">
-        {folders.map((f) => {
-          const files = documents.filter((d) => d.folder_id === f.id);
-          return (
-            <Panel key={f.id}>
-              <div className="mb-2 flex items-center gap-2 font-medium">
-                <Fa name="fa-folder" className="text-nbp-salvia" />
-                {f.name}
-              </div>
-              {files.length === 0 ? (
-                <p className="m-0 text-[0.82rem] text-nbp-tx3">Sem ficheiros.</p>
-              ) : (
-                <ul className="m-0 flex list-none flex-col gap-1 p-0">
-                  {files.map((d) => (
-                    <li key={d.id} className="flex items-center gap-2 text-[0.88rem]">
-                      <Fa name={FILE_META[d.file_kind].icon} />
-                      {d.name}
-                      <span className="text-nbp-tx3">{FILE_META[d.file_kind].label}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Panel>
-          );
-        })}
-      </div>
+      <label className="mb-5 flex max-w-[420px] flex-col gap-1.5 text-[0.82rem] text-nbp-tx2">
+        Membro
+        <select
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          className={fieldControlClass}
+        >
+          {members.length === 0 ? <option value="">Sem membros</option> : null}
+          {members.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.full_name}
+              {m.drive_folder_id ? "" : " · sem pasta"}
+            </option>
+          ))}
+        </select>
+      </label>
+      {selected ? (
+        <DriveBrowser
+          key={selected.id}
+          userId={selected.id}
+          emptyHref={`/admin/membros/${selected.id}`}
+          emptyTitle={`${selected.full_name} ainda não tem pasta`}
+          emptyDescription="Cola o link da pasta do Drive no detalhe deste membro. A navegação passa a ser a árvore dessa pasta."
+        />
+      ) : null}
     </>
   );
 }

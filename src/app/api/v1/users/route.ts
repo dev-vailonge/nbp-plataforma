@@ -1,6 +1,8 @@
+import { randomBytes } from "crypto";
 import { NextRequest } from "next/server";
 import { ok, err, parseJson, JsonParseError } from "@/lib/api/http";
 import { requireRole } from "@/lib/api/auth";
+import { parseDriveFolderId } from "@/lib/drive-folder";
 import type { MembershipStatus, NbpRole, Sector } from "@/types/database";
 
 function slugCode(name: string) {
@@ -69,6 +71,7 @@ export async function POST(req: NextRequest) {
     consultant_id?: string | null;
     gender?: "m" | "f" | null;
     code?: string;
+    drive_folder_id?: string | null;
   };
   try {
     body = await parseJson(req);
@@ -81,6 +84,12 @@ export async function POST(req: NextRequest) {
   const email = body.email?.trim().toLowerCase();
   if (!fullName) return err("bad_request", "Nome é obrigatório.", 400);
   if (!email) return err("bad_request", "Email é obrigatório.", 400);
+
+  const driveRaw = body.drive_folder_id;
+  const driveFolderId = parseDriveFolderId(driveRaw);
+  if (driveRaw && String(driveRaw).trim() && !driveFolderId) {
+    return err("bad_request", "Cola o link da pasta do Google Drive.", 400);
+  }
 
   const insert = {
     full_name: fullName,
@@ -96,6 +105,10 @@ export async function POST(req: NextRequest) {
     gender: body.gender || null,
     role: "membro" as NbpRole,
     code: body.code?.trim() || slugCode(fullName),
+    drive_folder_id: driveFolderId,
+    phase: "convite_criado" as const,
+    phase_before_pause: null,
+    invite_token: randomBytes(24).toString("base64url"),
     auth_id: null,
     avatar_url: null,
     login_streak: 0,

@@ -1,5 +1,6 @@
 export type NbpRole = "admin" | "consultor" | "membro";
 export type MembershipStatus = "ativo" | "inativo";
+export type { MemberPhase } from "@/lib/member-phase";
 export type Sector = "mkt" | "marca" | "com" | "dados" | "saude" | "foto" | "va" | "desp";
 export type Gender = "m" | "f";
 export type CourseKind = "formacao" | "tutoria" | "accountability";
@@ -50,7 +51,11 @@ export type NbpUser = {
   gender: Gender | null;
   avatar_url: string | null;
   membership_status: MembershipStatus;
+  phase: import("@/lib/member-phase").MemberPhase;
+  phase_before_pause: import("@/lib/member-phase").MemberPhase | null;
+  invite_token: string | null;
   consultant_id: string | null;
+  drive_folder_id: string | null;
   login_streak: number;
   last_login_on: string | null;
   created_at: string;
@@ -332,7 +337,12 @@ export type Database = {
         Relationships: [];
       };
     };
-    Functions: Record<string, never>;
+    Functions: {
+      nbp_invite_preview: {
+        Args: { p_token: string };
+        Returns: { full_name: string; email: string }[];
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

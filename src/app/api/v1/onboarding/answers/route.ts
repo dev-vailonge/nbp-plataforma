@@ -1,6 +1,9 @@
 import { NextRequest } from "next/server";
 import { ok, err, parseJson, JsonParseError } from "@/lib/api/http";
 import { requireAuth } from "@/lib/api/auth";
+import { answerIsFilled, onboardingProgress } from "@/lib/onboarding";
+import { nextOnboardingPhase } from "@/lib/member-phase";
+import type { NbpOnboardingAnswer, NbpOnboardingQuestion, NbpOnboardingSection } from "@/types/database";
 
 type AnswerInput = {
   question_id?: string;
@@ -57,5 +60,33 @@ export async function PUT(req: NextRequest) {
     .select();
 
   if (dbError) return err("db_error", dbError.message, 400);
+
+  if (nbpUser.phase === "convite_aceito" || nbpUser.phase === "onboarding_iniciado") {
+    const [sectionsRes, questionsRes, answersRes] = await Promise.all([
+      supabase.from("nbp_onboarding_sections").select("*"),
+      supabase.from("nbp_onboarding_questions").select("*"),
+      supabase.from("nbp_onboarding_answers").select("*").eq("user_id", nbpUser.id),
+    ]);
+    if (!sectionsRes.error && !questionsRes.error && !answersRes.error) {
+      const sections = (sectionsRes.data ?? []) as NbpOnboardingSection[];
+      const questions = (questionsRes.data ?? []) as NbpOnboardingQuestion[];
+      const answers = (answersRes.data ?? []) as NbpOnboardingAnswer[];
+      const byId = new Map(questions.map((question) => [question.id, question]));
+      const anyFilled = answers.some((answer) => {
+        const question = byId.get(answer.question_id);
+        return question ? answerIsFilled(question.kind, answer) : false;
+      });
+      const progress = onboardingProgress(sections, questions, answers);
+      const next = nextOnboardingPhase(
+        nbpUser.phase,
+        anyFilled,
+        progress.total > 0 && progress.remaining === 0,
+      );
+      if (next) {
+        await supabase.from("nbp_users").update({ phase: next }).eq("id", nbpUser.id);
+      }
+    }
+  }
+
   return ok(data ?? []);
 }

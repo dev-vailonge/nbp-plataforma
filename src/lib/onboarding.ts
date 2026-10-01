@@ -17,6 +17,23 @@ export type OnboardingPayload = {
   progress: OnboardingProgress;
 };
 
+export function formatOnboardingAnswer(
+  question: Pick<NbpOnboardingQuestion, "kind" | "options">,
+  answer: Pick<NbpOnboardingAnswer, "value_text" | "value_json"> | null | undefined,
+) {
+  if (!answerIsFilled(question.kind, answer)) return null;
+  const labelOf = (id: string) => question.options?.find((option) => option.id === id)?.label ?? id;
+  if (question.kind === "multi_choice") {
+    return (answer?.value_json ?? []).map(labelOf).join(", ");
+  }
+  if (question.kind === "single_choice") return labelOf(answer?.value_text ?? "");
+  if (question.kind === "yes_no") {
+    if (answer?.value_text === "yes") return "Sim";
+    if (answer?.value_text === "no") return "Não";
+  }
+  return answer?.value_text?.trim() || null;
+}
+
 export function answerIsFilled(
   kind: OnboardingQuestionKind,
   answer: Pick<NbpOnboardingAnswer, "value_text" | "value_json"> | null | undefined,

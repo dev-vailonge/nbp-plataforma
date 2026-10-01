@@ -4,8 +4,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/components/Panel";
 import { Pill } from "@/components/Pill";
-import { SECTORS, members } from "@/lib/mocks";
-import type { Sector } from "@/types/database";
+import { api } from "@/lib/api-client";
+import { PHASE_LABELS, MEMBER_PHASES, type MemberPhase } from "@/lib/member-phase";
+import { SECTORS, members as mockMembers } from "@/lib/mocks";
+import type { NbpUser, Sector } from "@/types/database";
 
 function RowMenu({
   open,
@@ -82,8 +84,20 @@ function RowMenu({
 export default function MembrosPage() {
   const [q, setQ] = useState("");
   const [setor, setSetor] = useState("");
-  const [status, setStatus] = useState("");
+  const [phase, setPhase] = useState("");
   const [menuId, setMenuId] = useState<string | null>(null);
+  const [members, setMembers] = useState<NbpUser[]>(mockMembers);
+
+  useEffect(() => {
+    let cancelled = false;
+    api<NbpUser[]>("/api/v1/users?role=membro").then((res) => {
+      if (cancelled || "error" in res) return;
+      setMembers(res.data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const now = new Date();
   const curYear = now.getFullYear();
@@ -93,14 +107,14 @@ export default function MembrosPage() {
     const query = q.toLowerCase().trim();
     return members.filter((m) => {
       if (setor && m.sector !== setor) return false;
-      if (status && m.membership_status !== status) return false;
+      if (phase && m.phase !== phase) return false;
       if (!query) return true;
       const blob = [m.full_name, m.email, m.city, m.company, m.sector ? SECTORS[m.sector] : ""]
         .join(" ")
         .toLowerCase();
       return blob.includes(query);
     });
-  }, [q, setor, status]);
+  }, [members, q, setor, phase]);
 
   return (
     <>
@@ -136,13 +150,16 @@ export default function MembrosPage() {
           ))}
         </select>
         <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          value={phase}
+          onChange={(e) => setPhase(e.target.value)}
           className="rounded-[10px] border-[0.5px] border-nbp-bd bg-nbp-sup2 px-3 py-2"
         >
-          <option value="">Todos os status</option>
-          <option value="ativo">Membro ativo</option>
-          <option value="inativo">Inativo</option>
+          <option value="">Todas as fases</option>
+          {MEMBER_PHASES.map((item) => (
+            <option key={item} value={item}>
+              {PHASE_LABELS[item]}
+            </option>
+          ))}
         </select>
       </div>
       {rows.length === 0 ? (
@@ -155,7 +172,7 @@ export default function MembrosPage() {
                 <th className="px-3 py-2.5 font-medium">Nome</th>
                 <th className="px-3 py-2.5 font-medium">Cidade</th>
                 <th className="px-3 py-2.5 font-medium">Setor</th>
-                <th className="px-3 py-2.5 font-medium">Status</th>
+                <th className="px-3 py-2.5 font-medium">Fase</th>
                 <th className="px-3 py-2.5 font-medium">
                   <span className="sr-only">Ações</span>
                 </th>
@@ -175,8 +192,8 @@ export default function MembrosPage() {
                       {m.sector ? SECTORS[m.sector] : "—"}
                     </td>
                     <td className="px-3 py-2.5">
-                      <Pill tone={m.membership_status === "ativo" ? "sage" : "muted"}>
-                        {m.membership_status === "ativo" ? "Ativo" : "Inativo"}
+                      <Pill tone={m.phase === "pausado" ? "muted" : m.phase === "acompanhamento" ? "sage" : "cream"}>
+                        {PHASE_LABELS[m.phase as MemberPhase] ?? m.phase}
                       </Pill>
                     </td>
                     <td className="px-3 py-2.5">
