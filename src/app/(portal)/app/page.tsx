@@ -3,15 +3,14 @@ import { Avatar, IconWell } from "@/components/Avatar";
 import { Fa } from "@/components/BrandMark";
 import { ButtonLink } from "@/components/Button";
 import { Panel, SectionLabel } from "@/components/Panel";
-import { Pill } from "@/components/Pill";
 import { PlanJourney } from "@/components/PlanJourney";
 import { RevenueChart } from "@/components/RevenueChart";
+import { TalkOfTheWeek } from "@/components/TalkOfTheWeek";
 import {
   currentMember,
   currentPlan,
   formatSessionWhen,
   homeAchievements,
-  homeAudioWeek,
   homeQuickActions,
   homeStats,
   nextSession,
@@ -62,72 +61,7 @@ export default function PortalHomePage() {
         </ButtonLink>
       </Panel>
 
-      <Panel
-        surface="card"
-        radius="2xl"
-        padding="lg"
-        className="relative mb-10 overflow-hidden before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:bg-[linear-gradient(180deg,#FDFFEF_0%,#C6C8BA_100%)] before:shadow-[0_0_12px_rgba(253,255,239,0.35)] before:content-[''] max-[560px]:px-[18px] max-[560px]:py-[18px]"
-        aria-labelledby="audio-week-title"
-      >
-        <div className="mb-[18px] flex items-start gap-4">
-          <Avatar label="JM" size="lg" tone="sage" className="!bg-[linear-gradient(135deg,#FDFFEF_0%,#C6C8BA_55%,#8A8B82_100%)] shadow-[0_0_0_1px_rgba(253,255,239,0.2),0_8px_24px_rgba(0,0,0,0.25)]" />
-          <div className="min-w-0 flex-1">
-            <div className="mb-1.5 inline-flex items-center gap-[7px] text-[0.66rem] tracking-[0.14em] text-nbp-tx3 uppercase">
-              <Fa name="fa-headphones" className="text-[11px] text-[#C6C8BA]" />
-              Áudio da semana
-            </div>
-            <h3
-              id="audio-week-title"
-              className="m-0 text-[1.1rem] font-semibold tracking-[-0.01em] text-nbp-tx"
-            >
-              {homeAudioWeek.title}
-            </h3>
-            <p className="mt-[5px] mb-0 text-[0.86rem] text-nbp-tx2">
-              {homeAudioWeek.sub} ·{" "}
-              <Link
-                href="/app/talks"
-                className="text-nbp-tx2 underline underline-offset-2 hover:text-nbp-tx"
-              >
-                Ver todos
-              </Link>
-            </p>
-          </div>
-          <Pill tone="salvia" className="hidden uppercase tracking-[0.06em] min-[561px]:inline-flex">
-            Novo
-          </Pill>
-        </div>
-
-        <div className="flex items-center gap-3.5 rounded-xl border border-nbp-bd bg-[rgba(253,255,239,0.02)] px-3.5 py-3">
-          <button
-            type="button"
-            aria-label="Reproduzir áudio da semana"
-            className="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 text-[#181818] shadow-[0_6px_18px_rgba(198,200,186,0.25)] transition hover:scale-105 hover:shadow-[0_8px_22px_rgba(198,200,186,0.35)]"
-            style={{ background: "linear-gradient(135deg, #FDFFEF 0%, #C6C8BA 100%)" }}
-          >
-            <Fa name="fa-play" className="ml-0.5 text-[15px]" />
-          </button>
-          <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <div
-              className="relative h-1.5 cursor-pointer overflow-hidden rounded-full bg-[rgba(198,200,186,0.12)]"
-              role="slider"
-              aria-label="Progresso do áudio"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={0}
-              tabIndex={0}
-            >
-              <div
-                className="h-full w-0 rounded-full bg-[linear-gradient(90deg,#C6C8BA,#FDFFEF)]"
-                aria-hidden
-              />
-            </div>
-            <div className="flex justify-between text-[0.72rem] text-nbp-tx3 tabular-nums">
-              <span>0:00</span>
-              <span>{homeAudioWeek.duration}</span>
-            </div>
-          </div>
-        </div>
-      </Panel>
+      <TalkOfTheWeek />
 
       <SectionLabel>Ações rápidas</SectionLabel>
       <div className="mb-10 grid grid-cols-2 gap-3.5 max-[560px]:grid-cols-1 min-[1081px]:grid-cols-4">

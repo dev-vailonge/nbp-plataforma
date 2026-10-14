@@ -796,10 +796,10 @@ export const planStages: NbpActionPlanStage[] = [
 ];
 
 export const planObjectives: NbpActionPlanObjective[] = [
-  { id: "o1", month_id: "pm-aug", title: "Testar escalão a 2.400 € com dois clientes novos", column: "todo", lesson_id: "m2.4", position: 0 },
-  { id: "o2", month_id: "pm-aug", title: "Enviar proposta à Vitor & Filhos", column: "todo", lesson_id: "m4.1", position: 1 },
-  { id: "o3", month_id: "pm-aug", title: "Gravar o vídeo de onboarding", column: "none", lesson_id: null, position: 2 },
-  { id: "o4", month_id: "pm-aug", title: "Sistema de referências a funcionar", column: "done", lesson_id: "m3.3", position: 3 },
+  { id: "o1", month_id: "pm-aug", stage_id: "s3", title: "Testar escalão a 2.400 € com dois clientes novos", column: "todo", lesson_id: "m2.4", position: 0 },
+  { id: "o2", month_id: "pm-aug", stage_id: "s3", title: "Enviar proposta à Vitor & Filhos", column: "todo", lesson_id: "m4.1", position: 1 },
+  { id: "o3", month_id: "pm-aug", stage_id: "s4", title: "Gravar o vídeo de onboarding", column: "none", lesson_id: null, position: 0 },
+  { id: "o4", month_id: "pm-aug", stage_id: "s2", title: "Sistema de referências a funcionar", column: "done", lesson_id: "m3.3", position: 0 },
 ];
 
 export const currentPlan = planMonths.find((m) => m.month === 8)!;

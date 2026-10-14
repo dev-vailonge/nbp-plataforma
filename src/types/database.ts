@@ -30,7 +30,7 @@ export type TelaShape = {
   c?: number;
   s?: number;
   txt?: string;
-  pts?: number[];
+  pts?: number[][];
 };
 
 export type Viewport = { ox: number; oy: number; z: number };
@@ -187,6 +187,7 @@ export type NbpActionPlanStage = {
 export type NbpActionPlanObjective = {
   id: string;
   month_id: string;
+  stage_id: string | null;
   title: string;
   column: ObjectiveColumn;
   lesson_id: string | null;

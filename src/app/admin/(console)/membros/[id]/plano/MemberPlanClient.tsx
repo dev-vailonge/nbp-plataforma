@@ -6,9 +6,11 @@ import { useSearchParams } from "next/navigation";
 import { Fa } from "@/components/BrandMark";
 import { Button } from "@/components/Button";
 import { Field, PageHeader, Panel, fieldControlClass } from "@/components/Panel";
+import { PlanWhiteboard } from "@/components/PlanWhiteboard";
 import { Pill } from "@/components/Pill";
 import { EmptyState } from "@/components/ui";
 import { api } from "@/lib/api-client";
+import { readLocalPlans, saveBoard, boardOf, writeLocalPlans, type LocalPlanBook } from "@/lib/local-plans";
 import {
   formatEur,
   planMonths as mockPlanMonths,
@@ -52,11 +54,19 @@ const MAB = [
   "dez",
 ];
 
-const COLUMN_LABEL: Record<string, string> = {
-  none: "Não iniciado",
-  todo: "Em andamento",
-  done: "Concluído",
-};
+type DraftStage = { id: string; name: string; tasks: string[] };
+
+const DRAFT_NAMES = [
+  "Página em branco",
+  "Posicionamento",
+  "Oferta irresistível",
+  "Aquisição de clientes",
+  "Vendas previsíveis",
+];
+
+function freshDraft(): DraftStage[] {
+  return DRAFT_NAMES.map((name, i) => ({ id: `draft-${i}`, name, tasks: [] }));
+}
 
 type PlanCreateResult = {
   month: NbpActionPlanMonth;
@@ -94,6 +104,7 @@ export default function MemberPlanClient({
   >({});
   const [loading, setLoading] = useState(true);
   const [demo, setDemo] = useState(false);
+  const [book, setBook] = useState<LocalPlanBook | null>(null);
   const [creating, setCreating] = useState(forceNew);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -102,10 +113,8 @@ export default function MemberPlanClient({
   const [subtitle, setSubtitle] = useState("");
   const [flagMain, setFlagMain] = useState("");
   const [flagTarget, setFlagTarget] = useState("");
-  const [stageLines, setStageLines] = useState(
-    "Página em branco\nPosicionamento\nOferta irresistível\nAquisição de clientes\nVendas previsíveis",
-  );
-  const [taskLines, setTaskLines] = useState("");
+  const [draft, setDraft] = useState<DraftStage[]>(freshDraft);
+  const [taskDraft, setTaskDraft] = useState<Record<string, string>>({});
 
   const plan = useMemo(
     () => months.find((p) => p.year === year && p.month === month) ?? null,
@@ -126,7 +135,7 @@ export default function MemberPlanClient({
         setObjectives([]);
         return;
       }
-      if (isDemo) {
+      if (isDemo || sessionStages?.[planMonth.id] || sessionObjectives?.[planMonth.id]) {
         const fromSession = sessionStages?.[planMonth.id];
         const objsFromSession = sessionObjectives?.[planMonth.id];
         setStages(
@@ -216,13 +225,23 @@ export default function MemberPlanClient({
       list = plansRes.data;
     }
 
+    const local = readLocalPlans(resolved.id);
+    if (local.months.length > 0) {
+      const byId = new Map(list.map((item) => [item.id, item]));
+      for (const item of local.months) byId.set(item.id, item);
+      list = [...byId.values()];
+    }
+
     setMonths(list);
     setDemo(isDemo);
+    setBook(local);
+    setDemoStagesByMonth(local.stages);
+    setDemoObjectivesByMonth(local.objectives);
 
     const current =
       list.find((p) => p.year === year && p.month === month) ?? null;
     setCreating(forceNew && !current);
-    await loadDetailFor(current, isDemo);
+    await loadDetailFor(current, isDemo, local.stages, local.objectives);
     setLoading(false);
     // year/month only seed the first paint; month nav updates stages below
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: load once per member
@@ -237,7 +256,8 @@ export default function MemberPlanClient({
     setSubtitle("");
     setFlagMain("");
     setFlagTarget("");
-    setTaskLines("");
+    setDraft(freshDraft());
+    setTaskDraft({});
     setCreating(true);
     setError(null);
   }
@@ -272,19 +292,43 @@ export default function MemberPlanClient({
       return;
     }
 
-    const stageNames = stageLines
-      .split("\n")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const namedDraft = draft
+      .map((stage) => ({ ...stage, name: stage.name.trim(), tasks: stage.tasks.map((task) => task.trim()).filter(Boolean) }))
+      .filter((stage) => stage.name);
 
-    const taskTitles = taskLines
-      .split("\n")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    if (namedDraft.length === 0) {
+      setError("Adiciona pelo menos uma etapa.");
+      setPending(false);
+      return;
+    }
+
+    const stamp = Date.now();
+    const builtStages: NbpActionPlanStage[] = namedDraft.map((stage, i) => ({
+      id: `stg-${stamp}-${i}`,
+      month_id: "",
+      position: i,
+      name: stage.name,
+      subtitle: null,
+      status: i === 0 ? "current" : "locked",
+    }));
+    const builtObjectives: NbpActionPlanObjective[] = [];
+    namedDraft.forEach((stage, stageIndex) => {
+      stage.tasks.forEach((taskTitle, taskIndex) => {
+        builtObjectives.push({
+          id: `obj-${stamp}-${stageIndex}-${taskIndex}`,
+          month_id: "",
+          stage_id: builtStages[stageIndex].id,
+          title: taskTitle,
+          column: "none",
+          lesson_id: null,
+          position: taskIndex,
+        });
+      });
+    });
 
     if (demo) {
       const newMonth: NbpActionPlanMonth = {
-        id: `pm-demo-${year}-${month}-${Date.now()}`,
+        id: `pm-demo-${year}-${month}-${stamp}`,
         user_id: member.id,
         year,
         month,
@@ -303,32 +347,28 @@ export default function MemberPlanClient({
         tela: [],
         viewport: { ox: 0, oy: 0, z: 1 },
       };
-      const newStages: NbpActionPlanStage[] = stageNames.map((name, i) => ({
-        id: `stg-demo-${Date.now()}-${i}`,
+      const newStages = builtStages.map((stage) => ({ ...stage, month_id: newMonth.id }));
+      const newObjectives = builtObjectives.map((objective) => ({
+        ...objective,
         month_id: newMonth.id,
-        position: i,
-        name,
-        subtitle: null,
-        status: i === 0 ? "current" : "locked",
       }));
-      const newObjectives: NbpActionPlanObjective[] = taskTitles.map(
-        (taskTitle, i) => ({
-          id: `obj-demo-${Date.now()}-${i}`,
-          month_id: newMonth.id,
-          title: taskTitle,
-          column: "none",
-          lesson_id: null,
-          position: i,
-        }),
-      );
-      setMonths((prev) => [newMonth, ...prev]);
+      const nextMonths = [newMonth, ...months];
+      const nextStages = { ...demoStagesByMonth, [newMonth.id]: newStages };
+      const nextObjectives = { ...demoObjectivesByMonth, [newMonth.id]: newObjectives };
+      setMonths(nextMonths);
       setStages(newStages);
       setObjectives(newObjectives);
-      setDemoStagesByMonth((prev) => ({ ...prev, [newMonth.id]: newStages }));
-      setDemoObjectivesByMonth((prev) => ({
-        ...prev,
-        [newMonth.id]: newObjectives,
-      }));
+      setDemoStagesByMonth(nextStages);
+      setDemoObjectivesByMonth(nextObjectives);
+      const previous = readLocalPlans(member.id);
+      const nextBook: LocalPlanBook = {
+        ...previous,
+        months: [...previous.months.filter((item) => item.id !== newMonth.id), newMonth],
+        stages: { ...previous.stages, [newMonth.id]: newStages },
+        objectives: { ...previous.objectives, [newMonth.id]: newObjectives },
+      };
+      writeLocalPlans(member.id, nextBook);
+      setBook(nextBook);
       setCreating(false);
       setPending(false);
       return;
@@ -345,8 +385,8 @@ export default function MemberPlanClient({
         flag_main: flagMain || null,
         flag_prefix: flagTarget ? "meta" : null,
         flag_target: flagTarget || null,
-        stages: stageNames.map((name) => ({ name })),
-        objectives: taskTitles.map((taskTitle) => ({ title: taskTitle })),
+        stages: namedDraft.map((stage) => ({ name: stage.name })),
+        objectives: builtObjectives.map((objective) => ({ title: objective.title })),
       }),
     });
     setPending(false);
@@ -354,10 +394,34 @@ export default function MemberPlanClient({
       setError(res.error.message);
       return;
     }
+    const apiStages = [...(res.data.stages ?? [])].sort((a, b) => a.position - b.position);
+    const linked = (res.data.objectives ?? []).map((objective, index) => {
+      const local = builtObjectives[index];
+      const stageIndex = builtStages.findIndex((stage) => stage.id === local?.stage_id);
+      return { ...objective, stage_id: apiStages[stageIndex]?.id ?? objective.stage_id ?? null };
+    });
     setMonths((prev) => [res.data.month, ...prev]);
-    setStages(res.data.stages);
-    setObjectives(res.data.objectives ?? []);
+    setStages(apiStages);
+    setObjectives(linked);
     setCreating(false);
+  }
+
+  function addDraftStage() {
+    setDraft((current) => [
+      ...current,
+      { id: `draft-${Date.now().toString(36)}`, name: "", tasks: [] },
+    ]);
+  }
+
+  function addDraftTask(stageId: string) {
+    const title = (taskDraft[stageId] ?? "").trim();
+    if (!title) return;
+    setDraft((current) =>
+      current.map((stage) =>
+        stage.id === stageId ? { ...stage, tasks: [...stage.tasks, title] } : stage,
+      ),
+    );
+    setTaskDraft((current) => ({ ...current, [stageId]: "" }));
   }
 
   if (loading) {
@@ -395,7 +459,7 @@ export default function MemberPlanClient({
 
       {demo ? (
         <p className="mb-4 rounded-[10px] border border-nbp-bd2 bg-nbp-sup2 px-3.5 py-2.5 text-[0.82rem] text-nbp-tx2">
-          Modo demonstração — planos criados ficam só nesta sessão.
+          Modo local — planos criados ficam neste browser e aparecem no portal deste membro.
         </p>
       ) : null}
 
@@ -466,12 +530,12 @@ export default function MemberPlanClient({
       </section>
 
       {creating ? (
-        <Panel surface="card" className="mb-5 max-w-[640px]">
+        <Panel surface="card" className="mb-5">
           <h2 className="mt-0 mb-1 text-[1.1rem] font-semibold">
             Criar plano — {monthName} {year}
           </h2>
           <p className="mt-0 mb-4 text-[0.86rem] text-nbp-tx2">
-            Um plano por mês. Define o desafio, as etapas e as tarefas iniciais.
+            Cada etapa é uma coluna. As tarefas nascem dentro da etapa.
           </p>
           <form onSubmit={onCreate} className="grid gap-3 sm:grid-cols-2">
             <Field label="Título do desafio" htmlFor="title" className="sm:col-span-2">
@@ -510,33 +574,82 @@ export default function MemberPlanClient({
                 className={fieldControlClass}
               />
             </Field>
-            <Field
-              label="Etapas (uma por linha)"
-              htmlFor="stages"
-              className="sm:col-span-2"
-            >
-              <textarea
-                id="stages"
-                rows={5}
-                value={stageLines}
-                onChange={(e) => setStageLines(e.target.value)}
-                className={`${fieldControlClass} resize-y font-mono text-[0.86rem]`}
-              />
-            </Field>
-            <Field
-              label="Tarefas (uma por linha)"
-              htmlFor="tasks"
-              className="sm:col-span-2"
-            >
-              <textarea
-                id="tasks"
-                rows={4}
-                value={taskLines}
-                onChange={(e) => setTaskLines(e.target.value)}
-                placeholder={"Ex.\nTestar escalão com dois clientes\nEnviar proposta à Vitor & Filhos\nGravar vídeo de onboarding"}
-                className={`${fieldControlClass} resize-y font-mono text-[0.86rem]`}
-              />
-            </Field>
+            <div className="sm:col-span-2">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <span className="text-[0.72rem] tracking-[0.12em] text-nbp-tx3 uppercase">
+                  Etapas e tarefas
+                </span>
+                <Button type="button" variant="ghost" size="sm" onClick={addDraftStage}>
+                  <Fa name="fa-plus" /> Etapa
+                </Button>
+              </div>
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {draft.map((stage) => (
+                  <div
+                    key={stage.id}
+                    className="flex w-[240px] shrink-0 flex-col gap-2 rounded-xl border border-nbp-bd bg-nbp-bg p-3"
+                  >
+                    <input
+                      value={stage.name}
+                      aria-label="Nome da etapa"
+                      onChange={(event) =>
+                        setDraft((current) =>
+                          current.map((item) =>
+                            item.id === stage.id ? { ...item, name: event.target.value } : item,
+                          ),
+                        )
+                      }
+                      placeholder="Nome da etapa"
+                      className={fieldControlClass}
+                    />
+                    {stage.tasks.map((task, index) => (
+                      <div
+                        key={`${stage.id}-${index}`}
+                        className="flex items-start gap-2 rounded-[10px] border border-nbp-bd bg-nbp-sup2 px-2.5 py-2 text-[0.84rem]"
+                      >
+                        <span className="min-w-0 flex-1">{task}</span>
+                        <button
+                          type="button"
+                          aria-label="Remover tarefa"
+                          className="cursor-pointer border-0 bg-transparent p-0 text-nbp-tx3"
+                          onClick={() =>
+                            setDraft((current) =>
+                              current.map((item) =>
+                                item.id === stage.id
+                                  ? { ...item, tasks: item.tasks.filter((_, taskIndex) => taskIndex !== index) }
+                                  : item,
+                              ),
+                            )
+                          }
+                        >
+                          <Fa name="fa-xmark" />
+                        </button>
+                      </div>
+                    ))}
+                    <div className="flex gap-1">
+                      <input
+                        value={taskDraft[stage.id] ?? ""}
+                        aria-label={`Tarefa em ${stage.name || "etapa"}`}
+                        onChange={(event) =>
+                          setTaskDraft((current) => ({ ...current, [stage.id]: event.target.value }))
+                        }
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            addDraftTask(stage.id);
+                          }
+                        }}
+                        placeholder="Nova tarefa"
+                        className={fieldControlClass}
+                      />
+                    </div>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => addDraftTask(stage.id)}>
+                      Adicionar tarefa
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
             {error ? (
               <p className="m-0 text-sm text-[#e88585] sm:col-span-2">{error}</p>
             ) : null}
@@ -621,65 +734,92 @@ export default function MemberPlanClient({
           </Panel>
 
           <Panel className="mb-4">
-            <h3 className="mt-0 mb-3 text-[0.9rem] text-nbp-tx2">Etapas</h3>
-            {stages.length === 0 ? (
-              <p className="m-0 text-nbp-tx3">Sem etapas neste mês.</p>
-            ) : (
-              <ol className="m-0 flex list-none flex-col gap-2 p-0">
-                {stages.map((s) => (
-                  <li
-                    key={s.id}
-                    className="flex items-center justify-between rounded-lg bg-nbp-bg px-3 py-2"
-                  >
-                    <span>{s.name}</span>
-                    <Pill
-                      tone={
-                        s.status === "done"
-                          ? "sage"
-                          : s.status === "current"
-                            ? "violet"
-                            : "muted"
-                      }
-                    >
-                      {s.status}
-                      {s.subtitle ? ` · ${s.subtitle}` : ""}
-                    </Pill>
-                  </li>
-                ))}
-              </ol>
-            )}
+            <h3 className="mt-0 mb-3 text-[0.9rem] text-nbp-tx2">Objetivos de {monthName}</h3>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              {(
+                [
+                  ["none", "Não iniciado"],
+                  ["todo", "Em andamento"],
+                  ["done", "Concluído"],
+                ] as const
+              ).map(([column, label]) => {
+                const cards = objectives.filter((objective) => objective.column === column);
+                return (
+                  <div key={column}>
+                    <div className="mb-2 text-[0.78rem] font-medium text-nbp-tx2">
+                      {label} · {cards.length}
+                    </div>
+                    {cards.length === 0 ? (
+                      <p className="m-0 text-[0.8rem] text-nbp-tx3">Sem objetivos neste estado.</p>
+                    ) : (
+                      cards.map((objective) => (
+                        <div
+                          key={objective.id}
+                          className="mb-2 rounded-[10px] border border-nbp-bd bg-nbp-sup2 px-2.5 py-2 text-[0.84rem] text-nbp-tx"
+                        >
+                          {objective.title}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </Panel>
 
           <Panel>
             <h3 className="mt-0 mb-3 text-[0.9rem] text-nbp-tx2">
               Tarefas de {monthName}
             </h3>
-            {objectives.length === 0 ? (
-              <p className="m-0 text-nbp-tx3">Sem tarefas neste mês.</p>
+            {stages.length === 0 ? (
+              <p className="m-0 text-nbp-tx3">Sem etapas neste mês.</p>
             ) : (
-              <ul className="m-0 flex list-none flex-col gap-2 p-0">
-                {objectives.map((o) => (
-                  <li
-                    key={o.id}
-                    className="flex items-center justify-between gap-3 rounded-lg border-[0.5px] border-nbp-bd bg-nbp-bg px-3 py-2"
-                  >
-                    <span>{o.title}</span>
-                    <Pill
-                      tone={
-                        o.column === "done"
-                          ? "sage"
-                          : o.column === "todo"
-                            ? "violet"
-                            : "muted"
-                      }
+              <div className="flex gap-3 overflow-x-auto pb-1">
+                {stages.map((stage) => {
+                  const cards = objectives.filter((objective) => objective.stage_id === stage.id);
+                  return (
+                    <div
+                      key={stage.id}
+                      className="w-[240px] shrink-0 rounded-xl border border-nbp-bd bg-nbp-bg p-3"
                     >
-                      {COLUMN_LABEL[o.column] ?? o.column}
-                    </Pill>
-                  </li>
-                ))}
-              </ul>
+                      <div className="mb-3 flex items-center justify-between gap-2">
+                        <span className="text-[0.86rem] font-semibold text-nbp-tx">{stage.name}</span>
+                        <span className="text-[0.74rem] text-nbp-tx3">{cards.length}</span>
+                      </div>
+                      {cards.length === 0 ? (
+                        <p className="m-0 text-[0.8rem] text-nbp-tx3">Sem tarefas nesta etapa.</p>
+                      ) : (
+                        cards.map((objective) => (
+                          <div
+                            key={objective.id}
+                            className="mb-2 rounded-[10px] border border-nbp-bd bg-nbp-sup2 px-2.5 py-2 text-[0.84rem] text-nbp-tx"
+                          >
+                            {objective.title}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </Panel>
+          <PlanWhiteboard
+            key={plan.id}
+            monthLabel={monthName}
+            initialShapes={boardOf(book, plan).tela}
+            initialViewport={boardOf(book, plan).viewport}
+            onChange={(tela, viewport) => {
+              const current = book ?? { months: [], stages: {}, objectives: {}, boards: {} };
+              const next = saveBoard(member.id, current, plan.id, tela, viewport);
+              setBook(next);
+              setMonths((items) =>
+                items.map((item) => (item.id === plan.id && next.months.some((saved) => saved.id === plan.id)
+                  ? { ...item, tela, viewport }
+                  : item)),
+              );
+            }}
+          />
         </>
       ) : null}
     </>
