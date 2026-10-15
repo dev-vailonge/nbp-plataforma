@@ -189,6 +189,7 @@ export type NbpActionPlanObjective = {
   month_id: string;
   stage_id: string | null;
   title: string;
+  description: string | null;
   column: ObjectiveColumn;
   lesson_id: string | null;
   position: number;

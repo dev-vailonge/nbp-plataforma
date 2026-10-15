@@ -54,18 +54,16 @@ const MAB = [
   "dez",
 ];
 
-type DraftStage = { id: string; name: string; tasks: string[] };
-
-const DRAFT_NAMES = [
-  "Página em branco",
-  "Posicionamento",
-  "Oferta irresistível",
-  "Aquisição de clientes",
-  "Vendas previsíveis",
-];
+type DraftTask = { title: string; description: string };
+type DraftStage = { id: string; name: string; tasks: DraftTask[] };
+type TaskComposer = { title: string; description: string };
 
 function freshDraft(): DraftStage[] {
-  return DRAFT_NAMES.map((name, i) => ({ id: `draft-${i}`, name, tasks: [] }));
+  return [{ id: "draft-0", name: "", tasks: [] }];
+}
+
+function emptyComposer(): TaskComposer {
+  return { title: "", description: "" };
 }
 
 type PlanCreateResult = {
@@ -114,7 +112,8 @@ export default function MemberPlanClient({
   const [flagMain, setFlagMain] = useState("");
   const [flagTarget, setFlagTarget] = useState("");
   const [draft, setDraft] = useState<DraftStage[]>(freshDraft);
-  const [taskDraft, setTaskDraft] = useState<Record<string, string>>({});
+  const [createStep, setCreateStep] = useState<"stages" | "tasks">("stages");
+  const [taskDraft, setTaskDraft] = useState<Record<string, TaskComposer>>({});
 
   const plan = useMemo(
     () => months.find((p) => p.year === year && p.month === month) ?? null,
@@ -257,6 +256,7 @@ export default function MemberPlanClient({
     setFlagMain("");
     setFlagTarget("");
     setDraft(freshDraft());
+    setCreateStep("stages");
     setTaskDraft({});
     setCreating(true);
     setError(null);
@@ -293,7 +293,13 @@ export default function MemberPlanClient({
     }
 
     const namedDraft = draft
-      .map((stage) => ({ ...stage, name: stage.name.trim(), tasks: stage.tasks.map((task) => task.trim()).filter(Boolean) }))
+      .map((stage) => ({
+        ...stage,
+        name: stage.name.trim(),
+        tasks: stage.tasks
+          .map((task) => ({ title: task.title.trim(), description: task.description.trim() }))
+          .filter((task) => task.title),
+      }))
       .filter((stage) => stage.name);
 
     if (namedDraft.length === 0) {
@@ -313,12 +319,13 @@ export default function MemberPlanClient({
     }));
     const builtObjectives: NbpActionPlanObjective[] = [];
     namedDraft.forEach((stage, stageIndex) => {
-      stage.tasks.forEach((taskTitle, taskIndex) => {
+      stage.tasks.forEach((task, taskIndex) => {
         builtObjectives.push({
           id: `obj-${stamp}-${stageIndex}-${taskIndex}`,
           month_id: "",
           stage_id: builtStages[stageIndex].id,
-          title: taskTitle,
+          title: task.title,
+          description: task.description || null,
           column: "none",
           lesson_id: null,
           position: taskIndex,
@@ -398,7 +405,11 @@ export default function MemberPlanClient({
     const linked = (res.data.objectives ?? []).map((objective, index) => {
       const local = builtObjectives[index];
       const stageIndex = builtStages.findIndex((stage) => stage.id === local?.stage_id);
-      return { ...objective, stage_id: apiStages[stageIndex]?.id ?? objective.stage_id ?? null };
+      return {
+        ...objective,
+        description: local?.description ?? null,
+        stage_id: apiStages[stageIndex]?.id ?? objective.stage_id ?? null,
+      };
     });
     setMonths((prev) => [res.data.month, ...prev]);
     setStages(apiStages);
@@ -413,15 +424,38 @@ export default function MemberPlanClient({
     ]);
   }
 
+  function removeDraftStage(stageId: string) {
+    setDraft((current) => current.filter((stage) => stage.id !== stageId));
+  }
+
+  function continueToTasks() {
+    const named = draft.map((stage) => ({ ...stage, name: stage.name.trim() })).filter((stage) => stage.name);
+    if (named.length === 0) {
+      setError("Adiciona pelo menos uma etapa.");
+      return;
+    }
+    setDraft(named);
+    setError(null);
+    setCreateStep("tasks");
+  }
+
   function addDraftTask(stageId: string) {
-    const title = (taskDraft[stageId] ?? "").trim();
-    if (!title) return;
+    const composer = taskDraft[stageId] ?? emptyComposer();
+    const title = composer.title.trim();
+    const description = composer.description.trim();
+    if (!title) {
+      setError("Escreve o título da tarefa.");
+      return;
+    }
+    setError(null);
     setDraft((current) =>
       current.map((stage) =>
-        stage.id === stageId ? { ...stage, tasks: [...stage.tasks, title] } : stage,
+        stage.id === stageId
+          ? { ...stage, tasks: [...stage.tasks, { title, description }] }
+          : stage,
       ),
     );
-    setTaskDraft((current) => ({ ...current, [stageId]: "" }));
+    setTaskDraft((current) => ({ ...current, [stageId]: emptyComposer() }));
   }
 
   if (loading) {
@@ -532,12 +566,21 @@ export default function MemberPlanClient({
       {creating ? (
         <Panel surface="card" className="mb-5">
           <h2 className="mt-0 mb-1 text-[1.1rem] font-semibold">
-            Criar plano — {monthName} {year}
+            {createStep === "stages" ? "1. Etapas" : "2. Tarefas"} — {monthName} {year}
           </h2>
           <p className="mt-0 mb-4 text-[0.86rem] text-nbp-tx2">
-            Cada etapa é uma coluna. As tarefas nascem dentro da etapa.
+            {createStep === "stages"
+              ? "Cria primeiro as etapas do plano. As tarefas entram no passo seguinte."
+              : "Cada etapa já existe. Adiciona as tarefas com título e descrição."}
           </p>
-          <form onSubmit={onCreate} className="grid gap-3 sm:grid-cols-2">
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (createStep === "stages") continueToTasks();
+              else void onCreate(event);
+            }}
+            className="grid gap-3 sm:grid-cols-2"
+          >
             <Field label="Título do desafio" htmlFor="title" className="sm:col-span-2">
               <input
                 id="title"
@@ -574,89 +617,142 @@ export default function MemberPlanClient({
                 className={fieldControlClass}
               />
             </Field>
-            <div className="sm:col-span-2">
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <span className="text-[0.72rem] tracking-[0.12em] text-nbp-tx3 uppercase">
-                  Etapas e tarefas
-                </span>
-                <Button type="button" variant="ghost" size="sm" onClick={addDraftStage}>
-                  <Fa name="fa-plus" /> Etapa
-                </Button>
-              </div>
-              <div className="flex gap-3 overflow-x-auto pb-2">
-                {draft.map((stage) => (
-                  <div
-                    key={stage.id}
-                    className="flex w-[240px] shrink-0 flex-col gap-2 rounded-xl border border-nbp-bd bg-nbp-bg p-3"
-                  >
-                    <input
-                      value={stage.name}
-                      aria-label="Nome da etapa"
-                      onChange={(event) =>
-                        setDraft((current) =>
-                          current.map((item) =>
-                            item.id === stage.id ? { ...item, name: event.target.value } : item,
-                          ),
-                        )
-                      }
-                      placeholder="Nome da etapa"
-                      className={fieldControlClass}
-                    />
-                    {stage.tasks.map((task, index) => (
-                      <div
-                        key={`${stage.id}-${index}`}
-                        className="flex items-start gap-2 rounded-[10px] border border-nbp-bd bg-nbp-sup2 px-2.5 py-2 text-[0.84rem]"
-                      >
-                        <span className="min-w-0 flex-1">{task}</span>
+            {createStep === "stages" ? (
+              <div className="sm:col-span-2">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="text-[0.72rem] tracking-[0.12em] text-nbp-tx3 uppercase">Etapas</span>
+                  <Button type="button" variant="ghost" size="sm" onClick={addDraftStage}>
+                    <Fa name="fa-plus" /> Etapa
+                  </Button>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {draft.map((stage, index) => (
+                    <div key={stage.id} className="flex items-center gap-2">
+                      <span className="w-6 shrink-0 text-[0.78rem] text-nbp-tx3 tabular-nums">{index + 1}</span>
+                      <input
+                        value={stage.name}
+                        aria-label={`Etapa ${index + 1}`}
+                        onChange={(event) =>
+                          setDraft((current) =>
+                            current.map((item) =>
+                              item.id === stage.id ? { ...item, name: event.target.value } : item,
+                            ),
+                          )
+                        }
+                        placeholder="Nome da etapa"
+                        className={fieldControlClass}
+                      />
+                      {draft.length > 1 ? (
                         <button
                           type="button"
-                          aria-label="Remover tarefa"
-                          className="cursor-pointer border-0 bg-transparent p-0 text-nbp-tx3"
-                          onClick={() =>
-                            setDraft((current) =>
-                              current.map((item) =>
-                                item.id === stage.id
-                                  ? { ...item, tasks: item.tasks.filter((_, taskIndex) => taskIndex !== index) }
-                                  : item,
-                              ),
-                            )
-                          }
+                          aria-label={`Remover etapa ${index + 1}`}
+                          onClick={() => removeDraftStage(stage.id)}
+                          className="cursor-pointer border-0 bg-transparent p-1 text-nbp-tx3 hover:text-nbp-tx"
                         >
                           <Fa name="fa-xmark" />
                         </button>
-                      </div>
-                    ))}
-                    <div className="flex gap-1">
-                      <input
-                        value={taskDraft[stage.id] ?? ""}
-                        aria-label={`Tarefa em ${stage.name || "etapa"}`}
-                        onChange={(event) =>
-                          setTaskDraft((current) => ({ ...current, [stage.id]: event.target.value }))
-                        }
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter") {
-                            event.preventDefault();
-                            addDraftTask(stage.id);
-                          }
-                        }}
-                        placeholder="Nova tarefa"
-                        className={fieldControlClass}
-                      />
+                      ) : null}
                     </div>
-                    <Button type="button" variant="ghost" size="sm" onClick={() => addDraftTask(stage.id)}>
-                      Adicionar tarefa
-                    </Button>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex flex-col gap-3 sm:col-span-2">
+                {draft.map((stage) => {
+                  const composer = taskDraft[stage.id] ?? emptyComposer();
+                  return (
+                    <div key={stage.id} className="rounded-xl border border-nbp-bd bg-nbp-bg p-3.5">
+                      <h3 className="mt-0 mb-3 text-[0.95rem] font-semibold text-nbp-tx">{stage.name}</h3>
+                      {stage.tasks.length === 0 ? (
+                        <p className="mt-0 mb-3 text-[0.82rem] text-nbp-tx3">Ainda sem tarefas nesta etapa.</p>
+                      ) : (
+                        <div className="mb-3 flex flex-col gap-2">
+                          {stage.tasks.map((task, index) => (
+                            <div
+                              key={`${stage.id}-${index}`}
+                              className="rounded-[10px] border border-nbp-bd bg-nbp-sup2 px-3 py-2.5"
+                            >
+                              <div className="flex items-start gap-2">
+                                <div className="min-w-0 flex-1">
+                                  <p className="m-0 text-[0.88rem] font-medium text-nbp-tx">{task.title}</p>
+                                  {task.description ? (
+                                    <p className="mt-1 mb-0 text-[0.8rem] leading-snug text-nbp-tx2">{task.description}</p>
+                                  ) : null}
+                                </div>
+                                <button
+                                  type="button"
+                                  aria-label="Remover tarefa"
+                                  className="cursor-pointer border-0 bg-transparent p-0 text-nbp-tx3"
+                                  onClick={() =>
+                                    setDraft((current) =>
+                                      current.map((item) =>
+                                        item.id === stage.id
+                                          ? { ...item, tasks: item.tasks.filter((_, taskIndex) => taskIndex !== index) }
+                                          : item,
+                                      ),
+                                    )
+                                  }
+                                >
+                                  <Fa name="fa-xmark" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <div className="grid gap-2">
+                        <input
+                          value={composer.title}
+                          aria-label={`Título da tarefa em ${stage.name}`}
+                          onChange={(event) =>
+                            setTaskDraft((current) => ({
+                              ...current,
+                              [stage.id]: { ...composer, title: event.target.value },
+                            }))
+                          }
+                          placeholder="Título da tarefa"
+                          className={fieldControlClass}
+                        />
+                        <textarea
+                          value={composer.description}
+                          aria-label={`Descrição da tarefa em ${stage.name}`}
+                          rows={3}
+                          onChange={(event) =>
+                            setTaskDraft((current) => ({
+                              ...current,
+                              [stage.id]: { ...composer, description: event.target.value },
+                            }))
+                          }
+                          placeholder="Descrição: o que fazer, com quem e como saber que ficou feito"
+                          className={`${fieldControlClass} resize-y`}
+                        />
+                        <Button type="button" variant="ghost" size="sm" onClick={() => addDraftTask(stage.id)}>
+                          <Fa name="fa-plus" /> Adicionar tarefa
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
             {error ? (
               <p className="m-0 text-sm text-[#e88585] sm:col-span-2">{error}</p>
             ) : null}
             <div className="flex flex-wrap gap-2 sm:col-span-2">
-              <Button type="submit" variant="primary" size="md" disabled={pending}>
-                {pending ? "A criar…" : "Criar plano deste mês"}
-              </Button>
+              {createStep === "stages" ? (
+                <Button type="button" variant="primary" size="md" onClick={continueToTasks}>
+                  Seguinte: tarefas
+                </Button>
+              ) : (
+                <>
+                  <Button type="submit" variant="primary" size="md" disabled={pending}>
+                    {pending ? "A criar…" : "Criar plano deste mês"}
+                  </Button>
+                  <Button type="button" variant="ghost" size="md" onClick={() => setCreateStep("stages")}>
+                    Voltar às etapas
+                  </Button>
+                </>
+              )}
               <Button
                 type="button"
                 variant="ghost"
@@ -768,9 +864,40 @@ export default function MemberPlanClient({
           </Panel>
 
           <Panel>
-            <h3 className="mt-0 mb-3 text-[0.9rem] text-nbp-tx2">
-              Tarefas de {monthName}
-            </h3>
+            <div className="mb-3 flex flex-wrap items-center gap-3">
+              <h3 className="m-0 text-[0.9rem] text-nbp-tx2">
+                Tarefas de {monthName}
+              </h3>
+              {stages.some((stage) => stage.status === "current") ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    if (!plan || !member) return;
+                    const ordered = [...stages].sort((a, b) => a.position - b.position);
+                    const index = ordered.findIndex((stage) => stage.status === "current");
+                    if (index < 0) return;
+                    const nextStages = ordered.map((stage, i) => {
+                      if (i === index) return { ...stage, status: "done" as const };
+                      if (i === index + 1) return { ...stage, status: "current" as const };
+                      return stage;
+                    });
+                    setStages(nextStages);
+                    setDemoStagesByMonth((current) => ({ ...current, [plan.id]: nextStages }));
+                    const base = book ?? { months: [], stages: {}, objectives: {}, boards: {} };
+                    const nextBook = {
+                      ...base,
+                      stages: { ...base.stages, [plan.id]: nextStages },
+                    };
+                    writeLocalPlans(member.id, nextBook);
+                    setBook(nextBook);
+                  }}
+                >
+                  Concluir {stages.find((stage) => stage.status === "current")?.name}
+                </Button>
+              ) : null}
+            </div>
             {stages.length === 0 ? (
               <p className="m-0 text-nbp-tx3">Sem etapas neste mês.</p>
             ) : (
@@ -794,7 +921,12 @@ export default function MemberPlanClient({
                             key={objective.id}
                             className="mb-2 rounded-[10px] border border-nbp-bd bg-nbp-sup2 px-2.5 py-2 text-[0.84rem] text-nbp-tx"
                           >
-                            {objective.title}
+                            <span className="block">{objective.title}</span>
+                            {objective.description ? (
+                              <span className="mt-1 block text-[0.78rem] leading-snug text-nbp-tx2">
+                                {objective.description}
+                              </span>
+                            ) : null}
                           </div>
                         ))
                       )}

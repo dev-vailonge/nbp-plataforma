@@ -796,10 +796,10 @@ export const planStages: NbpActionPlanStage[] = [
 ];
 
 export const planObjectives: NbpActionPlanObjective[] = [
-  { id: "o1", month_id: "pm-aug", stage_id: "s3", title: "Testar escalão a 2.400 € com dois clientes novos", column: "todo", lesson_id: "m2.4", position: 0 },
-  { id: "o2", month_id: "pm-aug", stage_id: "s3", title: "Enviar proposta à Vitor & Filhos", column: "todo", lesson_id: "m4.1", position: 1 },
-  { id: "o3", month_id: "pm-aug", stage_id: "s4", title: "Gravar o vídeo de onboarding", column: "none", lesson_id: null, position: 0 },
-  { id: "o4", month_id: "pm-aug", stage_id: "s2", title: "Sistema de referências a funcionar", column: "done", lesson_id: "m3.3", position: 0 },
+  { id: "o1", month_id: "pm-aug", stage_id: "s3", title: "Testar escalão a 2.400 € com dois clientes novos", description: "Propor o escalão a dois clientes novos. Registar o que aceitam, o que recusam e o motivo, antes de mexer na tabela toda.", column: "todo", lesson_id: "m2.4", position: 0 },
+  { id: "o2", month_id: "pm-aug", stage_id: "s3", title: "Enviar proposta à Vitor & Filhos", description: "Enviar a proposta escrita com preço, prazo e o que fica de fora. Confirmar que chegou e marcar a conversa de fecho.", column: "todo", lesson_id: "m4.1", position: 1 },
+  { id: "o3", month_id: "pm-aug", stage_id: "s4", title: "Gravar o vídeo de onboarding", description: "Gravar o vídeo que o aluno vê no primeiro dia, com os passos da primeira semana e o que precisa de trazer para a sessão.", column: "none", lesson_id: null, position: 0 },
+  { id: "o4", month_id: "pm-aug", stage_id: "s2", title: "Sistema de referências a funcionar", description: "Fechar o pedido de referência no fim de cada entrega, com a frase e o momento certos.", column: "done", lesson_id: "m3.3", position: 0 },
 ];
 
 export const currentPlan = planMonths.find((m) => m.month === 8)!;

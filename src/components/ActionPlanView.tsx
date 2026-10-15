@@ -95,8 +95,8 @@ const julStages: NbpActionPlanStage[] = [
 ];
 
 const julObjectives: NbpActionPlanObjective[] = [
-  { id: "jo1", month_id: "pm-jul", stage_id: "j2", title: "Guião de descoberta escrito", column: "done", lesson_id: "m4.1", position: 0 },
-  { id: "jo2", month_id: "pm-jul", stage_id: "j3", title: "Reduzir churn para 2,5%", column: "todo", lesson_id: null, position: 0 },
+  { id: "jo1", month_id: "pm-jul", stage_id: "j2", title: "Guião de descoberta escrito", description: "Escrever as perguntas da chamada e a ordem em que entram.", column: "done", lesson_id: "m4.1", position: 0 },
+  { id: "jo2", month_id: "pm-jul", stage_id: "j3", title: "Reduzir churn para 2,5%", description: "Listar quem saiu no mês e o motivo, e fechar uma ação para cada caso.", column: "todo", lesson_id: null, position: 0 },
 ];
 
 export function ActionPlanView() {
@@ -109,6 +109,7 @@ export function ActionPlanView() {
   const [addingStage, setAddingStage] = useState<string | null>(null);
   const [addingObjective, setAddingObjective] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
   const [newLesson, setNewLesson] = useState("");
   const [addError, setAddError] = useState("");
 
@@ -150,7 +151,12 @@ export function ActionPlanView() {
   useEffect(() => {
     if (!boardReady) return;
     if (localMonth && localBook) {
-      setObjs(localBook.objectives[localMonth.id] ?? []);
+      const seed = new Map(seedObjectives.map((item) => [item.id, item.description]));
+      setObjs(
+        (localBook.objectives[localMonth.id] ?? []).map((item) =>
+          item.description ? item : { ...item, description: seed.get(item.id) ?? null },
+        ),
+      );
       return;
     }
     if (month === 7) {
@@ -166,25 +172,55 @@ export function ActionPlanView() {
   const monthName = MES[month - 1];
 
   const editable = Boolean(localMonth) || month === 8;
+  const currentStage = stages.find((stage) => stage.status === "current") ?? null;
+  const stageFill = stages.length
+    ? Math.round((stages.filter((stage) => stage.status === "done").length / stages.length) * 100)
+    : fillPct;
   const board = plan ? boardOf(localBook, plan) : null;
 
-  function commit(next: NbpActionPlanObjective[]) {
+  function commit(next: NbpActionPlanObjective[], stagesNext?: NbpActionPlanStage[]) {
     setObjs(next);
     if (!localMonth || !localBook) return;
     const book: LocalPlanBook = {
       ...localBook,
       objectives: { ...localBook.objectives, [localMonth.id]: next },
+      stages: stagesNext ? { ...localBook.stages, [localMonth.id]: stagesNext } : localBook.stages,
+    };
+    writeLocalPlans(currentMember.id, book);
+    setLocalBook(book);
+  }
+
+  function advancedStages(list: NbpActionPlanStage[]) {
+    const ordered = [...list].sort((a, b) => a.position - b.position);
+    const index = ordered.findIndex((stage) => stage.status === "current");
+    if (index < 0) return null;
+    return ordered.map((stage, i) => {
+      if (i === index) return { ...stage, status: "done" as const };
+      if (i === index + 1) return { ...stage, status: "current" as const };
+      return stage;
+    });
+  }
+
+  function concludeCurrentStage() {
+    const next = advancedStages(stages);
+    if (!next || !localMonth || !localBook) return;
+    const book: LocalPlanBook = {
+      ...localBook,
+      stages: { ...localBook.stages, [localMonth.id]: next },
     };
     writeLocalPlans(currentMember.id, book);
     setLocalBook(book);
   }
 
   function toggleObj(id: string) {
-    commit(
-      objs.map((o) =>
-        o.id === id ? { ...o, column: o.column === "done" ? "todo" : "done" } : o,
-      ),
+    const next = objs.map((o) =>
+      o.id === id ? { ...o, column: o.column === "done" ? ("todo" as const) : ("done" as const) } : o,
     );
+    const current = stages.find((stage) => stage.status === "current");
+    const inStage = current ? next.filter((objective) => objective.stage_id === current.id) : [];
+    const finished = inStage.length > 0 && inStage.every((objective) => objective.column === "done");
+    const stagesNext = finished ? advancedStages(stages) : null;
+    commit(next, stagesNext ?? undefined);
   }
 
   function removeObj(id: string) {
@@ -213,6 +249,7 @@ export function ActionPlanView() {
         id: `o-${Date.now()}`,
         month_id: plan.id,
         title: t,
+        description: newDescription.trim() || null,
         stage_id: stageId,
         column: "none",
         lesson_id: newLesson || null,
@@ -221,6 +258,7 @@ export function ActionPlanView() {
     ]);
     setAddingObjective(false);
     setNewTitle("");
+    setNewDescription("");
     setNewLesson("");
     setAddError("");
   }
@@ -238,6 +276,7 @@ export function ActionPlanView() {
         id: `o-${Date.now()}`,
         month_id: plan.id,
         title: t,
+        description: newDescription.trim() || null,
         stage_id: stageId,
         column: "none",
         lesson_id: newLesson || null,
@@ -246,6 +285,7 @@ export function ActionPlanView() {
     ]);
     setAddingStage(null);
     setNewTitle("");
+    setNewDescription("");
     setNewLesson("");
     setAddError("");
   }
@@ -432,10 +472,22 @@ export function ActionPlanView() {
             </div>
             <PlanJourney
               stages={stages}
-              fillPct={fillPct}
+              fillPct={stageFill}
               selectedId={selectedStep}
               onSelect={setSelectedStep}
             />
+            {editable && currentStage ? (
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={concludeCurrentStage}
+                  className="cursor-pointer rounded-[10px] border border-nbp-bd2 bg-nbp-tx px-3.5 py-2 text-[0.84rem] font-semibold text-[#181818]"
+                >
+                  Concluir {currentStage.name}
+                </button>
+                <p className="m-0 text-[0.8rem] text-nbp-tx2">A etapa seguinte fica disponível.</p>
+              </div>
+            ) : null}
           </Panel>
 
           <div className="mb-3 flex flex-wrap items-baseline gap-2.5">
@@ -565,6 +617,7 @@ export function ActionPlanView() {
                         setAddingStage(null);
                         setAddError("");
                         setNewTitle("");
+                        setNewDescription("");
                       }}
                       className="flex w-full items-center gap-2 border-0 bg-transparent px-1 py-2.5 text-left text-[0.88rem] text-nbp-tx2 hover:text-nbp-tx"
                     >
@@ -583,16 +636,19 @@ export function ActionPlanView() {
           <div className="flex items-start gap-3 overflow-x-auto pb-2">
             {stages.map((stage) => {
               const items = monthObjs.filter((objective) => objective.stage_id === stage.id);
+              const open = stage.status !== "locked";
               return (
                 <div
                   key={stage.id}
-                  className="w-[250px] shrink-0 rounded-xl border border-nbp-bd bg-nbp-bg p-3"
+                  className={`w-[250px] shrink-0 rounded-xl border border-nbp-bd bg-nbp-bg p-3 ${
+                    open ? "" : "opacity-50"
+                  }`}
                   onDragOver={(event) => {
-                    if (!editable) return;
+                    if (!editable || !open) return;
                     event.preventDefault();
                   }}
                   onDrop={(event) => {
-                    if (!editable) return;
+                    if (!editable || !open) return;
                     event.preventDefault();
                     const id = event.dataTransfer.getData("text/plain");
                     if (id) moveObj(id, stage.id);
@@ -606,7 +662,9 @@ export function ActionPlanView() {
                   </div>
 
                   {items.length === 0 ? (
-                    <p className="m-0 px-1 py-3 text-[0.8rem] text-nbp-tx3">Larga uma tarefa aqui</p>
+                    <p className="m-0 px-1 py-3 text-[0.8rem] text-nbp-tx3">
+                      {open ? "Larga uma tarefa aqui" : "Disponível ao concluir a etapa anterior"}
+                    </p>
                   ) : null}
 
                   {items.map((o) => {
@@ -616,7 +674,7 @@ export function ActionPlanView() {
                     return (
                       <div
                         key={o.id}
-                        draggable={editable}
+                        draggable={editable && open}
                         onDragStart={(event) => event.dataTransfer.setData("text/plain", o.id)}
                         className="mb-2 rounded-[10px] border border-nbp-bd bg-nbp-sup2 transition hover:border-nbp-bd2"
                       >
@@ -627,16 +685,23 @@ export function ActionPlanView() {
                               done ? "text-[#3FBE93]" : "text-nbp-tx3"
                             }`}
                             aria-label={done ? "Reabrir" : "Concluir"}
-                            onClick={() => (editable ? toggleObj(o.id) : undefined)}
+                            onClick={() => (editable && open ? toggleObj(o.id) : undefined)}
                           >
                             <Fa name={done ? "fa-circle-check" : "fa-circle"} regular={!done} />
                           </button>
-                          <span
-                            className={`min-w-0 flex-1 py-3 pr-1 text-[0.88rem] leading-normal ${
-                              done ? "text-nbp-tx3 line-through" : "text-nbp-tx"
-                            }`}
-                          >
-                            {o.title}
+                          <span className="min-w-0 flex-1 py-3 pr-1">
+                            <span
+                              className={`block text-[0.88rem] leading-normal ${
+                                done ? "text-nbp-tx3 line-through" : "text-nbp-tx"
+                              }`}
+                            >
+                              {o.title}
+                            </span>
+                            {o.description ? (
+                              <span className="mt-1 block text-[0.78rem] leading-snug text-nbp-tx2">
+                                {o.description}
+                              </span>
+                            ) : null}
                           </span>
                           {editable ? (
                             <button
@@ -670,14 +735,22 @@ export function ActionPlanView() {
                     );
                   })}
 
-                  {editable && addingStage === stage.id ? (
+                  {editable && open && addingStage === stage.id ? (
                     <div className="mt-1 rounded-[10px] border border-nbp-bd bg-nbp-sup2 p-3">
                       <input
                         value={newTitle}
                         onChange={(e) => setNewTitle(e.target.value)}
-                        placeholder="Nova tarefa"
-                        aria-label="Nova tarefa"
+                        placeholder="Título da tarefa"
+                        aria-label="Título da tarefa"
                         className="mb-2 h-9 w-full rounded-lg border border-nbp-bd bg-nbp-fill px-2.5 text-[0.86rem] text-nbp-tx outline-none focus:border-nbp-bd2"
+                      />
+                      <textarea
+                        value={newDescription}
+                        onChange={(e) => setNewDescription(e.target.value)}
+                        placeholder="Descrição: o que fazer, com quem e como saber que ficou feito"
+                        aria-label="Descrição da tarefa"
+                        rows={3}
+                        className="mb-2 w-full resize-y rounded-lg border border-nbp-bd bg-nbp-fill px-2.5 py-2 text-[0.82rem] text-nbp-tx outline-none focus:border-nbp-bd2"
                       />
                       <label className="mb-1 block text-[0.72rem] text-nbp-tx2">Aula para rever</label>
                       <select
@@ -718,7 +791,7 @@ export function ActionPlanView() {
                       </div>
                     </div>
                   ) : null}
-                  {editable && addingStage !== stage.id ? (
+                  {editable && open && addingStage !== stage.id ? (
                     <button
                       type="button"
                       onClick={() => {
@@ -726,6 +799,7 @@ export function ActionPlanView() {
                         setAddingObjective(false);
                         setAddError("");
                         setNewTitle("");
+                        setNewDescription("");
                       }}
                       className="flex w-full items-center gap-2 border-0 bg-transparent px-1 py-2.5 text-left text-[0.88rem] text-nbp-tx2 hover:text-nbp-tx"
                     >
