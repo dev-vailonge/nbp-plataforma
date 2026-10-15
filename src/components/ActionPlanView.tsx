@@ -7,7 +7,15 @@ import { PlanJourney } from "@/components/PlanJourney";
 import { PlanWhiteboard } from "@/components/PlanWhiteboard";
 import { PageHeader, Panel } from "@/components/Panel";
 import { EmptyState } from "@/components/ui";
-import { readLocalPlans, saveBoard, boardOf, writeLocalPlans, type LocalPlanBook } from "@/lib/local-plans";
+import {
+  readLocalPlans,
+  saveBoard,
+  boardOf,
+  objectiveTone,
+  syncObjectiveFromTasks,
+  writeLocalPlans,
+  type LocalPlanBook,
+} from "@/lib/local-plans";
 import {
   currentMember,
   lessons,
@@ -106,7 +114,6 @@ export function ActionPlanView() {
   const [localBook, setLocalBook] = useState<LocalPlanBook | null>(null);
   const [boardReady, setBoardReady] = useState(false);
   const [objs, setObjs] = useState(() => [...seedObjectives]);
-  const [addingStage, setAddingStage] = useState<string | null>(null);
   const [addingObjective, setAddingObjective] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
@@ -142,11 +149,16 @@ export function ActionPlanView() {
     : month === 7
       ? julStages
       : seedStages.filter((stage) => stage.month_id === plan?.id);
+  const storedRecords = useMemo(() => {
+    if (!localMonth || !localBook) return null;
+    return localBook.objectives[localMonth.id] ?? [];
+  }, [localMonth, localBook]);
+
   const monthObjs = useMemo(() => {
-    if (localMonth) return objs.filter((objective) => objective.month_id === localMonth.id);
+    if (storedRecords) return storedRecords;
     if (month === 7) return julObjectives;
     return objs.filter((o) => o.month_id === plan?.id);
-  }, [localMonth, month, objs, plan?.id]);
+  }, [storedRecords, month, objs, plan?.id]);
 
   useEffect(() => {
     if (!boardReady) return;
@@ -166,12 +178,13 @@ export function ActionPlanView() {
     setObjs(seedObjectives.filter((objective) => objective.month_id === plan?.id));
   }, [boardReady, localMonth?.id, month, plan?.id]);
 
-  const doneN = monthObjs.filter((o) => o.column === "done").length;
-  const pct = monthObjs.length ? Math.round((doneN / monthObjs.length) * 100) : 0;
+  const goalCards = monthObjs.filter((objective) => objective.kind !== "task");
+  const doneN = goalCards.filter((o) => o.column === "done").length;
+  const pct = goalCards.length ? Math.round((doneN / goalCards.length) * 100) : 0;
   const fillPct = plan?.fill_pct ?? 0;
   const monthName = MES[month - 1];
 
-  const editable = Boolean(localMonth) || month === 8;
+  const editable = false;
   const currentStage = stages.find((stage) => stage.status === "current") ?? null;
   const stageFill = stages.length
     ? Math.round((stages.filter((stage) => stage.status === "done").length / stages.length) * 100)
@@ -212,27 +225,32 @@ export function ActionPlanView() {
     setLocalBook(book);
   }
 
-  function toggleObj(id: string) {
-    const next = objs.map((o) =>
-      o.id === id ? { ...o, column: o.column === "done" ? ("todo" as const) : ("done" as const) } : o,
+  function nextColumn(column: ObjectiveColumn): ObjectiveColumn {
+    if (column === "none") return "todo";
+    if (column === "todo") return "done";
+    return "none";
+  }
+
+  function advanceStatus(id: string) {
+    const base = storedRecords ?? objs;
+    const next = base.map((objective) =>
+      objective.id === id ? { ...objective, column: nextColumn(objective.column) } : objective,
     );
-    const current = stages.find((stage) => stage.status === "current");
-    const inStage = current ? next.filter((objective) => objective.stage_id === current.id) : [];
-    const finished = inStage.length > 0 && inStage.every((objective) => objective.column === "done");
-    const stagesNext = finished ? advancedStages(stages) : null;
-    commit(next, stagesNext ?? undefined);
+    commit(next);
   }
 
-  function removeObj(id: string) {
-    commit(objs.filter((o) => o.id !== id));
-  }
-
-  function moveObj(id: string, stageId: string) {
-    commit(objs.map((o) => (o.id === id ? { ...o, stage_id: stageId } : o)));
+  function toggleTaskDone(id: string) {
+    const base = storedRecords ?? objs;
+    const next = base.map((item) =>
+      item.id === id ? { ...item, column: item.column === "done" ? ("none" as const) : ("done" as const) } : item,
+    );
+    const changed = next.find((item) => item.id === id);
+    commit(syncObjectiveFromTasks(next, changed?.objective_id));
   }
 
   function moveColumn(id: string, column: ObjectiveColumn) {
-    commit(objs.map((o) => (o.id === id ? { ...o, column } : o)));
+    const base = storedRecords ?? objs;
+    commit(base.map((o) => (o.id === id ? { ...o, column } : o)));
   }
 
   function saveObjective() {
@@ -257,33 +275,6 @@ export function ActionPlanView() {
       },
     ]);
     setAddingObjective(false);
-    setNewTitle("");
-    setNewDescription("");
-    setNewLesson("");
-    setAddError("");
-  }
-
-  function saveObj(stageId: string) {
-    const t = newTitle.trim();
-    if (!t) {
-      setAddError("Escreve o objetivo primeiro.");
-      return;
-    }
-    if (!plan) return;
-    commit([
-      ...objs,
-      {
-        id: `o-${Date.now()}`,
-        month_id: plan.id,
-        title: t,
-        description: newDescription.trim() || null,
-        stage_id: stageId,
-        column: "none",
-        lesson_id: newLesson || null,
-        position: objs.length,
-      },
-    ]);
-    setAddingStage(null);
     setNewTitle("");
     setNewDescription("");
     setNewLesson("");
@@ -336,7 +327,7 @@ export function ActionPlanView() {
             const tem =
               planMonths.some((p) => p.year === year && p.month === m) ||
               Boolean(localBook?.months.some((p) => p.year === year && p.month === m));
-            const fut = year > 2026 || (year === 2026 && m > 8);
+            const fut = !tem && (year > 2026 || (year === 2026 && m > 8));
             return (
               <button
                 key={nm}
@@ -476,7 +467,7 @@ export function ActionPlanView() {
               selectedId={selectedStep}
               onSelect={setSelectedStep}
             />
-            {editable && currentStage ? (
+            {currentStage ? (
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <button
                   type="button"
@@ -493,7 +484,7 @@ export function ActionPlanView() {
           <div className="mb-3 flex flex-wrap items-baseline gap-2.5">
             <h3 className="m-0 text-base font-semibold text-nbp-tx">Objetivos de {monthName}</h3>
             <span className="ml-auto text-[0.82rem] text-nbp-tx2 tabular-nums">
-              {doneN}/{monthObjs.length}
+              {doneN}/{goalCards.length}
             </span>
           </div>
           <div className="mb-3.5 h-1 overflow-hidden rounded-full bg-nbp-fill" aria-hidden>
@@ -505,17 +496,15 @@ export function ActionPlanView() {
 
           <div className="mb-8 grid grid-cols-1 items-start gap-3 min-[961px]:grid-cols-3">
             {COLS.map((col) => {
-              const items = monthObjs.filter((objective) => objective.column === col.id);
+              const items = goalCards.filter((objective) => objective.column === col.id);
               return (
                 <div
                   key={col.id}
                   className="min-h-[120px] rounded-xl p-0.5"
                   onDragOver={(event) => {
-                    if (!editable) return;
                     event.preventDefault();
                   }}
                   onDrop={(event) => {
-                    if (!editable) return;
                     event.preventDefault();
                     const id = event.dataTransfer.getData("text/plain");
                     if (id) moveColumn(id, col.id);
@@ -546,37 +535,49 @@ export function ActionPlanView() {
                   </div>
                   {items.map((objective) => {
                     const done = objective.column === "done";
+                    const started = objective.column === "todo";
+                    const tone = objectiveTone(objective.id, goalCards);
                     return (
                       <div
                         key={objective.id}
-                        draggable={editable}
+                        draggable
                         onDragStart={(event) => event.dataTransfer.setData("text/plain", objective.id)}
-                        className="mb-2 rounded-[10px] border border-nbp-bd bg-nbp-sup2"
+                        className="mb-2 cursor-grab rounded-[10px] border border-nbp-bd bg-nbp-sup2"
+                        style={{ boxShadow: `inset 3px 0 0 ${tone}` }}
                       >
                         <div className="flex items-start gap-0.5">
                           <button
                             type="button"
-                            className={`shrink-0 border-0 bg-transparent py-3 pr-2 pl-2.5 ${
-                              done ? "text-[#3FBE93]" : "text-nbp-tx3"
+                            className={`shrink-0 cursor-pointer border-0 bg-transparent py-3 pr-2 pl-2.5 ${
+                              done ? "text-[#3FBE93]" : started ? "text-[#5DA9F0]" : "text-nbp-tx3"
                             }`}
-                            aria-label={done ? "Reabrir" : "Concluir"}
-                            onClick={() => (editable ? toggleObj(objective.id) : undefined)}
+                            aria-label={
+                              done ? "Voltar a não iniciado" : started ? "Concluir" : "Marcar em andamento"
+                            }
+                            onClick={() => advanceStatus(objective.id)}
                           >
-                            <Fa name={done ? "fa-circle-check" : "fa-circle"} regular={!done} />
+                            <Fa name={done ? "fa-circle-check" : "fa-circle"} regular={!done && !started} />
                           </button>
-                          <span
-                            className={`min-w-0 flex-1 py-3 pr-2.5 text-[0.88rem] leading-normal ${
-                              done ? "text-nbp-tx3 line-through" : "text-nbp-tx"
-                            }`}
-                          >
-                            {objective.title}
+                          <span className="min-w-0 flex-1 py-3 pr-2.5">
+                            <span
+                              className={`block text-[0.88rem] leading-normal ${
+                                done ? "text-nbp-tx3 line-through" : "text-nbp-tx"
+                              }`}
+                            >
+                              {objective.title}
+                            </span>
+                            {objective.description ? (
+                              <span className="mt-1 block text-[0.78rem] leading-snug text-nbp-tx2">
+                                {objective.description}
+                              </span>
+                            ) : null}
                           </span>
                         </div>
                       </div>
                     );
                   })}
-                  {items.length === 0 && col.id !== "none" ? (
-                    <p className="m-0 px-1.5 py-4 text-[0.8rem] text-nbp-tx3">Arrasta para aqui</p>
+                  {items.length === 0 ? (
+                    <p className="m-0 px-1.5 py-4 text-[0.8rem] text-nbp-tx3">Sem objetivos neste estado.</p>
                   ) : null}
                   {col.id === "none" && editable && addingObjective ? (
                     <div className="mt-1 rounded-[10px] border border-nbp-bd bg-nbp-sup2 p-3">
@@ -614,7 +615,6 @@ export function ActionPlanView() {
                       type="button"
                       onClick={() => {
                         setAddingObjective(true);
-                        setAddingStage(null);
                         setAddError("");
                         setNewTitle("");
                         setNewDescription("");
@@ -635,7 +635,12 @@ export function ActionPlanView() {
 
           <div className="flex items-start gap-3 overflow-x-auto pb-2">
             {stages.map((stage) => {
-              const items = monthObjs.filter((objective) => objective.stage_id === stage.id);
+              const items = monthObjs.filter((objective) => {
+                if (objective.stage_id !== stage.id) return false;
+                if (objective.kind === "objective") return false;
+                if (objective.kind === "task") return true;
+                return !localMonth;
+              });
               const open = stage.status !== "locked";
               return (
                 <div
@@ -643,16 +648,6 @@ export function ActionPlanView() {
                   className={`w-[250px] shrink-0 rounded-xl border border-nbp-bd bg-nbp-bg p-3 ${
                     open ? "" : "opacity-50"
                   }`}
-                  onDragOver={(event) => {
-                    if (!editable || !open) return;
-                    event.preventDefault();
-                  }}
-                  onDrop={(event) => {
-                    if (!editable || !open) return;
-                    event.preventDefault();
-                    const id = event.dataTransfer.getData("text/plain");
-                    if (id) moveObj(id, stage.id);
-                  }}
                 >
                   <div className="mb-3 flex items-center gap-2">
                     <span className="min-w-0 flex-1 text-[0.86rem] font-semibold text-nbp-tx">
@@ -663,149 +658,87 @@ export function ActionPlanView() {
 
                   {items.length === 0 ? (
                     <p className="m-0 px-1 py-3 text-[0.8rem] text-nbp-tx3">
-                      {open ? "Larga uma tarefa aqui" : "Disponível ao concluir a etapa anterior"}
+                      {open ? "Sem tarefas nesta etapa." : "Disponível ao concluir a etapa anterior"}
                     </p>
                   ) : null}
 
-                  {items.map((o) => {
-                    const lesson = lessons.find((l) => l.id === o.lesson_id);
-                    const style = o.lesson_id ? LESSON_STYLE[o.lesson_id] : null;
-                    const done = o.column === "done";
+                  {[
+                    ...goalCards
+                      .map((goal) => ({
+                        goal,
+                        tasks: items.filter((task) => task.objective_id === goal.id),
+                      }))
+                      .filter((group) => group.tasks.length > 0),
+                    ...items
+                      .filter((task) => !goalCards.some((goal) => goal.id === task.objective_id))
+                      .map((task) => ({ goal: null, tasks: [task] })),
+                  ].map((group) => {
+                    const tone = group.goal ? objectiveTone(group.goal.id, goalCards) : "#8A8B82";
                     return (
-                      <div
-                        key={o.id}
-                        draggable={editable && open}
-                        onDragStart={(event) => event.dataTransfer.setData("text/plain", o.id)}
-                        className="mb-2 rounded-[10px] border border-nbp-bd bg-nbp-sup2 transition hover:border-nbp-bd2"
-                      >
-                        <div className="flex items-start gap-0.5">
-                          <button
-                            type="button"
-                            className={`shrink-0 border-0 bg-transparent py-3 pr-2 pl-2.5 ${
-                              done ? "text-[#3FBE93]" : "text-nbp-tx3"
-                            }`}
-                            aria-label={done ? "Reabrir" : "Concluir"}
-                            onClick={() => (editable && open ? toggleObj(o.id) : undefined)}
-                          >
-                            <Fa name={done ? "fa-circle-check" : "fa-circle"} regular={!done} />
-                          </button>
-                          <span className="min-w-0 flex-1 py-3 pr-1">
-                            <span
-                              className={`block text-[0.88rem] leading-normal ${
-                                done ? "text-nbp-tx3 line-through" : "text-nbp-tx"
-                              }`}
+                      <div key={group.goal?.id ?? group.tasks[0]?.id}>
+                        {group.tasks.map((o) => {
+                          const lesson = lessons.find((l) => l.id === o.lesson_id);
+                          const style = o.lesson_id ? LESSON_STYLE[o.lesson_id] : null;
+                          const done = o.column === "done";
+                          return (
+                            <div
+                              key={o.id}
+                              className="mb-2 rounded-[10px] border border-nbp-bd bg-nbp-sup2 transition hover:border-nbp-bd2"
+                              style={{ boxShadow: `inset 3px 0 0 ${tone}` }}
                             >
-                              {o.title}
-                            </span>
-                            {o.description ? (
-                              <span className="mt-1 block text-[0.78rem] leading-snug text-nbp-tx2">
-                                {o.description}
-                              </span>
-                            ) : null}
-                          </span>
-                          {editable ? (
-                            <button
-                              type="button"
-                              className="shrink-0 border-0 bg-transparent py-3 pr-2.5 pl-2 text-nbp-tx3 hover:text-nbp-tx"
-                              aria-label="Remover"
-                              onClick={() => removeObj(o.id)}
-                            >
-                              <Fa name="fa-xmark" />
-                            </button>
-                          ) : null}
-                        </div>
-                        {lesson && style ? (
-                          <Link
-                            href="/app/conteudos"
-                            className="mb-2.5 ml-[34px] mr-2.5 flex w-[calc(100%-44px)] items-center gap-2 rounded-lg border border-nbp-bd bg-transparent py-1.5 pr-2 pl-1.5 text-left hover:border-nbp-bd2 hover:bg-[rgba(253,255,239,0.02)]"
-                          >
-                            <span
-                              className="flex h-[22px] w-[34px] shrink-0 items-center justify-center rounded text-[10px]"
-                              style={{ background: style.bg, color: style.fg }}
-                            >
-                              <Fa name="fa-play" />
-                            </span>
-                            <span className="min-w-0 flex-1">
-                              <span className="block truncate text-[0.74rem] text-nbp-tx">{lesson.title}</span>
-                              <span className="block text-[0.66rem] text-nbp-tx3">{lesson.duration_label}</span>
-                            </span>
-                          </Link>
-                        ) : null}
+                              <div className="flex items-start gap-0.5">
+                                <button
+                                  type="button"
+                                  className={`shrink-0 cursor-pointer border-0 bg-transparent py-3 pr-2 pl-2.5 ${
+                                    done ? "text-[#3FBE93]" : "text-nbp-tx3"
+                                  }`}
+                                  aria-label={done ? "Reabrir tarefa" : "Concluir tarefa"}
+                                  onClick={() => toggleTaskDone(o.id)}
+                                >
+                                  <Fa name={done ? "fa-circle-check" : "fa-circle"} regular={!done} />
+                                </button>
+                                <span className="min-w-0 flex-1 py-3 pr-2.5">
+                                  <span className="block text-[0.66rem] font-medium tracking-[0.08em] uppercase" style={{ color: tone }}>
+                                    {group.goal ? group.goal.title : "Sem objetivo"}
+                                  </span>
+                                  <span
+                                    className={`mt-1 block text-[0.88rem] leading-normal ${
+                                      done ? "text-nbp-tx3 line-through" : "text-nbp-tx"
+                                    }`}
+                                  >
+                                    {o.title}
+                                  </span>
+                                  {o.description ? (
+                                    <span className="mt-1 block text-[0.78rem] leading-snug text-nbp-tx2">
+                                      {o.description}
+                                    </span>
+                                  ) : null}
+                                </span>
+                              </div>
+                              {lesson && style ? (
+                                <Link
+                                  href="/app/conteudos"
+                                  className="mb-2.5 ml-[34px] mr-2.5 flex w-[calc(100%-44px)] items-center gap-2 rounded-lg border border-nbp-bd bg-transparent py-1.5 pr-2 pl-1.5 text-left hover:border-nbp-bd2 hover:bg-[rgba(253,255,239,0.02)]"
+                                >
+                                  <span
+                                    className="flex h-[22px] w-[34px] shrink-0 items-center justify-center rounded text-[10px]"
+                                    style={{ background: style.bg, color: style.fg }}
+                                  >
+                                    <Fa name="fa-play" />
+                                  </span>
+                                  <span className="min-w-0 flex-1">
+                                    <span className="block truncate text-[0.74rem] text-nbp-tx">{lesson.title}</span>
+                                    <span className="block text-[0.66rem] text-nbp-tx3">{lesson.duration_label}</span>
+                                  </span>
+                                </Link>
+                              ) : null}
+                            </div>
+                          );
+                        })}
                       </div>
                     );
                   })}
 
-                  {editable && open && addingStage === stage.id ? (
-                    <div className="mt-1 rounded-[10px] border border-nbp-bd bg-nbp-sup2 p-3">
-                      <input
-                        value={newTitle}
-                        onChange={(e) => setNewTitle(e.target.value)}
-                        placeholder="Título da tarefa"
-                        aria-label="Título da tarefa"
-                        className="mb-2 h-9 w-full rounded-lg border border-nbp-bd bg-nbp-fill px-2.5 text-[0.86rem] text-nbp-tx outline-none focus:border-nbp-bd2"
-                      />
-                      <textarea
-                        value={newDescription}
-                        onChange={(e) => setNewDescription(e.target.value)}
-                        placeholder="Descrição: o que fazer, com quem e como saber que ficou feito"
-                        aria-label="Descrição da tarefa"
-                        rows={3}
-                        className="mb-2 w-full resize-y rounded-lg border border-nbp-bd bg-nbp-fill px-2.5 py-2 text-[0.82rem] text-nbp-tx outline-none focus:border-nbp-bd2"
-                      />
-                      <label className="mb-1 block text-[0.72rem] text-nbp-tx2">Aula para rever</label>
-                      <select
-                        value={newLesson}
-                        onChange={(e) => setNewLesson(e.target.value)}
-                        className="mb-2 h-9 w-full rounded-lg border border-nbp-bd bg-nbp-fill px-2.5 text-[0.86rem] text-nbp-tx outline-none"
-                      >
-                        <option value="">Sem aula</option>
-                        {lessons
-                          .filter((l) => ["m2.4", "m3.3", "m4.1"].includes(l.id))
-                          .map((l) => (
-                            <option key={l.id} value={l.id}>
-                              {l.title}
-                            </option>
-                          ))}
-                      </select>
-                      {addError ? (
-                        <p className="mb-2 mt-0 text-[0.76rem] text-[#E87070]">{addError}</p>
-                      ) : null}
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => saveObj(stage.id)}
-                          className="flex-1 rounded-lg border border-nbp-bd2 bg-nbp-tx px-2 py-2 text-[0.82rem] font-semibold text-[#181818]"
-                        >
-                          Guardar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAddingStage(null);
-                            setAddError("");
-                          }}
-                          className="border-0 bg-transparent px-2.5 py-2 text-[0.82rem] text-nbp-tx2"
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
-                  {editable && open && addingStage !== stage.id ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setAddingStage(stage.id);
-                        setAddingObjective(false);
-                        setAddError("");
-                        setNewTitle("");
-                        setNewDescription("");
-                      }}
-                      className="flex w-full items-center gap-2 border-0 bg-transparent px-1 py-2.5 text-left text-[0.88rem] text-nbp-tx2 hover:text-nbp-tx"
-                    >
-                      <Fa name="fa-plus" /> Tarefa
-                    </button>
-                  ) : null}
                 </div>
               );
             })}

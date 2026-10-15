@@ -10,6 +10,37 @@ import type {
 const STORAGE_KEY = "nbp-local-plans-v1";
 const AUGUST_EXAMPLE_KEY = "nbp-aug-board-example-v1";
 const CLEAR_LATE_2026_KEY = "nbp-clear-out-nov-dez-2026-v1";
+const CLEAR_SEP_DEC_KEY = "nbp-clear-set-dez-2026-v1";
+const CLEAR_SEP_DEC_V2_KEY = "nbp-clear-set-dez-2026-v2";
+const CLEAR_SEP_DEC_V3_KEY = "nbp-clear-set-dez-2026-v3";
+const STAGE_SIM_KEY = "nbp-stage-sim-v1";
+
+const STAGE_SIM_ID = "pm-sim-set-2026";
+const LINK_DEMO_ID = "pm-link-set-2026";
+
+const OBJECTIVE_TONES = ["#E2B657", "#5DA9F0", "#3FBE93", "#C98BD0", "#E8A06A"];
+
+export function objectiveTone(id: string, goals: { id: string }[]): string {
+  const index = goals.findIndex((goal) => goal.id === id);
+  return OBJECTIVE_TONES[(index < 0 ? 0 : index) % OBJECTIVE_TONES.length];
+}
+
+/** Quando todas as tarefas do objetivo estão feitas, o objetivo passa a concluído. Se alguma volta atrás, o objetivo fica em andamento. */
+export function syncObjectiveFromTasks(
+  records: NbpActionPlanObjective[],
+  objectiveId: string | null | undefined,
+): NbpActionPlanObjective[] {
+  if (!objectiveId) return records;
+  const tasks = records.filter((item) => item.kind === "task" && item.objective_id === objectiveId);
+  if (tasks.length === 0) return records;
+  const allDone = tasks.every((item) => item.column === "done");
+  return records.map((item) => {
+    if (item.id !== objectiveId || item.kind === "task") return item;
+    if (allDone) return item.column === "done" ? item : { ...item, column: "done" };
+    if (item.column === "done") return { ...item, column: "todo" };
+    return item;
+  });
+}
 
 export type SavedBoard = {
   tela: TelaShape[];
@@ -86,6 +117,137 @@ function dropLate2026(book: LocalPlanBook): LocalPlanBook {
   };
 }
 
+export function withCurrentStage(list: NbpActionPlanStage[]): NbpActionPlanStage[] {
+  const ordered = list.map((stage, index) => ({ ...stage, position: index }));
+  if (ordered.length === 0 || ordered.some((stage) => stage.status === "current")) return ordered;
+  const locked = ordered.findIndex((stage) => stage.status === "locked");
+  if (locked < 0) return ordered;
+  return ordered.map((stage, index) =>
+    index === locked ? { ...stage, status: "current" } : stage,
+  );
+}
+
+function dropSepToDec2026(book: LocalPlanBook): LocalPlanBook {
+  const removed = (book.months ?? []).filter(
+    (month) =>
+      month.id === STAGE_SIM_ID ||
+      month.id === LINK_DEMO_ID ||
+      (month.year === 2026 && month.month >= 9 && month.month <= 12),
+  );
+  if (removed.length === 0) return book;
+  const ids = new Set(removed.map((month) => month.id));
+  const stages = { ...(book.stages ?? {}) };
+  const objectives = { ...(book.objectives ?? {}) };
+  const boards = { ...(book.boards ?? {}) };
+  for (const id of ids) {
+    delete stages[id];
+    delete objectives[id];
+    delete boards[id];
+  }
+  return {
+    months: book.months.filter((month) => !ids.has(month.id)),
+    stages,
+    objectives,
+    boards,
+  };
+}
+
+function clearSepToDec2026() {
+  if (typeof window === "undefined") return;
+  if (localStorage.getItem(CLEAR_SEP_DEC_KEY) === "1") return;
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) {
+    localStorage.setItem(CLEAR_SEP_DEC_KEY, "1");
+    localStorage.setItem(STAGE_SIM_KEY, "1");
+    return;
+  }
+  try {
+    const parsed = JSON.parse(raw) as Record<string, Partial<LocalPlanBook>>;
+    const next: Record<string, LocalPlanBook> = {};
+    for (const [userId, book] of Object.entries(parsed)) {
+      if (!book || !Array.isArray(book.months)) {
+        if (book) next[userId] = book as LocalPlanBook;
+        continue;
+      }
+      next[userId] = dropSepToDec2026({
+        months: book.months,
+        stages: book.stages ?? {},
+        objectives: book.objectives ?? {},
+        boards: book.boards ?? {},
+      });
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    localStorage.setItem(CLEAR_SEP_DEC_KEY, "1");
+    localStorage.setItem(STAGE_SIM_KEY, "1");
+  } catch {
+    localStorage.removeItem(CLEAR_SEP_DEC_KEY);
+  }
+}
+
+function clearSepToDec2026Again() {
+  if (typeof window === "undefined") return;
+  if (localStorage.getItem(CLEAR_SEP_DEC_V2_KEY) === "1") return;
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) {
+    localStorage.setItem(CLEAR_SEP_DEC_V2_KEY, "1");
+    localStorage.setItem(STAGE_SIM_KEY, "1");
+    return;
+  }
+  try {
+    const parsed = JSON.parse(raw) as Record<string, Partial<LocalPlanBook>>;
+    const next: Record<string, LocalPlanBook> = {};
+    for (const [userId, book] of Object.entries(parsed)) {
+      if (!book || !Array.isArray(book.months)) {
+        if (book) next[userId] = book as LocalPlanBook;
+        continue;
+      }
+      next[userId] = dropSepToDec2026({
+        months: book.months,
+        stages: book.stages ?? {},
+        objectives: book.objectives ?? {},
+        boards: book.boards ?? {},
+      });
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    localStorage.setItem(CLEAR_SEP_DEC_V2_KEY, "1");
+    localStorage.setItem(STAGE_SIM_KEY, "1");
+  } catch {
+    localStorage.removeItem(CLEAR_SEP_DEC_V2_KEY);
+  }
+}
+
+function clearSepToDec2026Final() {
+  if (typeof window === "undefined") return;
+  if (localStorage.getItem(CLEAR_SEP_DEC_V3_KEY) === "1") return;
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) {
+    localStorage.setItem(CLEAR_SEP_DEC_V3_KEY, "1");
+    localStorage.setItem(STAGE_SIM_KEY, "1");
+    return;
+  }
+  try {
+    const parsed = JSON.parse(raw) as Record<string, Partial<LocalPlanBook>>;
+    const next: Record<string, LocalPlanBook> = {};
+    for (const [userId, book] of Object.entries(parsed)) {
+      if (!book || !Array.isArray(book.months)) {
+        if (book) next[userId] = book as LocalPlanBook;
+        continue;
+      }
+      next[userId] = dropSepToDec2026({
+        months: book.months,
+        stages: book.stages ?? {},
+        objectives: book.objectives ?? {},
+        boards: book.boards ?? {},
+      });
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    localStorage.setItem(CLEAR_SEP_DEC_V3_KEY, "1");
+    localStorage.setItem(STAGE_SIM_KEY, "1");
+  } catch {
+    localStorage.removeItem(CLEAR_SEP_DEC_V3_KEY);
+  }
+}
+
 function clearLate2026Plans() {
   if (typeof window === "undefined") return;
   if (localStorage.getItem(CLEAR_LATE_2026_KEY) === "1") return;
@@ -116,12 +278,17 @@ function clearLate2026Plans() {
 export function readLocalPlans(userId: string): LocalPlanBook {
   if (typeof window === "undefined") return emptyBook();
   clearLate2026Plans();
+  clearSepToDec2026();
+  clearSepToDec2026Again();
+  clearSepToDec2026Final();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return restoreAugustExample(userId, emptyBook());
     const parsed = JSON.parse(raw) as Record<string, LocalPlanBook>;
     const book = parsed[userId];
-    if (!book || !Array.isArray(book.months)) return restoreAugustExample(userId, emptyBook());
+    if (!book || !Array.isArray(book.months)) {
+      return restoreAugustExample(userId, emptyBook());
+    }
     return restoreAugustExample(userId, {
       months: book.months,
       stages: book.stages ?? {},

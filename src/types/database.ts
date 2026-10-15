@@ -193,6 +193,10 @@ export type NbpActionPlanObjective = {
   column: ObjectiveColumn;
   lesson_id: string | null;
   position: number;
+  /** Objetivo fica no quadro de estados. Tarefa fica na etapa. */
+  kind?: "objective" | "task";
+  /** Na tarefa, aponta para o objetivo. No objetivo, fica vazio. */
+  objective_id?: string | null;
 };
 
 export type OnboardingOption = { id: string; label: string };

@@ -5,12 +5,23 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Fa } from "@/components/BrandMark";
 import { Button } from "@/components/Button";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Field, PageHeader, Panel, fieldControlClass } from "@/components/Panel";
+import { PlanJourney } from "@/components/PlanJourney";
 import { PlanWhiteboard } from "@/components/PlanWhiteboard";
 import { Pill } from "@/components/Pill";
 import { EmptyState } from "@/components/ui";
 import { api } from "@/lib/api-client";
-import { readLocalPlans, saveBoard, boardOf, writeLocalPlans, type LocalPlanBook } from "@/lib/local-plans";
+import {
+  objectiveTone,
+  readLocalPlans,
+  syncObjectiveFromTasks,
+  saveBoard,
+  boardOf,
+  withCurrentStage,
+  writeLocalPlans,
+  type LocalPlanBook,
+} from "@/lib/local-plans";
 import {
   formatEur,
   planMonths as mockPlanMonths,
@@ -23,7 +34,14 @@ import type {
   NbpActionPlanObjective,
   NbpActionPlanStage,
   NbpUser,
+  ObjectiveColumn,
 } from "@/types/database";
+
+const OBJECTIVE_COLS: { id: ObjectiveColumn; label: string; pill: "none" | "todo" | "done" }[] = [
+  { id: "none", label: "Não iniciado", pill: "none" },
+  { id: "todo", label: "Em andamento", pill: "todo" },
+  { id: "done", label: "Concluído", pill: "done" },
+];
 
 const MES = [
   "janeiro",
@@ -56,14 +74,23 @@ const MAB = [
 
 type DraftTask = { title: string; description: string };
 type DraftStage = { id: string; name: string; tasks: DraftTask[] };
-type TaskComposer = { title: string; description: string };
+type TaskComposer = { title: string; description: string; objectiveId: string };
+type ObjectiveComposer = {
+  title: string;
+  description: string;
+  taskIds: string[];
+};
 
 function freshDraft(): DraftStage[] {
   return [{ id: "draft-0", name: "", tasks: [] }];
 }
 
 function emptyComposer(): TaskComposer {
-  return { title: "", description: "" };
+  return { title: "", description: "", objectiveId: "" };
+}
+
+function emptyObjective(): ObjectiveComposer {
+  return { title: "", description: "", taskIds: [] };
 }
 
 type PlanCreateResult = {
@@ -114,6 +141,16 @@ export default function MemberPlanClient({
   const [draft, setDraft] = useState<DraftStage[]>(freshDraft);
   const [createStep, setCreateStep] = useState<"stages" | "tasks">("stages");
   const [taskDraft, setTaskDraft] = useState<Record<string, TaskComposer>>({});
+  const [addingObjective, setAddingObjective] = useState(false);
+  const [objectiveDraft, setObjectiveDraft] = useState<ObjectiveComposer>(emptyObjective());
+  const [composingStage, setComposingStage] = useState<string | null>(null);
+  const [editingTask, setEditingTask] = useState<string | null>(null);
+  const [confirm, setConfirm] = useState<null | {
+    title: string;
+    body: string;
+    confirmLabel: string;
+    run: () => void;
+  }>(null);
 
   const plan = useMemo(
     () => months.find((p) => p.year === year && p.month === month) ?? null,
@@ -329,6 +366,7 @@ export default function MemberPlanClient({
           column: "none",
           lesson_id: null,
           position: taskIndex,
+          kind: "task",
         });
       });
     });
@@ -437,6 +475,209 @@ export default function MemberPlanClient({
     setDraft(named);
     setError(null);
     setCreateStep("tasks");
+  }
+
+  function persistPlan(nextStages: NbpActionPlanStage[], nextObjectives: NbpActionPlanObjective[]) {
+    if (!plan || !member) return;
+    const stagesNext = withCurrentStage(nextStages);
+    setStages(stagesNext);
+    setObjectives(nextObjectives);
+    setDemoStagesByMonth((current) => ({ ...current, [plan.id]: stagesNext }));
+    setDemoObjectivesByMonth((current) => ({ ...current, [plan.id]: nextObjectives }));
+    const base = book ?? { months: [], stages: {}, objectives: {}, boards: {} };
+    const monthsNext = base.months.some((item) => item.id === plan.id)
+      ? base.months
+      : [...base.months, plan];
+    const nextBook: LocalPlanBook = {
+      ...base,
+      months: monthsNext,
+      stages: { ...base.stages, [plan.id]: stagesNext },
+      objectives: { ...base.objectives, [plan.id]: nextObjectives },
+    };
+    writeLocalPlans(member.id, nextBook);
+    setBook(nextBook);
+    if (!months.some((item) => item.id === plan.id)) {
+      setMonths((current) => (current.some((item) => item.id === plan.id) ? current : [plan, ...current]));
+    }
+  }
+
+  function renameSavedStage(stageId: string, name: string) {
+    persistPlan(
+      stages.map((stage) => (stage.id === stageId ? { ...stage, name } : stage)),
+      objectives,
+    );
+  }
+
+  function concludeSavedStage() {
+    if (!plan || !member) return;
+    const ordered = [...stages].sort((a, b) => a.position - b.position);
+    const index = ordered.findIndex((stage) => stage.status === "current");
+    if (index < 0) return;
+    const nextStages = ordered.map((stage, i) => {
+      if (i === index) return { ...stage, status: "done" as const };
+      if (i === index + 1) return { ...stage, status: "current" as const };
+      return stage;
+    });
+    persistPlan(nextStages, objectives);
+  }
+
+  function addSavedStage() {
+    if (!plan) return;
+    persistPlan(
+      [
+        ...stages,
+        {
+          id: `stg-${Date.now()}`,
+          month_id: plan.id,
+          position: stages.length,
+          name: "Nova etapa",
+          status: stages.some((stage) => stage.status === "current") ? "locked" : "current",
+          subtitle: null,
+        },
+      ],
+      objectives,
+    );
+  }
+
+  function removeSavedStage(stageId: string) {
+    const touched = new Set(
+      objectives
+        .filter((item) => item.kind === "task" && item.stage_id === stageId)
+        .map((item) => item.objective_id)
+        .filter((id): id is string => Boolean(id)),
+    );
+    let next = objectives.filter((objective) => objective.stage_id !== stageId);
+    for (const id of touched) next = syncObjectiveFromTasks(next, id);
+    persistPlan(
+      stages.filter((stage) => stage.id !== stageId),
+      next,
+    );
+  }
+
+  function removeSavedTask(taskId: string) {
+    const removed = objectives.find((item) => item.id === taskId);
+    const next = objectives.filter((objective) => objective.id !== taskId);
+    persistPlan(stages, syncObjectiveFromTasks(next, removed?.objective_id));
+  }
+
+  function updateSavedTask(
+    taskId: string,
+    patch: { title?: string; description?: string | null; objective_id?: string | null },
+  ) {
+    const previous = objectives.find((item) => item.id === taskId);
+    const next = objectives.map((objective) => (objective.id === taskId ? { ...objective, ...patch } : objective));
+    const updated = next.find((item) => item.id === taskId);
+    let synced = syncObjectiveFromTasks(next, previous?.kind === "task" ? previous.objective_id : null);
+    if (updated?.kind === "task" && updated.objective_id !== previous?.objective_id) {
+      synced = syncObjectiveFromTasks(synced, updated.objective_id);
+    }
+    persistPlan(stages, synced);
+  }
+
+  function moveSavedColumn(taskId: string, column: ObjectiveColumn) {
+    const next = objectives.map((objective) => (objective.id === taskId ? { ...objective, column } : objective));
+    const changed = next.find((item) => item.id === taskId);
+    persistPlan(stages, changed?.kind === "task" ? syncObjectiveFromTasks(next, changed.objective_id) : next);
+  }
+
+  function moveSavedToStage(taskId: string, stageId: string) {
+    persistPlan(
+      stages,
+      objectives.map((objective) => (objective.id === taskId ? { ...objective, stage_id: stageId } : objective)),
+    );
+  }
+
+  function removeSavedObjective(objectiveId: string) {
+    persistPlan(
+      stages,
+      objectives.filter((objective) => objective.id !== objectiveId && objective.objective_id !== objectiveId),
+    );
+  }
+
+  function addSavedObjective() {
+    if (!plan) return;
+    const title = objectiveDraft.title.trim();
+    if (!title) {
+      setError("Escreve o título do objetivo.");
+      return;
+    }
+    const objectiveId = `obj-${Date.now()}`;
+    const selected = new Set(objectiveDraft.taskIds);
+    const next = objectives.map((item) =>
+      item.kind === "task" && selected.has(item.id) ? { ...item, objective_id: objectiveId } : item,
+    );
+    persistPlan(
+      stages,
+      syncObjectiveFromTasks(
+        [
+          ...next,
+          {
+            id: objectiveId,
+            month_id: plan.id,
+            stage_id: null,
+            title,
+            description: objectiveDraft.description.trim() || null,
+            column: "none" as const,
+            lesson_id: null,
+            position: objectives.length,
+            kind: "objective" as const,
+            objective_id: null,
+          },
+        ],
+        objectiveId,
+      ),
+    );
+    setObjectiveDraft(emptyObjective());
+    setAddingObjective(false);
+    setError(null);
+  }
+
+  function addSavedTask(stageId: string) {
+    if (!plan) return;
+    const goals = objectives.filter((objective) => objective.kind !== "task");
+    if (goals.length === 0) {
+      setError("Cria um objetivo primeiro. A tarefa fica ligada a ele.");
+      return;
+    }
+    const composer = taskDraft[stageId] ?? emptyComposer();
+    const title = composer.title.trim();
+    if (!title) {
+      setError("Escreve o título da tarefa.");
+      return;
+    }
+    if (!goals.some((goal) => goal.id === composer.objectiveId)) {
+      setError("Escolhe o objetivo desta tarefa.");
+      return;
+    }
+    setError(null);
+    const inStage = objectives.filter((objective) => objective.stage_id === stageId && objective.kind === "task").length;
+    persistPlan(stages, [
+      ...objectives,
+      {
+        id: `task-${Date.now()}`,
+        month_id: plan.id,
+        stage_id: stageId,
+        title,
+        description: composer.description.trim() || null,
+        column: "none",
+        lesson_id: null,
+        position: inStage,
+        kind: "task",
+        objective_id: composer.objectiveId,
+      },
+    ]);
+    setTaskDraft((current) => ({ ...current, [stageId]: emptyComposer() }));
+    setComposingStage(null);
+  }
+
+  function askConfirm(next: { title: string; body: string; confirmLabel: string; run: () => void }) {
+    setConfirm({
+      ...next,
+      run: () => {
+        next.run();
+        setConfirm(null);
+      },
+    });
   }
 
   function addDraftTask(stageId: string) {
@@ -646,8 +887,15 @@ export default function MemberPlanClient({
                         <button
                           type="button"
                           aria-label={`Remover etapa ${index + 1}`}
-                          onClick={() => removeDraftStage(stage.id)}
-                          className="cursor-pointer border-0 bg-transparent p-1 text-nbp-tx3 hover:text-nbp-tx"
+                          onClick={() =>
+                            askConfirm({
+                              title: "Excluir etapa",
+                              body: `Queres excluir «${stage.name.trim() || `etapa ${index + 1}`}»?`,
+                              confirmLabel: "Excluir etapa",
+                              run: () => removeDraftStage(stage.id),
+                            })
+                          }
+                          className="cursor-pointer rounded-md border border-nbp-bd bg-transparent p-1 text-nbp-tx3 hover:text-nbp-tx"
                         >
                           <Fa name="fa-xmark" />
                         </button>
@@ -662,7 +910,35 @@ export default function MemberPlanClient({
                   const composer = taskDraft[stage.id] ?? emptyComposer();
                   return (
                     <div key={stage.id} className="rounded-xl border border-nbp-bd bg-nbp-bg p-3.5">
-                      <h3 className="mt-0 mb-3 text-[0.95rem] font-semibold text-nbp-tx">{stage.name}</h3>
+                      <div className="mb-3 flex items-center gap-2">
+                        <input
+                          value={stage.name}
+                          aria-label={`Nome da etapa ${stage.name}`}
+                          onChange={(event) =>
+                            setDraft((current) =>
+                              current.map((item) =>
+                                item.id === stage.id ? { ...item, name: event.target.value } : item,
+                              ),
+                            )
+                          }
+                          className={fieldControlClass}
+                        />
+                        <button
+                          type="button"
+                          aria-label={`Excluir etapa ${stage.name}`}
+                          onClick={() =>
+                            askConfirm({
+                              title: "Excluir etapa",
+                              body: `Queres excluir «${stage.name}»? As tarefas desta etapa também saem.`,
+                              confirmLabel: "Excluir etapa",
+                              run: () => removeDraftStage(stage.id),
+                            })
+                          }
+                          className="cursor-pointer rounded-md border border-nbp-bd bg-transparent p-1.5 text-nbp-tx3 hover:text-nbp-tx"
+                        >
+                          <Fa name="fa-xmark" />
+                        </button>
+                      </div>
                       {stage.tasks.length === 0 ? (
                         <p className="mt-0 mb-3 text-[0.82rem] text-nbp-tx3">Ainda sem tarefas nesta etapa.</p>
                       ) : (
@@ -682,15 +958,24 @@ export default function MemberPlanClient({
                                 <button
                                   type="button"
                                   aria-label="Remover tarefa"
-                                  className="cursor-pointer border-0 bg-transparent p-0 text-nbp-tx3"
+                                  className="cursor-pointer rounded-md border border-nbp-bd bg-transparent p-1 text-nbp-tx3"
                                   onClick={() =>
-                                    setDraft((current) =>
-                                      current.map((item) =>
-                                        item.id === stage.id
-                                          ? { ...item, tasks: item.tasks.filter((_, taskIndex) => taskIndex !== index) }
-                                          : item,
-                                      ),
-                                    )
+                                    askConfirm({
+                                      title: "Excluir tarefa",
+                                      body: `Queres excluir «${task.title}»?`,
+                                      confirmLabel: "Excluir tarefa",
+                                      run: () =>
+                                        setDraft((current) =>
+                                          current.map((item) =>
+                                            item.id === stage.id
+                                              ? {
+                                                  ...item,
+                                                  tasks: item.tasks.filter((_, taskIndex) => taskIndex !== index),
+                                                }
+                                              : item,
+                                          ),
+                                        ),
+                                    })
                                   }
                                 >
                                   <Fa name="fa-xmark" />
@@ -733,6 +1018,9 @@ export default function MemberPlanClient({
                     </div>
                   );
                 })}
+                <Button type="button" variant="ghost" size="sm" onClick={addDraftStage}>
+                  <Fa name="fa-plus" /> Etapa
+                </Button>
               </div>
             )}
             {error ? (
@@ -827,108 +1115,478 @@ export default function MemberPlanClient({
                 </div>
               ))}
             </div>
-          </Panel>
-
-          <Panel className="mb-4">
-            <h3 className="mt-0 mb-3 text-[0.9rem] text-nbp-tx2">Objetivos de {monthName}</h3>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              {(
-                [
-                  ["none", "Não iniciado"],
-                  ["todo", "Em andamento"],
-                  ["done", "Concluído"],
-                ] as const
-              ).map(([column, label]) => {
-                const cards = objectives.filter((objective) => objective.column === column);
-                return (
-                  <div key={column}>
-                    <div className="mb-2 text-[0.78rem] font-medium text-nbp-tx2">
-                      {label} · {cards.length}
-                    </div>
-                    {cards.length === 0 ? (
-                      <p className="m-0 text-[0.8rem] text-nbp-tx3">Sem objetivos neste estado.</p>
-                    ) : (
-                      cards.map((objective) => (
-                        <div
-                          key={objective.id}
-                          className="mb-2 rounded-[10px] border border-nbp-bd bg-nbp-sup2 px-2.5 py-2 text-[0.84rem] text-nbp-tx"
-                        >
-                          {objective.title}
-                        </div>
-                      ))
-                    )}
+            {stages.length > 0 ? (
+              <div className="mt-5">
+                <PlanJourney
+                  stages={[...stages].sort((a, b) => a.position - b.position)}
+                  fillPct={
+                    stages.length
+                      ? Math.round((stages.filter((stage) => stage.status === "done").length / stages.length) * 100)
+                      : 0
+                  }
+                />
+                {stages.some((stage) => stage.status === "current") ? (
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <Button type="button" variant="solid" size="sm" onClick={concludeSavedStage}>
+                      Concluir {stages.find((stage) => stage.status === "current")?.name}
+                    </Button>
+                    <p className="m-0 text-[0.8rem] text-nbp-tx2">A etapa seguinte fica disponível para o membro.</p>
                   </div>
-                );
-              })}
-            </div>
+                ) : null}
+              </div>
+            ) : null}
           </Panel>
 
-          <Panel>
-            <div className="mb-3 flex flex-wrap items-center gap-3">
-              <h3 className="m-0 text-[0.9rem] text-nbp-tx2">
-                Tarefas de {monthName}
-              </h3>
-              {stages.some((stage) => stage.status === "current") ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    if (!plan || !member) return;
-                    const ordered = [...stages].sort((a, b) => a.position - b.position);
-                    const index = ordered.findIndex((stage) => stage.status === "current");
-                    if (index < 0) return;
-                    const nextStages = ordered.map((stage, i) => {
-                      if (i === index) return { ...stage, status: "done" as const };
-                      if (i === index + 1) return { ...stage, status: "current" as const };
-                      return stage;
-                    });
-                    setStages(nextStages);
-                    setDemoStagesByMonth((current) => ({ ...current, [plan.id]: nextStages }));
-                    const base = book ?? { months: [], stages: {}, objectives: {}, boards: {} };
-                    const nextBook = {
-                      ...base,
-                      stages: { ...base.stages, [plan.id]: nextStages },
-                    };
-                    writeLocalPlans(member.id, nextBook);
-                    setBook(nextBook);
+          <div className="mb-3 flex flex-wrap items-baseline gap-2.5">
+            <h3 className="m-0 text-base font-semibold text-nbp-tx">Objetivos de {monthName}</h3>
+            <span className="ml-auto text-[0.82rem] text-nbp-tx2 tabular-nums">
+              {objectives.filter((objective) => objective.kind !== "task" && objective.column === "done").length}/
+              {objectives.filter((objective) => objective.kind !== "task").length}
+            </span>
+          </div>
+          <div className="mb-8 grid grid-cols-1 items-start gap-3 min-[961px]:grid-cols-3">
+            {OBJECTIVE_COLS.map((col) => {
+              const cards = objectives.filter((objective) => objective.kind !== "task" && objective.column === col.id);
+              return (
+                <div
+                  key={col.id}
+                  className="min-h-[120px] rounded-xl p-0.5"
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    const id = event.dataTransfer.getData("text/plain");
+                    if (id) moveSavedColumn(id, col.id);
                   }}
                 >
-                  Concluir {stages.find((stage) => stage.status === "current")?.name}
-                </Button>
-              ) : null}
-            </div>
+                  <div className="mb-3 flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.78rem] font-medium ${
+                        col.pill === "none"
+                          ? "bg-[rgba(198,200,186,0.08)] text-nbp-tx2"
+                          : col.pill === "todo"
+                            ? "bg-[rgba(93,169,240,0.12)] text-[#97C3EC]"
+                            : "bg-[rgba(63,190,147,0.12)] text-[#63CBA6]"
+                      }`}
+                    >
+                      <span
+                        className={`h-[7px] w-[7px] rounded-full ${
+                          col.pill === "none" ? "bg-[#8A8B82]" : col.pill === "todo" ? "bg-[#5DA9F0]" : "bg-[#3FBE93]"
+                        }`}
+                      />
+                      {col.label}
+                    </span>
+                    <span className="ml-auto text-[0.74rem] text-nbp-tx3 tabular-nums">{cards.length}</span>
+                  </div>
+                  {cards.map((objective) => {
+                    const tone = objectiveTone(
+                      objective.id,
+                      objectives.filter((item) => item.kind !== "task"),
+                    );
+                    return (
+                    <div
+                      key={objective.id}
+                      draggable
+                      onDragStart={(event) => event.dataTransfer.setData("text/plain", objective.id)}
+                      className="mb-2 rounded-[10px] border border-nbp-bd bg-nbp-sup2"
+                      style={{ boxShadow: `inset 3px 0 0 ${tone}` }}
+                    >
+                      <div className="flex items-start gap-1 px-2.5 py-2.5">
+                        <div className="min-w-0 flex-1">
+                          <input
+                            value={objective.title}
+                            aria-label={`Título do objetivo ${objective.title}`}
+                            onChange={(event) => updateSavedTask(objective.id, { title: event.target.value })}
+                            className="w-full border-0 bg-transparent p-0 text-[0.88rem] text-nbp-tx outline-none"
+                          />
+                          <textarea
+                            value={objective.description ?? ""}
+                            aria-label={`Descrição do objetivo ${objective.title}`}
+                            rows={2}
+                            onChange={(event) =>
+                              updateSavedTask(objective.id, { description: event.target.value || null })
+                            }
+                            placeholder="Descrição"
+                            className="mt-1 w-full resize-y border-0 bg-transparent p-0 text-[0.78rem] text-nbp-tx2 outline-none"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          aria-label={`Excluir objetivo ${objective.title}`}
+                          onClick={() =>
+                            askConfirm({
+                              title: "Excluir objetivo",
+                              body: `Queres excluir «${objective.title}»? As tarefas ligadas a este objetivo também saem.`,
+                              confirmLabel: "Excluir",
+                              run: () => removeSavedObjective(objective.id),
+                            })
+                          }
+                          className="cursor-pointer border-0 bg-transparent p-1 text-nbp-tx3 hover:text-nbp-tx"
+                        >
+                          <Fa name="fa-xmark" />
+                        </button>
+                      </div>
+                    </div>
+                    );
+                  })}
+                  {cards.length === 0 && col.id !== "none" ? (
+                    <p className="m-0 px-1.5 py-4 text-[0.8rem] text-nbp-tx3">Arrasta para aqui</p>
+                  ) : null}
+                  {col.id === "none" && addingObjective ? (
+                    <div className="mt-1 rounded-[10px] border border-nbp-bd bg-nbp-sup2 p-3">
+                      <input
+                        value={objectiveDraft.title}
+                        onChange={(event) => setObjectiveDraft((current) => ({ ...current, title: event.target.value }))}
+                        placeholder="Novo objetivo"
+                        aria-label="Novo objetivo"
+                        className="mb-2 h-9 w-full rounded-lg border border-nbp-bd bg-nbp-fill px-2.5 text-[0.86rem] text-nbp-tx outline-none"
+                      />
+                      <textarea
+                        value={objectiveDraft.description}
+                        onChange={(event) =>
+                          setObjectiveDraft((current) => ({ ...current, description: event.target.value }))
+                        }
+                        placeholder="Descrição"
+                        aria-label="Descrição do objetivo"
+                        rows={2}
+                        className="mb-2 w-full resize-y rounded-lg border border-nbp-bd bg-nbp-fill px-2.5 py-2 text-[0.82rem] text-nbp-tx outline-none"
+                      />
+                      <p className="mt-1 mb-2 text-[0.72rem] font-medium tracking-[0.08em] text-nbp-tx3 uppercase">
+                        Tarefas já criadas
+                      </p>
+                      {objectives.filter((item) => item.kind === "task").length === 0 ? (
+                        <p className="m-0 mb-3 text-[0.78rem] text-nbp-tx2">
+                          Cria as tarefas na etapa. Depois marca aqui as que pertencem a este objetivo.
+                        </p>
+                      ) : (
+                        <div className="mb-3 max-h-40 space-y-1.5 overflow-y-auto">
+                          {objectives
+                            .filter((item) => item.kind === "task")
+                            .map((task) => {
+                              const stageName = stages.find((stage) => stage.id === task.stage_id)?.name;
+                              const currentGoal = objectives.find((item) => item.id === task.objective_id);
+                              const checked = objectiveDraft.taskIds.includes(task.id);
+                              return (
+                                <label key={task.id} className="flex cursor-pointer items-start gap-2 text-[0.8rem] text-nbp-tx">
+                                  <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() =>
+                                      setObjectiveDraft((current) => ({
+                                        ...current,
+                                        taskIds: checked
+                                          ? current.taskIds.filter((id) => id !== task.id)
+                                          : [...current.taskIds, task.id],
+                                      }))
+                                    }
+                                    className="mt-1"
+                                  />
+                                  <span className="min-w-0">
+                                    {task.title}
+                                    <span className="block text-[0.72rem] text-nbp-tx3">
+                                      {stageName ?? "Sem etapa"}
+                                      {currentGoal ? ` · ${currentGoal.title}` : ""}
+                                    </span>
+                                  </span>
+                                </label>
+                              );
+                            })}
+                        </div>
+                      )}
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={addSavedObjective}
+                          className="flex-1 rounded-lg border border-nbp-bd2 bg-nbp-tx px-2 py-2 text-[0.82rem] font-semibold text-[#181818]"
+                        >
+                          Guardar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAddingObjective(false);
+                            setObjectiveDraft(emptyObjective());
+                          }}
+                          className="border-0 bg-transparent px-2.5 py-2 text-[0.82rem] text-nbp-tx2"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+                  {col.id === "none" && !addingObjective ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAddingObjective(true);
+                        setObjectiveDraft(emptyObjective());
+                        setError(null);
+                      }}
+                      className="flex w-full items-center gap-2 border-0 bg-transparent px-1 py-2.5 text-left text-[0.88rem] text-nbp-tx2 hover:text-nbp-tx"
+                    >
+                      <Fa name="fa-plus" /> Objetivo
+                    </button>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mb-3 flex flex-wrap items-center gap-2.5">
+            <h3 className="m-0 text-base font-semibold text-nbp-tx">Tarefas de {monthName}</h3>
+            <Button type="button" variant="ghost" size="sm" onClick={addSavedStage}>
+              <Fa name="fa-plus" /> Etapa
+            </Button>
+          </div>
+          <Panel>
             {stages.length === 0 ? (
               <p className="m-0 text-nbp-tx3">Sem etapas neste mês.</p>
             ) : (
               <div className="flex gap-3 overflow-x-auto pb-1">
                 {stages.map((stage) => {
-                  const cards = objectives.filter((objective) => objective.stage_id === stage.id);
+                  const cards = objectives.filter((objective) => objective.kind === "task" && objective.stage_id === stage.id);
+                  const goals = objectives.filter((objective) => objective.kind !== "task");
                   return (
                     <div
                       key={stage.id}
-                      className="w-[240px] shrink-0 rounded-xl border border-nbp-bd bg-nbp-bg p-3"
+                      className="w-[250px] shrink-0 rounded-xl border border-nbp-bd bg-nbp-bg p-3"
+                      onDragOver={(event) => event.preventDefault()}
+                      onDrop={(event) => {
+                        event.preventDefault();
+                        const id = event.dataTransfer.getData("text/plain");
+                        if (id) moveSavedToStage(id, stage.id);
+                      }}
                     >
-                      <div className="mb-3 flex items-center justify-between gap-2">
-                        <span className="text-[0.86rem] font-semibold text-nbp-tx">{stage.name}</span>
-                        <span className="text-[0.74rem] text-nbp-tx3">{cards.length}</span>
+                      <div className="mb-3 flex items-center gap-2">
+                        <input
+                          value={stage.name}
+                          aria-label={`Nome da etapa ${stage.name}`}
+                          onChange={(event) => renameSavedStage(stage.id, event.target.value)}
+                          className="min-w-0 flex-1 border-0 bg-transparent p-0 text-[0.86rem] font-semibold text-nbp-tx outline-none"
+                        />
+                        <span className="text-[0.74rem] text-nbp-tx3 tabular-nums">{cards.length}</span>
+                        <button
+                          type="button"
+                          aria-label={`Excluir etapa ${stage.name}`}
+                          onClick={() =>
+                            askConfirm({
+                              title: "Excluir etapa",
+                              body: `Queres excluir «${stage.name}»? As tarefas desta etapa também saem.`,
+                              confirmLabel: "Excluir etapa",
+                              run: () => removeSavedStage(stage.id),
+                            })
+                          }
+                          className="cursor-pointer border-0 bg-transparent p-1 text-nbp-tx3 hover:text-nbp-tx"
+                        >
+                          <Fa name="fa-xmark" />
+                        </button>
                       </div>
-                      {cards.length === 0 ? (
-                        <p className="m-0 text-[0.8rem] text-nbp-tx3">Sem tarefas nesta etapa.</p>
-                      ) : (
-                        cards.map((objective) => (
+                      {cards.length === 0 && composingStage !== stage.id ? (
+                        <p className="m-0 px-1 py-3 text-[0.8rem] text-nbp-tx3">Larga uma tarefa aqui</p>
+                      ) : null}
+                      {cards.map((objective) => {
+                        const done = objective.column === "done";
+                        const editing = editingTask === objective.id;
+                        const parent = goals.find((goal) => goal.id === objective.objective_id);
+                        const tone = parent ? objectiveTone(parent.id, goals) : "#8A8B82";
+                        return (
                           <div
                             key={objective.id}
-                            className="mb-2 rounded-[10px] border border-nbp-bd bg-nbp-sup2 px-2.5 py-2 text-[0.84rem] text-nbp-tx"
+                            draggable={!editing}
+                            onDragStart={(event) => event.dataTransfer.setData("text/plain", objective.id)}
+                            className="mb-2 rounded-[10px] border border-nbp-bd bg-nbp-sup2"
+                            style={{ boxShadow: `inset 3px 0 0 ${tone}` }}
                           >
-                            <span className="block">{objective.title}</span>
-                            {objective.description ? (
-                              <span className="mt-1 block text-[0.78rem] leading-snug text-nbp-tx2">
-                                {objective.description}
-                              </span>
-                            ) : null}
+                            <div className="flex items-start gap-0.5">
+                              <button
+                                type="button"
+                                className={`shrink-0 border-0 bg-transparent py-3 pr-2 pl-2.5 ${
+                                  done ? "text-[#3FBE93]" : "text-nbp-tx3"
+                                }`}
+                                aria-label={done ? "Reabrir" : "Concluir"}
+                                onClick={() => moveSavedColumn(objective.id, done ? "none" : "done")}
+                              >
+                                <Fa name={done ? "fa-circle-check" : "fa-circle"} regular={!done} />
+                              </button>
+                              {editing ? (
+                                <div className="min-w-0 flex-1 py-2 pr-1">
+                                  <select
+                                    value={objective.objective_id ?? ""}
+                                    aria-label={`Objetivo da tarefa ${objective.title}`}
+                                    onChange={(event) =>
+                                      updateSavedTask(objective.id, { objective_id: event.target.value || null })
+                                    }
+                                    className="mb-1 h-8 w-full rounded-lg border border-nbp-bd bg-nbp-fill px-2 text-[0.78rem] text-nbp-tx outline-none"
+                                  >
+                                    <option value="">Escolhe o objetivo</option>
+                                    {goals.map((goal) => (
+                                      <option key={goal.id} value={goal.id}>
+                                        {goal.title}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <input
+                                    value={objective.title}
+                                    aria-label={`Título da tarefa ${objective.title}`}
+                                    onChange={(event) => updateSavedTask(objective.id, { title: event.target.value })}
+                                    className="mb-1 w-full rounded-lg border border-nbp-bd bg-nbp-fill px-2 py-1.5 text-[0.84rem] text-nbp-tx outline-none"
+                                  />
+                                  <textarea
+                                    value={objective.description ?? ""}
+                                    aria-label={`Descrição da tarefa ${objective.title}`}
+                                    rows={2}
+                                    onChange={(event) =>
+                                      updateSavedTask(objective.id, { description: event.target.value || null })
+                                    }
+                                    placeholder="Descrição"
+                                    className="w-full resize-y rounded-lg border border-nbp-bd bg-nbp-fill px-2 py-1.5 text-[0.78rem] text-nbp-tx2 outline-none"
+                                  />
+                                </div>
+                              ) : (
+                                <span className="min-w-0 flex-1 py-3 pr-1">
+                                  <span className="mb-1 block text-[0.66rem] font-medium tracking-[0.08em] uppercase" style={{ color: tone }}>
+                                    {parent ? parent.title : "Sem objetivo"}
+                                  </span>
+                                  <span
+                                    className={`block text-[0.88rem] leading-normal ${
+                                      done ? "text-nbp-tx3 line-through" : "text-nbp-tx"
+                                    }`}
+                                  >
+                                    {objective.title}
+                                  </span>
+                                  {objective.description ? (
+                                    <span className="mt-1 block text-[0.78rem] leading-snug text-nbp-tx2">
+                                      {objective.description}
+                                    </span>
+                                  ) : null}
+                                </span>
+                              )}
+                              <button
+                                type="button"
+                                aria-label={editing ? "Fechar edição" : `Editar tarefa ${objective.title}`}
+                                onClick={() => setEditingTask(editing ? null : objective.id)}
+                                className="shrink-0 border-0 bg-transparent py-3 pr-1 pl-1 text-nbp-tx3 hover:text-nbp-tx"
+                              >
+                                <Fa name={editing ? "fa-check" : "fa-pen"} />
+                              </button>
+                              <button
+                                type="button"
+                                aria-label={`Excluir tarefa ${objective.title}`}
+                                onClick={() =>
+                                  askConfirm({
+                                    title: "Excluir tarefa",
+                                    body: `Queres excluir «${objective.title}»?`,
+                                    confirmLabel: "Excluir tarefa",
+                                    run: () => removeSavedTask(objective.id),
+                                  })
+                                }
+                                className="shrink-0 border-0 bg-transparent py-3 pr-2.5 pl-1 text-nbp-tx3 hover:text-nbp-tx"
+                              >
+                                <Fa name="fa-xmark" />
+                              </button>
+                            </div>
                           </div>
-                        ))
+                        );
+                      })}
+                      {composingStage === stage.id ? (
+                        <div className="mt-1 rounded-[10px] border border-nbp-bd bg-nbp-sup2 p-3">
+                          {goals.length === 0 ? (
+                            <p className="m-0 mb-2 text-[0.8rem] text-nbp-tx2">
+                              Cria um objetivo primeiro. A tarefa fica ligada a ele.
+                            </p>
+                          ) : (
+                            <>
+                              <label className="mb-1 block text-[0.72rem] text-nbp-tx3" htmlFor={`goal-${stage.id}`}>
+                                Objetivo desta tarefa
+                              </label>
+                              <select
+                                id={`goal-${stage.id}`}
+                                value={(taskDraft[stage.id] ?? emptyComposer()).objectiveId}
+                                onChange={(event) =>
+                                  setTaskDraft((current) => ({
+                                    ...current,
+                                    [stage.id]: {
+                                      ...(current[stage.id] ?? emptyComposer()),
+                                      objectiveId: event.target.value,
+                                    },
+                                  }))
+                                }
+                                className="mb-2 h-9 w-full rounded-lg border border-nbp-bd bg-nbp-fill px-2.5 text-[0.82rem] text-nbp-tx outline-none"
+                              >
+                                <option value="">Escolhe o objetivo</option>
+                                {goals.map((goal) => (
+                                  <option key={goal.id} value={goal.id}>
+                                    {goal.title}
+                                  </option>
+                                ))}
+                              </select>
+                              <input
+                                value={(taskDraft[stage.id] ?? emptyComposer()).title}
+                                aria-label={`Nova tarefa em ${stage.name}`}
+                                onChange={(event) =>
+                                  setTaskDraft((current) => ({
+                                    ...current,
+                                    [stage.id]: {
+                                      ...(current[stage.id] ?? emptyComposer()),
+                                      title: event.target.value,
+                                    },
+                                  }))
+                                }
+                                placeholder="Título da tarefa"
+                                className="mb-2 h-9 w-full rounded-lg border border-nbp-bd bg-nbp-fill px-2.5 text-[0.86rem] text-nbp-tx outline-none"
+                              />
+                              <textarea
+                                value={(taskDraft[stage.id] ?? emptyComposer()).description}
+                                aria-label={`Descrição da nova tarefa em ${stage.name}`}
+                                rows={3}
+                                onChange={(event) =>
+                                  setTaskDraft((current) => ({
+                                    ...current,
+                                    [stage.id]: {
+                                      ...(current[stage.id] ?? emptyComposer()),
+                                      description: event.target.value,
+                                    },
+                                  }))
+                                }
+                                placeholder="Descrição: o que fazer, com quem e como saber que ficou feito"
+                                className="mb-2 w-full resize-y rounded-lg border border-nbp-bd bg-nbp-fill px-2.5 py-2 text-[0.82rem] text-nbp-tx outline-none"
+                              />
+                            </>
+                          )}
+                          <div className="flex gap-2">
+                            {goals.length > 0 ? (
+                              <button
+                                type="button"
+                                onClick={() => addSavedTask(stage.id)}
+                                className="flex-1 rounded-lg border border-nbp-bd2 bg-nbp-tx px-2 py-2 text-[0.82rem] font-semibold text-[#181818]"
+                              >
+                                Guardar
+                              </button>
+                            ) : null}
+                            <button
+                              type="button"
+                              onClick={() => setComposingStage(null)}
+                              className="border-0 bg-transparent px-2.5 py-2 text-[0.82rem] text-nbp-tx2"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const only = goals.length === 1 ? goals[0].id : "";
+                            setComposingStage(stage.id);
+                            setTaskDraft((current) => ({
+                              ...current,
+                              [stage.id]: { ...(current[stage.id] ?? emptyComposer()), objectiveId: current[stage.id]?.objectiveId || only },
+                            }));
+                            setError(null);
+                          }}
+                          className="flex w-full items-center gap-2 border-0 bg-transparent px-1 py-2.5 text-left text-[0.88rem] text-nbp-tx2 hover:text-nbp-tx"
+                        >
+                          <Fa name="fa-plus" /> Tarefa
+                        </button>
                       )}
                     </div>
                   );
@@ -953,6 +1611,15 @@ export default function MemberPlanClient({
             }}
           />
         </>
+      ) : null}
+      {confirm ? (
+        <ConfirmDialog
+          title={confirm.title}
+          body={confirm.body}
+          confirmLabel={confirm.confirmLabel}
+          onConfirm={confirm.run}
+          onClose={() => setConfirm(null)}
+        />
       ) : null}
     </>
   );
